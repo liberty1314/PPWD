@@ -1,11 +1,9 @@
-import { request } from '@/utils/request'
 import type { PageResult } from '@/types'
 import type { PasswordEntry, PasswordQueryParams } from '@/types'
 import type { PasswordEntryApiParams } from '@/utils/contentMetadata'
 import { toVaultEntryId, type VaultEntryId } from '../../shared/vaultEntryId'
 import {
   fetchOfflinePasswordEntriesRaw,
-  shouldUseOfflineVault,
   updateOfflinePasswordEntryRaw
 } from '@/api/offlineVaultLocal'
 
@@ -13,10 +11,20 @@ import {
  * 密码库原始 API（不做客户端加解密，供密钥更换时重新加密使用）
  */
 
-export function getPasswordListRawApi(
+export async function getPasswordListRawApi(
   params: PasswordQueryParams = {}
 ): Promise<PageResult<PasswordEntry>> {
-  return request.get<PageResult<PasswordEntry>>('/passwords', { params })
+  const entries = await fetchAllPasswordEntriesRaw()
+  const keyword = params.keyword?.trim().toLocaleLowerCase()
+  const filtered = entries.filter((entry) => {
+    if (params.passwordType && entry.passwordType !== params.passwordType) return false
+    if (!keyword) return true
+    return JSON.stringify(entry.content).toLocaleLowerCase().includes(keyword)
+  })
+  const page = Math.max(1, params.page ?? 1)
+  const pageSize = Math.max(1, params.pageSize ?? 50)
+  const start = (page - 1) * pageSize
+  return { list: filtered.slice(start, start + pageSize), total: filtered.length, page, pageSize }
 }
 
 export function updatePasswordRawApi(
@@ -24,30 +32,10 @@ export function updatePasswordRawApi(
   data: PasswordEntryApiParams
 ): Promise<PasswordEntry> {
   const entryId = toVaultEntryId(id)
-  if (shouldUseOfflineVault()) {
-    return updateOfflinePasswordEntryRaw(entryId, data)
-  }
-  return request.put<PasswordEntry>(`/passwords/${entryId}`, data)
+  return updateOfflinePasswordEntryRaw(entryId, data)
 }
 
-/** 拉取当前用户全部密码条目（原始 content） */
+/** 拉取本地保险库全部密码条目（原始 content） */
 export async function fetchAllPasswordEntriesRaw(): Promise<PasswordEntry[]> {
-  if (shouldUseOfflineVault()) {
-    return fetchOfflinePasswordEntriesRaw()
-  }
-
-  const pageSize = 50
-  let page = 1
-  const all: PasswordEntry[] = []
-
-  while (true) {
-    const data = await getPasswordListRawApi({ page, pageSize })
-    all.push(...data.list.map((entry) => ({ ...entry, id: toVaultEntryId(entry.id) })))
-    if (all.length >= data.total || data.list.length === 0) {
-      break
-    }
-    page += 1
-  }
-
-  return all
+  return fetchOfflinePasswordEntriesRaw()
 }

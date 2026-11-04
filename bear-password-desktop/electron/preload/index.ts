@@ -215,12 +215,11 @@ const offlineVaultApi = {
   getDefaultDataDir: () => ipcRenderer.invoke('offline-vault:getDefaultDataDir') as Promise<string>,
   getSettings: () =>
     ipcRenderer.invoke('offline-vault:getSettings') as Promise<{
-      enabled: boolean
       dataDir: string
     }>,
-  setSettings: (partial: { enabled?: boolean; dataDir?: string }) =>
+  setSettings: (partial: { dataDir?: string }) =>
     ipcRenderer.invoke('offline-vault:setSettings', partial) as Promise<
-      | { ok: true; settings: { enabled: boolean; dataDir: string } }
+      | { ok: true; settings: { dataDir: string } }
       | { ok: false; error: string }
     >,
   pickDataDir: (currentDir?: string) =>

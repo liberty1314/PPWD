@@ -1,29 +1,22 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { OfflineVaultSettings, OfflineVaultSnapshot } from '../../shared/offlineVault'
-import { mergeOfflineVaultSnapshots, normalizeOfflineVaultSnapshot } from '../../shared/offlineVault'
-import { setOfflineVaultModeEnabled, isOfflineVaultApiAvailable } from '@/utils/offlineVaultMode'
-import { fetchAllPasswordEntriesRaw } from '@/api/vaultRaw'
-import { getFavoriteMetaApi } from '@/api/favorites'
-import { getRecentVisitMetaApi } from '@/api/recent'
+import { mergeOfflineVaultSnapshots } from '../../shared/offlineVault'
+import { isLocalVaultApiAvailable } from '@/utils/localVault'
 import { useVaultStore } from '@/stores/vault'
-import type { PasswordEntry } from '@/types'
 
 export const useOfflineVaultStore = defineStore('offlineVault', () => {
-  const enabled = ref(false)
   const dataDir = ref('')
   const defaultDataDir = ref('')
   const initialized = ref(false)
   const saving = ref(false)
 
   function applySettings(settings: OfflineVaultSettings): void {
-    enabled.value = settings.enabled
     dataDir.value = settings.dataDir
-    setOfflineVaultModeEnabled(settings.enabled)
   }
 
   async function loadSettings(): Promise<void> {
-    if (!isOfflineVaultApiAvailable()) {
+    if (!isLocalVaultApiAvailable()) {
       initialized.value = true
       return
     }
@@ -39,7 +32,7 @@ export const useOfflineVaultStore = defineStore('offlineVault', () => {
   }
 
   async function persistSettings(partial: Partial<OfflineVaultSettings>): Promise<boolean> {
-    if (!isOfflineVaultApiAvailable()) return false
+    if (!isLocalVaultApiAvailable()) return false
 
     saving.value = true
     try {
@@ -53,109 +46,50 @@ export const useOfflineVaultStore = defineStore('offlineVault', () => {
   }
 
   async function pickDataDir(): Promise<string | null> {
-    if (!isOfflineVaultApiAvailable()) return null
+    if (!isLocalVaultApiAvailable()) return null
     return window.offlineVaultApi!.pickDataDir(dataDir.value || defaultDataDir.value)
   }
 
-  async function setDataDir(
-    nextDir: string,
-    options: { migrateSnapshot?: unknown } = {}
-  ): Promise<boolean> {
+  async function setDataDir(nextDir: string): Promise<boolean> {
     const trimmed = nextDir.trim()
     if (!trimmed) return false
+    if (dataDir.value === trimmed) return true
 
-    const ok = await persistSettings({ dataDir: trimmed })
-    if (!ok) return false
+    const previousDir = dataDir.value
+    saving.value = true
+    try {
+      const currentSnapshot = (await window.offlineVaultApi!.readSnapshot()) as OfflineVaultSnapshot
+      const switched = await window.offlineVaultApi!.setSettings({ dataDir: trimmed })
+      if (!switched.ok) return false
+      applySettings(switched.settings)
 
-    if (options.migrateSnapshot) {
-      const result = await window.offlineVaultApi!.importSnapshot(options.migrateSnapshot)
-      if (!result.ok) return false
+      const destinationSnapshot = (await window.offlineVaultApi!.readSnapshot()) as OfflineVaultSnapshot
+      const mergedSnapshot = mergeOfflineVaultSnapshots(currentSnapshot, destinationSnapshot)
+      const result = await window.offlineVaultApi!.importSnapshot(mergedSnapshot)
+      if (!result.ok) {
+        if (previousDir) await persistSettings({ dataDir: previousDir })
+        return false
+      }
 
       const vaultStore = useVaultStore()
       vaultStore.reset()
       await vaultStore.refresh()
+      return true
+    } catch {
+      if (previousDir) await persistSettings({ dataDir: previousDir })
+      return false
+    } finally {
+      saving.value = false
     }
-
-    return true
-  }
-
-  async function importCurrentVaultToLocal(): Promise<boolean> {
-    if (!isOfflineVaultApiAvailable()) return false
-
-    const [localSnapshotRaw, serverEntries, favorites, recents] = await Promise.all([
-      window.offlineVaultApi!.readSnapshot(),
-      fetchAllPasswordEntriesRaw(),
-      getFavoriteMetaApi().catch(() => []),
-      getRecentVisitMetaApi().catch(() => [])
-    ])
-
-    const localSnapshot = normalizeOfflineVaultSnapshot(localSnapshotRaw)
-    const serverSnapshot = buildOfflineVaultSnapshot(serverEntries, favorites, recents)
-    const mergedSnapshot = mergeOfflineVaultSnapshots(localSnapshot, serverSnapshot)
-
-    const result = await window.offlineVaultApi!.importSnapshot(mergedSnapshot)
-    return result.ok
-  }
-
-  async function setEnabled(
-    nextEnabled: boolean,
-    options: { migrate?: boolean } = {}
-  ): Promise<boolean> {
-    if (nextEnabled) {
-      if (options.migrate !== false) {
-        const imported = await importCurrentVaultToLocal()
-        if (!imported) return false
-      }
-      const ok = await persistSettings({ enabled: true })
-      if (!ok) return false
-    } else {
-      const ok = await persistSettings({ enabled: false })
-      if (!ok) return false
-    }
-
-    const vaultStore = useVaultStore()
-    vaultStore.reset()
-    await vaultStore.refresh()
-
-    return true
   }
 
   return {
-    enabled,
     dataDir,
     defaultDataDir,
     initialized,
     saving,
     loadSettings,
     pickDataDir,
-    setDataDir,
-    setEnabled,
-    importCurrentVaultToLocal
+    setDataDir
   }
 })
-
-function buildOfflineVaultSnapshot(
-  entries: PasswordEntry[],
-  favorites: Array<{ passwordId: string; time?: string }>,
-  recents: Array<{ passwordId: string; time?: string }>
-): OfflineVaultSnapshot {
-  return {
-    version: 1,
-    nextId: 1,
-    entries: entries.map((entry) => ({
-      id: entry.id,
-      passwordType: entry.passwordType,
-      content: entry.content,
-      createTime: entry.createTime,
-      updateTime: entry.updateTime
-    })),
-    favorites: favorites.map((item) => ({
-      passwordId: item.passwordId,
-      time: item.time
-    })),
-    recentVisits: recents.map((item) => ({
-      passwordId: item.passwordId,
-      time: item.time
-    }))
-  }
-}

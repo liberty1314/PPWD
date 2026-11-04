@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import {
   DEFAULT_OFFLINE_VAULT_SNAPSHOT,
@@ -21,21 +21,41 @@ function readSnapshotFile(dataDir: string): OfflineVaultSnapshot {
   const filePath = getDataFilePath(dataDir)
 
   if (!existsSync(filePath)) {
-    return { ...DEFAULT_OFFLINE_VAULT_SNAPSHOT }
+    return {
+      ...DEFAULT_OFFLINE_VAULT_SNAPSHOT,
+      entries: [],
+      favorites: [],
+      recentVisits: []
+    }
   }
 
   try {
     const raw = JSON.parse(readFileSync(filePath, 'utf-8'))
     return normalizeOfflineVaultSnapshot(raw)
-  } catch {
-    return { ...DEFAULT_OFFLINE_VAULT_SNAPSHOT }
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('本地保险库文件已损坏，未修改原文件。请从备份恢复后重试')
+    }
+    throw error instanceof Error ? error : new Error('读取本地保险库失败')
   }
 }
 
 function writeSnapshotFile(dataDir: string, snapshot: OfflineVaultSnapshot): void {
   ensureOfflineVaultDataDir(dataDir)
   const normalized = normalizeOfflineVaultSnapshot(snapshot)
-  writeFileSync(getDataFilePath(dataDir), JSON.stringify(normalized, null, 2), 'utf-8')
+  const filePath = getDataFilePath(dataDir)
+  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`
+  try {
+    writeFileSync(tempPath, JSON.stringify(normalized, null, 2), 'utf-8')
+    renameSync(tempPath, filePath)
+  } catch (error) {
+    try {
+      unlinkSync(tempPath)
+    } catch {
+      // 临时文件不存在或已被清理。
+    }
+    throw error instanceof Error ? new Error(`保存本地保险库失败：${error.message}`) : new Error('保存本地保险库失败')
+  }
 }
 
 function withSnapshot<T>(dataDir: string, mutate: (snapshot: OfflineVaultSnapshot) => T): T {

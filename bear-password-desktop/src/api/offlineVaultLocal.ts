@@ -1,11 +1,11 @@
 import type { PasswordEntry, PasswordRelationMetaItem } from '@/types'
 import type { PasswordEntryApiParams } from '@/utils/contentMetadata'
 import { toVaultEntryId, type VaultEntryId } from '../../shared/vaultEntryId'
-import { isOfflineVaultApiAvailable, isOfflineVaultMode } from '@/utils/offlineVaultMode'
+import { isLocalVaultApiAvailable } from '@/utils/localVault'
 
 function assertOfflineApi(): void {
-  if (!isOfflineVaultApiAvailable()) {
-    throw new Error('离线存储不可用')
+  if (!isLocalVaultApiAvailable()) {
+    throw new Error('本地保险库不可用，请重启应用后重试')
   }
 }
 
@@ -88,8 +88,4 @@ export async function recordOfflineRecentVisitApi(passwordId: VaultEntryId): Pro
   if (!result.ok) {
     throw new Error(result.error)
   }
-}
-
-export function shouldUseOfflineVault(): boolean {
-  return isOfflineVaultMode() && isOfflineVaultApiAvailable()
 }

@@ -446,3 +446,31 @@
     - scripts/build-all.mjs
     - scripts/release-dir.mjs
     - docs/readme_2611.md
+
+[2026-11-04 16:04] feat(desktop): 将保险库数据层切换为本地存储
+  Body: 将桌面端条目、收藏、最近访问与统计统一改为本地读写，移除离线模式开关并增强快照错误处理与原子写入。同步明确请求层和依赖清理须等待认证重构及设置去账号化完成。
+  Footer: 破坏性变更: 桌面端数据 API 不再访问服务端，历史服务端数据不会自动同步到本地库。
+  Files:
+    - bear-password-desktop/electron/main/offlineVaultConfig.ts
+    - bear-password-desktop/electron/main/offlineVaultStorage.ts
+    - bear-password-desktop/electron/preload/index.ts
+    - bear-password-desktop/shared/offlineVault.d.ts
+    - bear-password-desktop/shared/offlineVault.ts
+    - bear-password-desktop/src/api/dashboard.ts
+    - bear-password-desktop/src/api/favorites.ts
+    - bear-password-desktop/src/api/offlineVaultLocal.ts
+    - bear-password-desktop/src/api/recent.ts
+    - bear-password-desktop/src/api/vault.ts
+    - bear-password-desktop/src/api/vaultRaw.ts
+    - bear-password-desktop/src/components/settings/OfflineVaultSettingsPanel.vue
+    - bear-password-desktop/src/env.d.ts
+    - bear-password-desktop/src/layouts/MainLayout.vue
+    - bear-password-desktop/src/locales/en.ts
+    - bear-password-desktop/src/locales/ja.ts
+    - bear-password-desktop/src/locales/zh-CN.ts
+    - bear-password-desktop/src/stores/offlineVault.ts
+    - bear-password-desktop/src/stores/vault.ts
+    - bear-password-desktop/src/utils/localVault.ts
+    - bear-password-desktop/src/utils/offlineVaultMode.ts
+    - docs/开发计划.md
+    - docs/readme_2611.md

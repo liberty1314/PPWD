@@ -1,6 +1,5 @@
-/** 离线模式配置 */
+/** 本地保险库配置 */
 export interface OfflineVaultSettings {
-  enabled: boolean
   /** 本地数据目录（绝对路径） */
   dataDir: string
 }
@@ -41,24 +40,29 @@ export const DEFAULT_OFFLINE_VAULT_SNAPSHOT: OfflineVaultSnapshot = {
 }
 
 export function normalizeOfflineVaultSettings(
-  raw: Partial<OfflineVaultSettings> | null | undefined,
+  raw: Partial<OfflineVaultSettings> & { enabled?: unknown } | null | undefined,
   defaultDataDir: string
 ): OfflineVaultSettings {
   const dataDir =
     typeof raw?.dataDir === 'string' && raw.dataDir.trim() ? raw.dataDir.trim() : defaultDataDir
 
   return {
-    enabled: raw?.enabled === true,
     dataDir
   }
 }
 
 export function normalizeOfflineVaultSnapshot(raw: unknown): OfflineVaultSnapshot {
   if (!raw || typeof raw !== 'object') {
-    return { ...DEFAULT_OFFLINE_VAULT_SNAPSHOT }
+    throw new Error('本地保险库文件格式无效')
   }
 
   const source = raw as Partial<OfflineVaultSnapshot>
+  if (source.version !== 1) {
+    throw new Error(`不支持的本地保险库版本：${String(source.version ?? '未知')}`)
+  }
+  if (!Array.isArray(source.entries) || !Array.isArray(source.favorites) || !Array.isArray(source.recentVisits)) {
+    throw new Error('本地保险库文件结构不完整')
+  }
   const nextId = typeof source.nextId === 'number' && source.nextId > 0 ? source.nextId : 1
 
   return {

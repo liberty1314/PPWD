@@ -11,7 +11,6 @@ import {
   mapFavoriteMeta,
   mapRecentVisitMeta
 } from '@/utils/vaultEntryLists'
-import { isOfflineVaultMode } from '@/utils/offlineVaultMode'
 import { toVaultEntryId } from '../../shared/vaultEntryId'
 
 /** 后台定时刷新间隔（毫秒） */
@@ -27,7 +26,7 @@ interface RefreshOptions {
 }
 
 /**
- * 密码库全量缓存：从服务器拉取密文后本地解密，收藏/最近访问由缓存 + 元数据组装
+ * 密码库全量缓存：从本地库读取密文后解密，收藏/最近访问由缓存 + 元数据组装
  */
 export const useVaultStore = defineStore('vault', () => {
   const allEntries = ref<PasswordEntry[]>([])
@@ -51,10 +50,6 @@ export const useVaultStore = defineStore('vault', () => {
   const loading = computed(() => initialLoading.value)
 
   function startBackgroundTimer(): void {
-    if (isOfflineVaultMode()) {
-      stopBackgroundTimer()
-      return
-    }
     stopBackgroundTimer()
     backgroundTimer = setInterval(() => {
       if (loaded.value) {

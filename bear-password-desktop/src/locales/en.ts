@@ -307,21 +307,8 @@ const messages: MessageDict = {
   'settings.securityKeyVerifyFailed': 'Verification failed',
   'settings.autoLock': 'Auto-lock when idle',
   'settings.autoLockDesc': 'Lock the vault after inactivity; unlocking requires your master password',
-  'settings.offlineMode': 'Offline mode',
-  'settings.offlineModeDesc': 'When enabled, vault data is read and written only from a local folder—no server requests',
-  'settings.offlineModeEnableConfirm':
-    'Enabling merges local data with the server: matching IDs keep the local copy; new server-only items are added. All changes stay local afterward. Continue?',
-  'settings.offlineModeDisableConfirm':
-    'Disabling will sync from the server again. Local changes will not be uploaded automatically. Continue?',
-  'settings.offlineModeEnabled': 'Offline mode enabled',
-  'settings.offlineModeDisabled': 'Offline mode disabled',
-  'settings.offlineModeSaveFailed': 'Failed to save offline mode settings',
-  'settings.offlineModeEnabledNote':
-    'Offline mode is on: entries, favorites, and recent visits are stored in vault-data.json under the folder above.',
-  'settings.offlineModeDisabledNote':
-    'When offline mode is off, the folder below is used as the default location when you enable it.',
   'settings.offlineDataDir': 'Local data folder',
-  'settings.offlineDataDirDesc': 'Where vault data is stored in offline mode; you can change it anytime',
+  'settings.offlineDataDirDesc': 'Where the local vault is stored; you can change it anytime',
   'settings.offlineDataDirChoose': 'Choose folder',
   'settings.offlineDataDirUnset': 'Not set (default folder will be used)',
   'settings.offlineDataDirChangeConfirm':

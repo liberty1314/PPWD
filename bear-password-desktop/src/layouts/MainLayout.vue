@@ -32,12 +32,6 @@
             </div>
             <div class="main-layout__user-meta">
               <span class="main-layout__username">{{ authStore.displayName }}</span>
-              <span
-                v-if="offlineVaultStore.enabled"
-                class="main-layout__offline-tag"
-              >
-                {{ t('settings.offlineMode') }}
-              </span>
             </div>
           </button>
         </div>
@@ -108,7 +102,6 @@ import { useServerStore } from '@/stores/server'
 import { useSettingsDialogStore } from '@/stores/settingsDialog'
 import { useVersionStore } from '@/stores/version'
 import { useVaultStore } from '@/stores/vault'
-import { useOfflineVaultStore } from '@/stores/offlineVault'
 import { preloadVaultViewChunk } from '@/utils/vaultViewPreload'
 import { useAutoLockActivity } from '@/composables/useAutoLockActivity'
 import { useI18n } from '@/composables/useI18n'
@@ -121,7 +114,6 @@ const serverStore = useServerStore()
 const settingsDialog = useSettingsDialogStore()
 const versionStore = useVersionStore()
 const vaultStore = useVaultStore()
-const offlineVaultStore = useOfflineVaultStore()
 const route = useRoute()
 
 const VAULT_PAGE_NAMES = new Set(['Vault', 'Favorites', 'Recent'])
@@ -229,9 +221,6 @@ onMounted(() => {
     .then((profile) => authStore.syncProfile(profile))
     .catch(() => {})
   void versionStore.checkForUpdate()
-  if (!offlineVaultStore.initialized) {
-    void offlineVaultStore.loadSettings()
-  }
 })
 
 onUnmounted(() => {

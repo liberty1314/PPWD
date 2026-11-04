@@ -1,19 +1,6 @@
 <template>
   <div class="offline-vault-settings">
-    <div class="offline-vault-settings__row offline-vault-settings__row--toggle">
-      <div class="offline-vault-settings__row-label">
-        <span>{{ t('settings.offlineMode') }}</span>
-        <small>{{ t('settings.offlineModeDesc') }}</small>
-      </div>
-      <el-switch
-        :model-value="offlineVaultStore.enabled"
-        :loading="toggling"
-        :disabled="!available || offlineVaultStore.saving || securityStore.isMigrating"
-        @change="handleToggle"
-      />
-    </div>
-
-    <div v-if="offlineVaultStore.enabled" class="offline-vault-settings__panel">
+    <div class="offline-vault-settings__panel">
       <div class="offline-vault-settings__row-label">
         <span>{{ t('settings.offlineDataDir') }}</span>
         <small>{{ t('settings.offlineDataDirDesc') }}</small>
@@ -30,35 +17,28 @@
         <el-button
           size="large"
           class="offline-vault-settings__dir-btn"
-          :disabled="!available || offlineVaultStore.saving || securityStore.isMigrating"
+          :disabled="!available || offlineVaultStore.saving"
           @click="handlePickDir"
         >
           {{ t('settings.offlineDataDirChoose') }}
         </el-button>
       </div>
 
-      <p class="offline-vault-settings__note">
-        {{ t('settings.offlineModeEnabledNote') }}
-      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useI18n } from '@/composables/useI18n'
 import { useOfflineVaultStore } from '@/stores/offlineVault'
-import { useSecurityStore } from '@/stores/security'
-import { isOfflineVaultApiAvailable } from '@/utils/offlineVaultMode'
+import { isLocalVaultApiAvailable } from '@/utils/localVault'
 import { settingsMessageBoxConfirm } from '@/utils/settingsMessageBox'
 
 const { t } = useI18n()
 const offlineVaultStore = useOfflineVaultStore()
-const securityStore = useSecurityStore()
-
-const toggling = ref(false)
-const available = computed(() => isOfflineVaultApiAvailable())
+const available = computed(() => isLocalVaultApiAvailable())
 
 const displayDataDir = computed(
   () => offlineVaultStore.dataDir || offlineVaultStore.defaultDataDir || t('settings.offlineDataDirUnset')
@@ -70,83 +50,27 @@ onMounted(async () => {
   }
 })
 
-async function handleToggle(next: string | number | boolean): Promise<void> {
-  const enabled = next === true
-  if (enabled === offlineVaultStore.enabled) return
-
-  try {
-    if (enabled) {
-      await settingsMessageBoxConfirm(
-        t('settings.offlineModeEnableConfirm'),
-        t('settings.offlineMode'),
-        {
-          confirmButtonText: t('msg.confirm'),
-          cancelButtonText: t('msg.cancel'),
-          type: 'warning'
-        }
-      )
-    } else {
-      await settingsMessageBoxConfirm(
-        t('settings.offlineModeDisableConfirm'),
-        t('settings.offlineMode'),
-        {
-          confirmButtonText: t('msg.confirm'),
-          cancelButtonText: t('msg.cancel'),
-          type: 'warning'
-        }
-      )
-    }
-  } catch {
-    return
-  }
-
-  toggling.value = true
-  try {
-    const ok = await offlineVaultStore.setEnabled(enabled)
-    if (!ok) {
-      ElMessage.error(t('settings.offlineModeSaveFailed'))
-      return
-    }
-    ElMessage.success(enabled ? t('settings.offlineModeEnabled') : t('settings.offlineModeDisabled'))
-  } catch (error) {
-    const message = error instanceof Error ? error.message : t('settings.offlineModeSaveFailed')
-    ElMessage.error(message)
-  } finally {
-    toggling.value = false
-  }
-}
-
 async function handlePickDir(): Promise<void> {
-  let snapshotToMigrate: unknown = null
-
-  if (offlineVaultStore.enabled) {
-    snapshotToMigrate = await window.offlineVaultApi?.readSnapshot()
-  }
-
   const picked = await offlineVaultStore.pickDataDir()
   if (!picked) return
 
   if (picked === offlineVaultStore.dataDir) return
 
-  if (offlineVaultStore.enabled) {
-    try {
-      await settingsMessageBoxConfirm(
-        t('settings.offlineDataDirChangeConfirm'),
-        t('settings.offlineDataDir'),
-        {
-          confirmButtonText: t('msg.confirm'),
-          cancelButtonText: t('msg.cancel'),
-          type: 'warning'
-        }
-      )
-    } catch {
-      return
-    }
+  try {
+    await settingsMessageBoxConfirm(
+      t('settings.offlineDataDirChangeConfirm'),
+      t('settings.offlineDataDir'),
+      {
+        confirmButtonText: t('msg.confirm'),
+        cancelButtonText: t('msg.cancel'),
+        type: 'warning'
+      }
+    )
+  } catch {
+    return
   }
 
-  const ok = await offlineVaultStore.setDataDir(picked, {
-    migrateSnapshot: offlineVaultStore.enabled ? snapshotToMigrate : undefined
-  })
+  const ok = await offlineVaultStore.setDataDir(picked)
   if (!ok) {
     ElMessage.error(t('settings.offlineDataDirSaveFailed'))
     return

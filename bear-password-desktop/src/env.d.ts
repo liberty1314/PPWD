@@ -183,7 +183,6 @@ interface ExtensionBridgeApi {
 }
 
 interface OfflineVaultSettingsState {
-  enabled: boolean
   dataDir: string
 }
 

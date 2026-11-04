@@ -1,6 +1,5 @@
-/** 离线模式配置 */
+/** 本地保险库配置 */
 export interface OfflineVaultSettings {
-    enabled: boolean;
     /** 本地数据目录（绝对路径） */
     dataDir: string;
 }
@@ -27,7 +26,9 @@ export interface OfflineVaultSnapshot {
 export declare const OFFLINE_VAULT_DATA_FILE = "vault-data.json";
 export declare const OFFLINE_VAULT_SETTINGS_FILE = "offline-vault-settings.json";
 export declare const DEFAULT_OFFLINE_VAULT_SNAPSHOT: OfflineVaultSnapshot;
-export declare function normalizeOfflineVaultSettings(raw: Partial<OfflineVaultSettings> | null | undefined, defaultDataDir: string): OfflineVaultSettings;
+export declare function normalizeOfflineVaultSettings(raw: (Partial<OfflineVaultSettings> & {
+    enabled?: unknown;
+}) | null | undefined, defaultDataDir: string): OfflineVaultSettings;
 export declare function normalizeOfflineVaultSnapshot(raw: unknown): OfflineVaultSnapshot;
 /**
  * 合并离线快照：相同 ID 以本地为准，仅补充对方独有的条目与元数据。
