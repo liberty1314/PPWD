@@ -581,7 +581,6 @@ import {
   getPasswordTypeFilterOptions,
   getPasswordTypeLabel
 } from '@/utils/passwordTypeI18n'
-import { useServerStore } from '@/stores/server'
 import { useSecurityStore } from '@/stores/security'
 import { useTrayStore } from '@/stores/tray'
 import { useVaultStore } from '@/stores/vault'
@@ -655,7 +654,6 @@ const LIST_SCROLL_THRESHOLD = 120
 
 const route = useRoute()
 const { t, locale } = useI18n()
-const serverStore = useServerStore()
 const securityStore = useSecurityStore()
 const trayStore = useTrayStore()
 const vaultStore = useVaultStore()
@@ -874,14 +872,6 @@ watch(
     exitSelectionMode()
     keyword.value = ''
     filterType.value = ''
-  }
-)
-
-watch(
-  () => serverStore.revision,
-  () => {
-    vaultStore.reset()
-    void vaultStore.ensureLoaded()
   }
 )
 

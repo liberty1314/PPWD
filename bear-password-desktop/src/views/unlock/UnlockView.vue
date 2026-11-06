@@ -2,14 +2,14 @@
   <main class="gate-page">
     <section class="gate-panel" aria-labelledby="unlock-title">
       <AppLogo size="md" />
-      <p class="gate-eyebrow">本机保险库</p>
-      <h1 id="unlock-title">解锁</h1>
+      <p class="gate-eyebrow">{{ t('unlock.localVault') }}</p>
+      <h1 id="unlock-title">{{ t('unlock.title') }}</h1>
       <p v-if="biometricSettingsLoaded" class="gate-copy">
-        {{ biometricOnlyMode ? '使用系统生物识别解锁，或切换为手机验证器动态码。' : '输入手机验证器当前显示的 6 位动态码。' }}
+        {{ biometricOnlyMode ? t('unlock.biometricHint') : t('unlock.totpHint') }}
       </p>
-      <p v-else class="gate-copy" role="status">正在检查生物识别状态…</p>
+      <p v-else class="gate-copy" role="status">{{ t('unlock.checkingBiometric') }}</p>
       <p v-if="biometricSettingsLoaded && biometricEnabled && !biometricAvailable" class="gate-notice" role="status">
-        生物识别当前不可用，请使用手机动态码解锁。
+        {{ t('unlock.biometricUnavailable') }}
       </p>
       <el-button
         v-if="biometricOnlyMode"
@@ -21,20 +21,20 @@
       >
         {{ biometricLabel }}
       </el-button>
-      <div v-if="biometricOnlyMode" class="gate-divider"><span>或</span></div>
+      <div v-if="biometricOnlyMode" class="gate-divider"><span>{{ t('unlock.or') }}</span></div>
       <el-form v-if="biometricSettingsLoaded && !biometricOnlyMode" label-position="top" @submit.prevent="submit">
-        <el-form-item label="6 位动态码">
+        <el-form-item :label="t('unlock.tokenCode')">
           <el-input v-model="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" :disabled="loading" @keyup.enter="submit" />
         </el-form-item>
         <p v-if="error" class="gate-error" role="alert">{{ error }}</p>
         <el-button type="primary" size="large" class="gate-primary" :loading="loading" @click="submit">
-          使用动态码解锁
+          {{ t('unlock.totpUnlock') }}
         </el-button>
       </el-form>
-      <el-button v-if="biometricOnlyMode" text class="gate-switch" @click="showTotpFallback = true">改用动态码</el-button>
-      <el-button v-else-if="biometricAvailable && biometricEnabled" text class="gate-switch" @click="switchToBiometric">改用生物识别</el-button>
+      <el-button v-if="biometricOnlyMode" text class="gate-switch" @click="showTotpFallback = true">{{ t('unlock.useTotp') }}</el-button>
+      <el-button v-else-if="biometricAvailable && biometricEnabled" text class="gate-switch" @click="switchToBiometric">{{ t('unlock.useBiometric') }}</el-button>
       <div class="gate-links">
-        <el-button text @click="router.push({ name: 'Recover' })">恢复访问</el-button>
+        <el-button text @click="router.push({ name: 'Recover' })">{{ t('unlock.recoverAccess') }}</el-button>
       </div>
     </section>
   </main>
@@ -47,8 +47,10 @@ import AppLogo from '@/components/common/AppLogo.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useBiometricUnlockStore } from '@/stores/biometricUnlock'
+import { useI18n } from '@/composables/useI18n'
 
 const router = useRouter()
+const { t } = useI18n()
 const authStore = useAuthStore()
 const autoLockStore = useAutoLockStore()
 const biometricStore = useBiometricUnlockStore()
@@ -62,7 +64,7 @@ const biometricAvailable = ref(false)
 const biometricKind = ref<'touchId' | 'windowsHello' | null>(null)
 const biometricEnabled = computed(() => biometricStore.preferBiometricUnlock)
 const biometricOnlyMode = computed(() => biometricAvailable.value && biometricEnabled.value && !showTotpFallback.value)
-const biometricLabel = computed(() => biometricKind.value === 'touchId' ? '使用 Touch ID' : '使用 Windows Hello')
+const biometricLabel = computed(() => biometricKind.value === 'touchId' ? t('unlock.touchId') : t('unlock.windowsHello'))
 
 onMounted(async () => {
   try {
@@ -99,16 +101,16 @@ async function submit(): Promise<void> {
     const result = await window.phoneTokenApi!.verify(code.value)
     if (!result.ok) {
       error.value = result.reason === 'unavailable'
-        ? '系统安全存储不可用，无法解锁'
+        ? t('unlock.storageUnavailable')
         : result.reason === 'locked'
-          ? '尝试次数过多，请稍后再试'
-          : '验证失败'
+          ? t('unlock.tooManyAttempts')
+          : t('unlock.verificationFailed')
       code.value = ''
       return
     }
     await completeUnlock(result.vuk)
   } catch {
-    error.value = '验证失败'
+    error.value = t('unlock.verificationFailed')
   } finally {
     loading.value = false
   }
@@ -119,11 +121,11 @@ async function unlockBiometric(): Promise<void> {
   biometricLoading.value = true
   error.value = ''
   try {
-    const result = await window.localVaultApi!.biometricUnlock('解锁 BearPassword 保险库')
+    const result = await window.localVaultApi!.biometricUnlock(t('unlock.title'))
     if (!result.ok) {
       error.value = result.reason === 'canceled'
           ? ''
-          : '生物识别解锁失败'
+          : t('unlock.biometricFailed')
       if (result.reason !== 'canceled') showTotpFallback.value = true
       return
     }
@@ -131,7 +133,7 @@ async function unlockBiometric(): Promise<void> {
     autoLockStore.unlock()
     void router.replace({ name: 'Dashboard' })
   } catch {
-    error.value = '生物识别解锁失败'
+    error.value = t('unlock.biometricFailed')
     showTotpFallback.value = true
   } finally {
     biometricLoading.value = false

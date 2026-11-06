@@ -6,19 +6,6 @@
       <p class="dashboard-view__desc">{{ t('dashboard.tagline') }}</p>
     </header>
 
-    <div
-      v-if="versionStore.hasUpdate"
-      class="dashboard-view__update-banner"
-    >
-      <div class="dashboard-view__update-text">
-        <h3>{{ t('dashboard.updateTitle') }}</h3>
-        <p>{{ t('dashboard.updateBody', { version: versionStore.latestVersion }) }}</p>
-      </div>
-      <button type="button" class="dashboard-view__action" @click="versionStore.openDownload">
-        {{ t('dashboard.updateDownload') }}
-      </button>
-    </div>
-
     <div class="dashboard-view__stats">
       <StatCard
         :label="t('dashboard.totalPasswords')"
@@ -78,17 +65,6 @@
         </div>
       </div>
 
-      <div
-        v-if="!securityStore.hasSecurityKey"
-        class="dashboard-view__tip-card dashboard-view__tip-card--wide"
-      >
-        <div class="dashboard-view__tip-card-head">
-          <h3>{{ t('dashboard.securityKeyAlertTitle') }}</h3>
-        </div>
-        <p class="dashboard-view__tip-lead">{{ t('dashboard.securityKeyAlertWarning') }}</p>
-        <h4 class="dashboard-view__tip-subtitle">{{ t('dashboard.securityKeyExplainTitle') }}</h4>
-        <p>{{ t('dashboard.securityKeyExplainBody') }}</p>
-      </div>
     </div>
   </div>
 </template>
@@ -103,7 +79,6 @@ import type { DashboardStats } from '@/types'
 import { useI18n } from '@/composables/useI18n'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useSecurityStore } from '@/stores/security'
-import { useVersionStore } from '@/stores/version'
 import { openVaultCreate, openVaultImport } from '@/utils/vaultQuickSearch'
 import { appMessageBoxConfirm } from '@/utils/appMessageBox'
 import { buildChromePasswordCsv } from '@/utils/passwordExport'
@@ -113,7 +88,6 @@ import { resolveEntryType } from '@/utils/vaultEntryDisplay'
 const router = useRouter()
 const autoLockStore = useAutoLockStore()
 const securityStore = useSecurityStore()
-const versionStore = useVersionStore()
 const { t } = useI18n()
 const loading = ref(true)
 const exporting = ref(false)

@@ -684,6 +684,30 @@ function registerFileIpc(): void {
       return { ok: true as const, filePath: result.filePath }
     }
   )
+
+  ipcMain.handle('file:pickEncryptedVaultBackup', async () => {
+    const parent = mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined
+    const result = await dialog.showOpenDialog(parent, {
+      title: '选择 BearPassword 加密备份',
+      filters: [{ name: 'BearPassword Backup', extensions: ['bpbackup'] }],
+      properties: ['openFile']
+    })
+    if (result.canceled || !result.filePaths.length) return null
+    const filePath = result.filePaths[0]
+    return { fileName: basename(filePath), content: await readFile(filePath, 'utf-8') }
+  })
+
+  ipcMain.handle('file:saveEncryptedVaultBackup', async (_event, payload: { content: string }) => {
+    const parent = mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined
+    const result = await dialog.showSaveDialog(parent, {
+      title: '保存 BearPassword 加密备份',
+      defaultPath: 'BearPassword-backup.bpbackup',
+      filters: [{ name: 'BearPassword Backup', extensions: ['bpbackup'] }]
+    })
+    if (result.canceled || !result.filePath) return { ok: false as const, canceled: true as const }
+    await writeFile(result.filePath, payload.content, { encoding: 'utf-8', mode: 0o600 })
+    return { ok: true as const, filePath: result.filePath }
+  })
 }
 
 /** 注册生物识别解锁 IPC（Touch ID / Windows Hello） */

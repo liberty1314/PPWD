@@ -537,3 +537,61 @@
     - bear-password-desktop/src/utils/offlineVaultMode.ts
     - docs/开发计划.md
     - docs/readme_2611.md
+
+[2026-11-06 17:10] feat(desktop): 完善本地设置、加密备份与账号功能清理
+  Body: 设置页新增手机令牌管理、加密备份导入导出和清空保险库确认，补齐本地解锁流程的中英日文案。移除桌面端无调用方的服务端认证、更新与公告代码，并同步阶段 2 人工验收状态。
+  Footer: 破坏性变更: 桌面端不再提供服务端账号认证与同步路径；本地版不承诺旧云端数据迁移。
+  Files:
+    - bear-password-desktop/electron.vite.config.ts
+    - bear-password-desktop/electron/main/index.ts
+    - bear-password-desktop/electron/main/phoneTokenIpc.ts
+    - bear-password-desktop/electron/main/phoneTokenStorage.ts
+    - bear-password-desktop/electron/main/updater.ts
+    - bear-password-desktop/electron/main/vaultUnlockKeyStorage.ts
+    - bear-password-desktop/electron/preload/index.ts
+    - bear-password-desktop/package.json
+    - bear-password-desktop/pnpm-lock.yaml
+    - bear-password-desktop/shared/offlineVault.ts
+    - bear-password-desktop/shared/updater.ts
+    - bear-password-desktop/src/api/announcement.ts
+    - bear-password-desktop/src/api/auth.ts
+    - bear-password-desktop/src/api/health.ts
+    - bear-password-desktop/src/api/index.ts
+    - bear-password-desktop/src/api/mfa.ts
+    - bear-password-desktop/src/api/srpAuth.ts
+    - bear-password-desktop/src/api/version.ts
+    - bear-password-desktop/src/components/common/AnnouncementDialog.vue
+    - bear-password-desktop/src/components/settings/MfaSettingsPanel.vue
+    - bear-password-desktop/src/components/settings/VaultBackupSettingsPanel.vue
+    - bear-password-desktop/src/env.d.ts
+    - bear-password-desktop/src/locales/en.ts
+    - bear-password-desktop/src/locales/ja.ts
+    - bear-password-desktop/src/locales/zh-CN.ts
+    - bear-password-desktop/src/stores/server.ts
+    - bear-password-desktop/src/stores/version.ts
+    - bear-password-desktop/src/types/announcement.ts
+    - bear-password-desktop/src/types/auth.ts
+    - bear-password-desktop/src/types/health.ts
+    - bear-password-desktop/src/types/index.ts
+    - bear-password-desktop/src/types/version.ts
+    - bear-password-desktop/src/utils/apiErrorMessage.ts
+    - bear-password-desktop/src/utils/encryptedVaultBackup.ts
+    - bear-password-desktop/src/utils/markdown.ts
+    - bear-password-desktop/src/utils/request.ts
+    - bear-password-desktop/src/utils/serverUrl.ts
+    - bear-password-desktop/src/utils/srp/srpClient.ts
+    - bear-password-desktop/src/utils/versionCompare.ts
+    - bear-password-desktop/src/views/dashboard/DashboardView.vue
+    - bear-password-desktop/src/views/settings/SettingsView.vue
+    - bear-password-desktop/src/views/unlock/BindView.vue
+    - bear-password-desktop/src/views/unlock/RecoverView.vue
+    - bear-password-desktop/src/views/unlock/SetupView.vue
+    - bear-password-desktop/src/views/unlock/UnlockView.vue
+    - bear-password-desktop/src/views/vault/VaultView.vue
+    - bear-password-desktop/tests/encryptedVaultBackup.test.mjs
+    - docs/project/development-report-m2.md
+    - docs/project/implementation-plan-m2.md
+    - docs/project/manual-verification-m2.md
+    - docs/project/test-report-m2.md
+    - docs/开发计划.md
+    - docs/readme_2611.md

@@ -28,7 +28,7 @@ import {
   removeStoredRecoveryKey,
   saveStoredRecoveryKey
 } from './recoveryKeyStorage'
-import { loadStoredVaultUnlockKey, saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
+import { loadStoredVaultUnlockKey, removeStoredVaultUnlockKey, saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
 
 const PHONE_TOKEN_FILE = 'phone-token-state.enc'
 const PHONE_TOKEN_AUDIT_FILE = 'phone-token-audit.log'
@@ -444,6 +444,55 @@ export async function recoverPhoneToken(
       tokenVerifiedThisSession = false
       recoveryKeyReadAuthorized = false
       writeAuditEvent('phone_token_recovery_started')
+      return { ok: true }
+    } catch {
+      return { ok: false, reason: 'unavailable' }
+    }
+  })
+}
+
+export async function destroyLocalVault(
+  code: string,
+  masterPassword: string,
+  clearSnapshot: () => void
+): Promise<{ ok: true } | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'unbound' }> {
+  return enqueue(async () => {
+    const now = Date.now()
+    if (!currentAvailability()) return { ok: false, reason: 'unavailable' }
+    let state: PhoneTokenState
+    try {
+      state = readPhoneTokenState()
+    } catch {
+      return { ok: false, reason: 'unavailable' }
+    }
+    if (!state.secret) return { ok: false, reason: 'unbound' }
+    if (state.lockedUntil > now) return { ok: false, reason: 'locked' }
+
+    const acceptedStep = matchPhoneTokenStep(state.secret, code, now, state.lastAcceptedStep)
+    if (acceptedStep === null) {
+      const failure = failureResult(state, now)
+      return { ok: false, reason: failure.reason === 'locked' ? 'locked' : 'invalid' }
+    }
+    state.lastAcceptedStep = acceptedStep
+    writePhoneTokenState(state)
+
+    try {
+      const meta = loadStoredLocalVaultCrypto()
+      const recoveryKey = loadStoredRecoveryKey()
+      if (!meta || !recoveryKey || !(await verifyPasswordAndRecoverKey(masterPassword, recoveryKey, meta))) {
+        const failure = failureResult(state, now)
+        return { ok: false, reason: failure.reason === 'locked' ? 'locked' : 'invalid' }
+      }
+      clearSnapshot()
+      removeStoredRecoveryKey()
+      removeStoredLocalVaultCrypto()
+      await removeStoredVaultUnlockKey()
+      state.secret = null
+      Object.assign(state, resetPhoneTokenFailureState())
+      writePhoneTokenState(state)
+      tokenVerifiedThisSession = false
+      recoveryKeyReadAuthorized = false
+      writeAuditEvent('local_vault_deleted')
       return { ok: true }
     } catch {
       return { ok: false, reason: 'unavailable' }

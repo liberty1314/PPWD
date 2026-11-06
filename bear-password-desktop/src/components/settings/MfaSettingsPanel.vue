@@ -1,30 +1,30 @@
 <template>
   <section class="phone-token-settings" aria-labelledby="phone-token-title">
-    <h3 id="phone-token-title">手机令牌</h3>
+    <h3 id="phone-token-title">{{ t('phoneToken.title') }}</h3>
     <p class="phone-token-settings__status">
-      {{ authStore.hasPhoneTokenBinding ? '已绑定' : '未绑定' }}
-      <span v-if="authStore.status?.fingerprint">· 恢复密钥指纹 {{ authStore.status.fingerprint }}</span>
+      {{ authStore.hasPhoneTokenBinding ? t('phoneToken.bound') : t('phoneToken.unbound') }}
+      <span v-if="authStore.status?.fingerprint">· {{ t('phoneToken.fingerprint', { fingerprint: authStore.status.fingerprint }) }}</span>
     </p>
 
     <div v-if="authStore.hasPhoneTokenBinding" class="phone-token-settings__section">
-      <h4>换绑验证器</h4>
-      <p>先使用旧验证器动态码和主密码验证。旧绑定作废后需完成新的二维码绑定。</p>
-      <el-input v-model="password" type="password" show-password autocomplete="current-password" placeholder="主密码" />
-      <el-input v-model="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="旧验证器 6 位动态码" />
-      <el-button type="primary" :loading="loading" @click="startRebind">验证并换绑</el-button>
+      <h4>{{ t('phoneToken.rebind') }}</h4>
+      <p>{{ t('phoneToken.rebindHint') }}</p>
+      <el-input v-model="password" type="password" show-password autocomplete="current-password" :placeholder="t('phoneToken.masterPassword')" />
+      <el-input v-model="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" :placeholder="t('phoneToken.oldCode')" />
+      <el-button type="primary" :loading="loading" @click="startRebind">{{ t('phoneToken.verifyRebind') }}</el-button>
     </div>
 
     <div v-if="authStore.hasRecoveryKey" class="phone-token-settings__section">
-      <h4>恢复密钥</h4>
-      <p>已配置。查看完整密钥前需再次验证主密码和手机令牌。</p>
+      <h4>{{ t('recoveryKey.title') }}</h4>
+      <p>{{ t('recoveryKey.viewHint') }}</p>
       <template v-if="!revealedKey">
-        <el-input v-model="revealPassword" type="password" show-password autocomplete="current-password" placeholder="主密码" />
-        <el-input v-model="revealCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位动态码" />
-        <el-button :loading="revealing" @click="revealRecoveryKey">验证并查看</el-button>
+        <el-input v-model="revealPassword" type="password" show-password autocomplete="current-password" :placeholder="t('phoneToken.masterPassword')" />
+        <el-input v-model="revealCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" :placeholder="t('phoneToken.code')" />
+        <el-button :loading="revealing" @click="revealRecoveryKey">{{ t('recoveryKey.verifyView') }}</el-button>
       </template>
       <template v-else>
         <el-input :model-value="revealedKey" type="textarea" readonly :rows="3" resize="none" />
-        <el-button @click="clearRevealedKey">隐藏恢复密钥</el-button>
+        <el-button @click="clearRevealedKey">{{ t('recoveryKey.hide') }}</el-button>
       </template>
     </div>
 
@@ -38,10 +38,12 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsDialogStore } from '@/stores/settingsDialog'
+import { useI18n } from '@/composables/useI18n'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const settingsDialog = useSettingsDialogStore()
+const { t } = useI18n()
 const password = ref('')
 const code = ref('')
 const revealPassword = ref('')
@@ -59,10 +61,10 @@ async function startRebind(): Promise<void> {
     const authorized = await window.phoneTokenApi!.rebind(code.value, password.value)
     if (!authorized.ok) {
       error.value = authorized.reason === 'unavailable'
-        ? '系统安全存储不可用'
+        ? t('phoneToken.storageUnavailable')
         : authorized.reason === 'locked'
-          ? '尝试次数过多，请稍后重试'
-          : '验证失败'
+          ? t('phoneToken.locked')
+          : t('phoneToken.verificationFailed')
       code.value = ''
       return
     }
@@ -72,7 +74,7 @@ async function startRebind(): Promise<void> {
     settingsDialog.close()
     void router.replace({ name: 'Bind', query: { rebind: '1' } })
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : '换绑失败'
+    error.value = cause instanceof Error ? cause.message : t('phoneToken.rebindFailed')
   } finally {
     loading.value = false
   }
@@ -86,20 +88,20 @@ async function revealRecoveryKey(): Promise<void> {
     const result = await window.recoveryKeyApi!.authorize(revealCode.value, revealPassword.value)
     if (!result.ok) {
       error.value = result.reason === 'unavailable'
-        ? '系统安全存储不可用'
+        ? t('phoneToken.storageUnavailable')
         : result.reason === 'locked'
-          ? '尝试次数过多，请稍后重试'
-          : '验证失败'
+          ? t('phoneToken.locked')
+          : t('phoneToken.verificationFailed')
       revealCode.value = ''
       return
     }
     const key = await window.recoveryKeyApi!.get()
-    if (!key) throw new Error('恢复密钥读取失败')
+    if (!key) throw new Error(t('recoveryKey.readFailed'))
     revealedKey.value = key
     revealPassword.value = ''
     revealCode.value = ''
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : '恢复密钥读取失败'
+    error.value = cause instanceof Error ? cause.message : t('recoveryKey.readFailed')
   } finally {
     revealing.value = false
   }
@@ -107,7 +109,7 @@ async function revealRecoveryKey(): Promise<void> {
 
 function clearRevealedKey(): void {
   revealedKey.value = ''
-  ElMessage.success('恢复密钥已隐藏')
+  ElMessage.success(t('recoveryKey.hidden'))
 }
 
 onUnmounted(() => {

@@ -42,3 +42,9 @@ export async function saveStoredVaultUnlockKey(vuk: Buffer): Promise<{ ok: true 
     return { ok: false, error: '保险库解锁密钥保存失败' }
   }
 }
+
+export async function removeStoredVaultUnlockKey(): Promise<void> {
+  await unlink(getVaultUnlockKeyPath()).catch((error: NodeJS.ErrnoException) => {
+    if (error.code !== 'ENOENT') throw error
+  })
+}

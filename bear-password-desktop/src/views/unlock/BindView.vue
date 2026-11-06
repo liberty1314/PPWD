@@ -2,24 +2,24 @@
   <main class="gate-page">
     <section class="gate-panel" aria-labelledby="bind-title">
       <AppLogo size="md" />
-      <p class="gate-eyebrow">{{ isRebinding ? '更换验证器' : '首次设置' }}</p>
-      <h1 id="bind-title">绑定手机令牌</h1>
-      <p class="gate-copy">使用手机上的验证器扫描二维码，或手动输入密钥。绑定前请确认主密码和动态码。</p>
-      <p v-if="!storageAvailable" class="gate-warning" role="alert">系统安全存储不可用，无法完成绑定。</p>
-      <div class="bind-qr"><img v-if="qrDataUrl" :src="qrDataUrl" alt="手机令牌绑定二维码" /></div>
-      <label class="gate-label" for="token-secret">手动密钥</label>
+      <p class="gate-eyebrow">{{ isRebinding ? t('unlock.rebind') : t('unlock.firstSetup') }}</p>
+      <h1 id="bind-title">{{ t('unlock.bind') }}</h1>
+      <p class="gate-copy">{{ t('unlock.bindHint') }}</p>
+      <p v-if="!storageAvailable" class="gate-warning" role="alert">{{ t('unlock.storageBindUnavailable') }}</p>
+      <div class="bind-qr"><img v-if="qrDataUrl" :src="qrDataUrl" :alt="t('unlock.bind')" /></div>
+      <label class="gate-label" for="token-secret">{{ t('unlock.manualSecret') }}</label>
       <el-input id="token-secret" :model-value="secret" readonly />
       <el-form label-position="top" class="bind-form" @submit.prevent="submit">
-        <el-form-item label="主密码">
+        <el-form-item :label="t('unlock.masterPassword')">
           <el-input v-model="password" type="password" show-password autocomplete="current-password" :disabled="!storageAvailable || loading" />
         </el-form-item>
-        <el-form-item label="6 位动态码">
+        <el-form-item :label="t('unlock.tokenCode')">
           <el-input v-model="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" :disabled="!storageAvailable || loading" @keyup.enter="submit" />
         </el-form-item>
         <p v-if="error" class="gate-error" role="alert">{{ error }}</p>
-        <el-button type="primary" size="large" class="gate-primary" :disabled="!storageAvailable" :loading="loading" @click="submit">验证并绑定</el-button>
+        <el-button type="primary" size="large" class="gate-primary" :disabled="!storageAvailable" :loading="loading" @click="submit">{{ t('unlock.verifyBind') }}</el-button>
       </el-form>
-      <el-button v-if="!isRebinding" text :disabled="loading" @click="regenerate">重新生成密钥</el-button>
+      <el-button v-if="!isRebinding" text :disabled="loading" @click="regenerate">{{ t('unlock.regenerateSecret') }}</el-button>
     </section>
   </main>
 </template>
@@ -32,8 +32,10 @@ import AppLogo from '@/components/common/AppLogo.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { generatePhoneTokenSecret, createPhoneTokenQrDataUrl } from '@/utils/phoneToken'
+import { useI18n } from '@/composables/useI18n'
 
 const router = useRouter()
+const { t } = useI18n()
 const route = useRoute()
 const authStore = useAuthStore()
 const autoLockStore = useAutoLockStore()
@@ -60,7 +62,7 @@ function regenerate(): void {
 async function submit(): Promise<void> {
   if (loading.value) return
   if (!/^\d{6}$/.test(code.value.trim()) || !password.value) {
-    error.value = '验证失败'
+    error.value = t('unlock.verificationFailed')
     return
   }
   loading.value = true
@@ -69,10 +71,10 @@ async function submit(): Promise<void> {
     const result = await window.phoneTokenApi!.set(secret.value, code.value, password.value)
     if (!result.ok) {
       error.value = result.reason === 'unavailable'
-        ? '系统安全存储不可用，无法完成绑定'
+        ? t('unlock.storageBindUnavailable')
         : result.reason === 'locked'
-          ? '尝试次数过多，请稍后再试'
-          : '验证失败'
+          ? t('unlock.tooManyAttempts')
+          : t('unlock.verificationFailed')
       code.value = ''
       return
     }
@@ -81,10 +83,10 @@ async function submit(): Promise<void> {
     password.value = ''
     secret.value = ''
     qrDataUrl.value = ''
-    ElMessage.success('手机令牌绑定成功')
+    ElMessage.success(t('unlock.bindSuccess'))
     void router.replace({ name: 'Dashboard' })
   } catch {
-    error.value = '验证失败'
+    error.value = t('unlock.verificationFailed')
   } finally {
     loading.value = false
   }

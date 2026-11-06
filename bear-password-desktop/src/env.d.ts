@@ -1,13 +1,5 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_SERVER_URL?: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
-
 /** Vue 单文件组件类型声明 */
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
@@ -128,6 +120,9 @@ interface FileApi {
     defaultFileName: string
     content: string
   }) => Promise<{ ok: true; filePath: string } | { ok: false; canceled: true }>
+  pickEncryptedVaultBackup: () => Promise<{ fileName: string; content: string } | null>
+  saveEncryptedVaultBackup: (payload: { content: string }) =>
+    Promise<{ ok: true; filePath: string } | { ok: false; canceled: true }>
 }
 
 /** Electron preload 暴露的剪贴板图片读取 API */
@@ -175,6 +170,7 @@ interface PhoneTokenApi {
   verify: (code: string) => Promise<PhoneTokenAuthResult>
   rebind: (code: string, masterPassword: string) => Promise<PhoneTokenOperationResult>
   recover: (masterPassword: string, recoveryKey: string) => Promise<PhoneTokenOperationResult>
+  destroy: (code: string, masterPassword: string) => Promise<PhoneTokenOperationResult>
 }
 
 /** 恢复密钥只允许在本进程已验证手机令牌后读取 */

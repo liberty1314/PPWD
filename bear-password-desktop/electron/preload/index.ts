@@ -147,6 +147,12 @@ const fileApi = {
   saveSecurityKeyBackup: (payload: { defaultFileName: string; content: string }) =>
     ipcRenderer.invoke('file:saveSecurityKeyBackup', payload) as Promise<
       { ok: true; filePath: string } | { ok: false; canceled: true }
+    >,
+  pickEncryptedVaultBackup: () =>
+    ipcRenderer.invoke('file:pickEncryptedVaultBackup') as Promise<{ fileName: string; content: string } | null>,
+  saveEncryptedVaultBackup: (payload: { content: string }) =>
+    ipcRenderer.invoke('file:saveEncryptedVaultBackup', payload) as Promise<
+      { ok: true; filePath: string } | { ok: false; canceled: true }
     >
 }
 
@@ -186,7 +192,9 @@ const phoneTokenApi = {
   rebind: (code: string, masterPassword: string) =>
     ipcRenderer.invoke('phone-token:rebind', code, masterPassword) as Promise<PhoneTokenOperationResult>,
   recover: (masterPassword: string, recoveryKey: string) =>
-    ipcRenderer.invoke('phone-token:recover', masterPassword, recoveryKey) as Promise<PhoneTokenOperationResult>
+    ipcRenderer.invoke('phone-token:recover', masterPassword, recoveryKey) as Promise<PhoneTokenOperationResult>,
+  destroy: (code: string, masterPassword: string) =>
+    ipcRenderer.invoke('local-vault:destroy', code, masterPassword) as Promise<PhoneTokenOperationResult>
 }
 
 contextBridge.exposeInMainWorld('phoneTokenApi', phoneTokenApi)

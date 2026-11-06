@@ -2,20 +2,20 @@
   <main class="gate-page">
     <section class="gate-panel" aria-labelledby="recover-title">
       <AppLogo size="md" />
-      <p class="gate-eyebrow">恢复手机令牌</p>
-      <h1 id="recover-title">验证恢复材料</h1>
-      <p class="gate-copy">需要同时提供主密码和完整恢复密钥。验证成功后，旧令牌会立即作废，并进入重新绑定流程。</p>
+      <p class="gate-eyebrow">{{ t('unlock.recoveryTitle') }}</p>
+      <h1 id="recover-title">{{ t('unlock.verifyRecovery') }}</h1>
+      <p class="gate-copy">{{ t('unlock.recoveryHint') }}</p>
       <el-form label-position="top" @submit.prevent="submit">
-        <el-form-item label="主密码">
+        <el-form-item :label="t('unlock.masterPassword')">
           <el-input v-model="password" type="password" show-password autocomplete="current-password" :disabled="loading" />
         </el-form-item>
-        <el-form-item label="恢复密钥">
+        <el-form-item :label="t('unlock.recoveryKey')">
           <el-input v-model="recoveryKey" type="textarea" :rows="3" resize="none" autocomplete="off" :disabled="loading" />
         </el-form-item>
         <p v-if="error" class="gate-error" role="alert">{{ error }}</p>
-        <el-button type="primary" size="large" class="gate-primary" :loading="loading" @click="submit">验证并重新绑定</el-button>
+        <el-button type="primary" size="large" class="gate-primary" :loading="loading" @click="submit">{{ t('unlock.verifyRebind') }}</el-button>
       </el-form>
-      <el-button text :disabled="loading" @click="router.replace({ name: 'Unlock' })">返回解锁</el-button>
+      <el-button text :disabled="loading" @click="router.replace({ name: 'Unlock' })">{{ t('unlock.backUnlock') }}</el-button>
     </section>
   </main>
 </template>
@@ -25,8 +25,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppLogo from '@/components/common/AppLogo.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from '@/composables/useI18n'
 
 const router = useRouter()
+const { t } = useI18n()
 const authStore = useAuthStore()
 const password = ref('')
 const recoveryKey = ref('')
@@ -41,10 +43,10 @@ async function submit(): Promise<void> {
     const result = await window.phoneTokenApi!.recover(password.value, recoveryKey.value)
     if (!result.ok) {
       error.value = result.reason === 'unavailable'
-        ? '系统安全存储不可用，无法恢复'
+        ? t('unlock.storageUnavailable')
         : result.reason === 'locked'
-          ? '尝试次数过多，请稍后再试'
-          : '验证失败'
+          ? t('unlock.tooManyAttempts')
+          : t('unlock.verificationFailed')
       return
     }
     password.value = ''
@@ -52,7 +54,7 @@ async function submit(): Promise<void> {
     await authStore.refreshStatus()
     void router.replace({ name: 'Bind', query: { recovery: '1' } })
   } catch {
-    error.value = '验证失败'
+    error.value = t('unlock.verificationFailed')
   } finally {
     loading.value = false
   }

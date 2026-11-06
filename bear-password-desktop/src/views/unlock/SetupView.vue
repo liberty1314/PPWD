@@ -2,46 +2,46 @@
   <main class="gate-page">
     <section class="gate-panel" aria-labelledby="setup-title">
       <AppLogo size="md" />
-      <p class="gate-eyebrow">{{ step === 'password' ? '本机保险库' : '恢复材料' }}</p>
-      <h1 id="setup-title">{{ step === 'password' ? '创建保险库' : '保存恢复密钥' }}</h1>
+      <p class="gate-eyebrow">{{ step === 'password' ? t('unlock.localVault') : t('unlock.recoveryMaterials') }}</p>
+      <h1 id="setup-title">{{ step === 'password' ? t('unlock.setup') : t('unlock.saveRecovery') }}</h1>
 
       <template v-if="step === 'password'">
-        <p class="gate-copy">设置只在本机使用的主密码。新保险库不会连接服务器，也不会导入旧数据。</p>
+        <p class="gate-copy">{{ t('unlock.createHint') }}</p>
         <el-form label-position="top" @submit.prevent="prepareRecoveryKey">
-          <el-form-item label="主密码">
+          <el-form-item :label="t('unlock.masterPassword')">
             <el-input v-model="masterPassword" type="password" show-password autocomplete="new-password" />
           </el-form-item>
-          <el-form-item label="确认主密码">
+          <el-form-item :label="t('unlock.confirmPassword')">
             <el-input v-model="confirmPassword" type="password" show-password autocomplete="new-password" @keyup.enter="prepareRecoveryKey" />
           </el-form-item>
           <p v-if="error" class="gate-error" role="alert">{{ error }}</p>
           <el-button type="primary" size="large" class="gate-primary" @click="prepareRecoveryKey">
-            继续
+            {{ t('unlock.continue') }}
           </el-button>
         </el-form>
       </template>
 
       <template v-else>
-        <p class="gate-copy">恢复密钥只展示这一次。请将它导出或保存到安全位置，再继续绑定手机令牌。</p>
-        <label class="gate-label" for="recovery-key">恢复密钥</label>
+        <p class="gate-copy">{{ t('unlock.recoveryOnceHint') }}</p>
+        <label class="gate-label" for="recovery-key">{{ t('unlock.recoveryKey') }}</label>
         <el-input id="recovery-key" :model-value="recoveryKey" type="textarea" readonly :rows="4" resize="none" class="gate-secret" />
-        <p class="gate-fingerprint">指纹：{{ fingerprint }}</p>
-        <el-checkbox v-model="backupConfirmed" class="gate-confirm">我已妥善保存恢复密钥</el-checkbox>
+        <p class="gate-fingerprint">{{ t('unlock.fingerprint', { fingerprint }) }}</p>
+        <el-checkbox v-model="backupConfirmed" class="gate-confirm">{{ t('unlock.recoverySaved') }}</el-checkbox>
         <div class="gate-actions">
-          <el-button :disabled="creating" @click="downloadKit">导出 Emergency Kit</el-button>
+          <el-button :disabled="creating" @click="downloadKit">{{ t('unlock.exportKit') }}</el-button>
           <el-button type="primary" :disabled="!backupConfirmed" :loading="creating" @click="createVault">
-            创建并继续
+            {{ t('unlock.createContinue') }}
           </el-button>
         </div>
-        <el-button text :disabled="creating" @click="regenerateKey">重新生成密钥</el-button>
-        <el-button v-if="error.includes('空目录')" text :disabled="creating" @click="chooseEmptyDirectory">
-          选择空数据目录
+        <el-button text :disabled="creating" @click="regenerateKey">{{ t('unlock.regenerate') }}</el-button>
+        <el-button v-if="directoryError" text :disabled="creating" @click="chooseEmptyDirectory">
+          {{ t('unlock.chooseEmptyDir') }}
         </el-button>
         <p v-if="error" class="gate-error" role="alert">{{ error }}</p>
       </template>
 
       <p v-if="!safeStorageAvailable" class="gate-warning" role="status">
-        当前系统安全存储不可用，创建保险库会被阻止。
+        {{ t('unlock.safeStorageUnavailable') }}
       </p>
     </section>
   </main>
@@ -55,8 +55,11 @@ import { useAuthStore } from '@/stores/auth'
 import { computeSecretKeyFingerprint } from '@/utils/vaultCrypto/vaultKeyDerivation'
 import { buildEmergencyKitFileContent, buildEmergencyKitFileName } from '@/utils/vaultCrypto/emergencyKit'
 import { generatePhoneTokenRecoveryKey } from '@/utils/phoneToken'
+import { useI18n } from '@/composables/useI18n'
+import { computed } from 'vue'
 
 const router = useRouter()
+const { t } = useI18n()
 const authStore = useAuthStore()
 const step = ref<'password' | 'recovery'>('password')
 const masterPassword = ref('')
@@ -67,6 +70,7 @@ const backupConfirmed = ref(false)
 const creating = ref(false)
 const error = ref('')
 const safeStorageAvailable = ref(true)
+const directoryError = computed(() => error.value === t('unlock.setup.emptyDirRequired'))
 
 onMounted(async () => {
   try {
@@ -86,15 +90,15 @@ async function makeRecoveryKey(): Promise<void> {
 async function prepareRecoveryKey(): Promise<void> {
   error.value = ''
   if (!masterPassword.value.trim()) {
-    error.value = '请输入主密码'
+    error.value = t('unlock.setup.passwordRequired')
     return
   }
   if (masterPassword.value.trim().length < 6 || masterPassword.value.trim().length > 64) {
-    error.value = '主密码需为 6 至 64 位'
+    error.value = t('unlock.setup.passwordLength')
     return
   }
   if (masterPassword.value !== confirmPassword.value) {
-    error.value = '两次输入的主密码不一致'
+    error.value = t('unlock.setup.passwordMismatch')
     return
   }
   await makeRecoveryKey()
@@ -108,7 +112,7 @@ async function regenerateKey(): Promise<void> {
 
 function downloadKit(): void {
   if (!window.fileApi?.saveSecurityKeyBackup) {
-    error.value = '当前环境无法导出恢复材料'
+    error.value = t('unlock.setup.exportUnavailable')
     return
   }
   void window.fileApi.saveSecurityKeyBackup({
@@ -122,13 +126,13 @@ function downloadKit(): void {
   }).then((result) => {
     if (result.ok) backupConfirmed.value = true
   }).catch(() => {
-    error.value = '恢复材料导出失败，请重试'
+    error.value = t('unlock.setup.exportFailed')
   })
 }
 
 async function chooseEmptyDirectory(): Promise<void> {
   const picked = await window.offlineVaultApi?.pickEmptyDataDir()
-  if (picked && !picked.ok) error.value = picked.error ?? '无法使用所选目录'
+  if (picked && !picked.ok) error.value = t('unlock.setup.directoryUnavailable')
   else if (picked?.ok) error.value = ''
 }
 
@@ -143,7 +147,9 @@ async function createVault(): Promise<void> {
     recoveryKey.value = ''
     void router.replace({ name: 'Bind' })
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : '保险库创建失败'
+    error.value = cause instanceof Error && cause.message.includes('数据目录')
+      ? t('unlock.setup.emptyDirRequired')
+      : t('unlock.setup.createFailed')
   } finally {
     creating.value = false
   }

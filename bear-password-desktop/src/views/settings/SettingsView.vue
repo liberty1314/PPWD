@@ -79,6 +79,7 @@
     <div v-if="showSection('security')" class="settings-view__section">
       <h3 v-if="!section">{{ t('settings.security') }}</h3>
       <MfaSettingsPanel />
+      <VaultBackupSettingsPanel />
 
       <div class="settings-view__row settings-view__row--auto-lock">
         <div class="settings-view__row-label">
@@ -282,6 +283,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import ShortcutInput from '@/components/settings/ShortcutInput.vue'
 import MfaSettingsPanel from '@/components/settings/MfaSettingsPanel.vue'
+import VaultBackupSettingsPanel from '@/components/settings/VaultBackupSettingsPanel.vue'
 import OfflineVaultSettingsPanel from '@/components/settings/OfflineVaultSettingsPanel.vue'
 import { APP_VERSION, AUTHOR_GITHUB_URL, AUTHOR_NAME, OFFICIAL_WEBSITE_URL } from '@/constants/app'
 import { useAppStore } from '@/stores/app'

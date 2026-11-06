@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import { loadOfflineVaultSettings } from './offlineVaultConfig'
-import { readOfflineVaultSnapshot } from './offlineVaultStorage'
+import { importOfflineVaultSnapshot, readOfflineVaultSnapshot } from './offlineVaultStorage'
 import { hasStoredRecoveryKey, loadStoredRecoveryKey } from './recoveryKeyStorage'
 import { promptBiometricUnlock } from './biometricAuth'
 import { loadStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
@@ -8,6 +8,7 @@ import {
   bindPhoneToken,
   authorizeRecoveryKeyRead,
   consumeRecoveryKeyReadAuthorization,
+  destroyLocalVault,
   getPhoneTokenStatus,
   initializeLocalVault,
   recoverPhoneToken,
@@ -84,6 +85,21 @@ export function registerPhoneTokenIpc(): void {
       return { ok: false as const, reason: 'invalid' as const }
     }
     return recoverPhoneToken(password, recoveryKey)
+  })
+  ipcMain.handle('local-vault:destroy', async (_event, code: unknown, password: unknown) => {
+    if (typeof code !== 'string' || typeof password !== 'string') {
+      return { ok: false as const, reason: 'invalid' as const }
+    }
+    return destroyLocalVault(code, password, () => {
+      const settings = loadOfflineVaultSettings()
+      importOfflineVaultSnapshot(settings.dataDir, {
+        version: 1,
+        nextId: 1,
+        entries: [],
+        favorites: [],
+        recentVisits: []
+      })
+    })
   })
   ipcMain.handle('recovery-key:has', () => hasStoredRecoveryKey())
   ipcMain.handle('recovery-key:get', () => {

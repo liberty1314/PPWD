@@ -27,7 +27,7 @@ export interface OfflineVaultSnapshot {
   recentVisits: OfflineVaultRelationMeta[]
 }
 
-import { toVaultEntryId } from './vaultEntryId'
+import { toVaultEntryId } from './vaultEntryId.ts'
 export const OFFLINE_VAULT_DATA_FILE = 'vault-data.json'
 export const OFFLINE_VAULT_SETTINGS_FILE = 'offline-vault-settings.json'
 
