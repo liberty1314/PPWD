@@ -41,9 +41,9 @@ export async function persistVaultPassword(password: string): Promise<VaultPassw
   return { ok: true }
 }
 
-export async function clearPersistedVaultPassword(): Promise<void> {
-  if (!canUseVaultPasswordApi()) return
-  await window.vaultPasswordApi!.remove()
+export async function clearPersistedVaultPassword(): Promise<{ ok: boolean; error?: string }> {
+  if (!canUseVaultPasswordApi()) return { ok: false, error: '当前环境不支持安全存储' }
+  return window.vaultPasswordApi!.remove()
 }
 
 export async function isSecureVaultPasswordStorageAvailable(): Promise<boolean> {

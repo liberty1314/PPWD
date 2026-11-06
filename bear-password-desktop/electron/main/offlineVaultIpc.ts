@@ -67,6 +67,30 @@ export function registerOfflineVaultIpc(getMainWindow: () => BrowserWindow | nul
     return result.filePaths[0]
   })
 
+  ipcMain.handle('offline-vault:pickEmptyDataDir', async (_event, currentDir: unknown) => {
+    const parent = getMainWindow()
+    const safeParent = parent && !parent.isDestroyed() ? parent : undefined
+    const result = await dialog.showOpenDialog(safeParent, {
+      title: '选择新的本地保险库目录',
+      defaultPath: typeof currentDir === 'string' && currentDir ? currentDir : getDefaultOfflineVaultDataDir(),
+      properties: ['openDirectory', 'createDirectory']
+    })
+
+    if (result.canceled || !result.filePaths.length) return { ok: false as const, canceled: true as const }
+
+    try {
+      const selectedDir = result.filePaths[0]
+      const snapshot = readOfflineVaultSnapshot(selectedDir)
+      if (snapshot.entries.length || snapshot.favorites.length || snapshot.recentVisits.length) {
+        return { ok: false as const, canceled: false as const, error: '所选目录已有数据，请选择空目录' }
+      }
+      const settings = saveOfflineVaultSettings({ dataDir: selectedDir })
+      return { ok: true as const, settings }
+    } catch {
+      return { ok: false as const, canceled: false as const, error: '所选目录无法安全读取，请选择空目录' }
+    }
+  })
+
   ipcMain.handle('offline-vault:readSnapshot', () => readOfflineVaultSnapshot(resolveDataDir()))
 
   ipcMain.handle('offline-vault:importSnapshot', (_event, snapshot: unknown) => {

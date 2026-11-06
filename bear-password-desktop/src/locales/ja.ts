@@ -318,26 +318,32 @@ const messages: MessageDict = {
   'settings.clipboardClearDesc':
     'パスワードなどをコピーしたあと、指定時間でクリップボードから消去します。アプリをロックしたときも即座に消去します',
   'settings.preferBiometricUnlock': '生体認証を優先',
-  'settings.preferBiometricUnlockDesc': 'ロック中はトレイまたはショートカットから起動時に生体認証を優先',
-  'settings.preferBiometricUnlockDescTouchId': 'ロック中はトレイまたはショートカットから起動時に Touch ID を優先',
+  'settings.biometricEnableTitle': '生体認証によるクイック解除を有効化',
+  'settings.biometricEnablePasswordPrompt': '保管庫のマスターパスワードを入力し、システムの生体認証を一度行ってください。次回以降は生体認証を優先し、認証アプリのコードにも切り替えられます。解除用にマスターパスワードは保存されません。',
+  'settings.biometricEnablePasswordPlaceholder': '保管庫のマスターパスワード',
+  'settings.biometricEnablePasswordRequired': '保管庫のマスターパスワードを入力してください',
+  'settings.biometricEnableConfirm': '確認して有効化',
+  'settings.biometricEnableFailed': '確認が完了しなかったため、生体認証によるクイック解除は有効になっていません。',
+  'settings.preferBiometricUnlockDesc': 'アプリ起動時は生体認証を優先し、認証アプリのコードにも切り替え可能',
+  'settings.preferBiometricUnlockDescTouchId': 'アプリ起動時は Touch ID を優先し、認証アプリのコードにも切り替え可能',
   'settings.preferBiometricUnlockDescWindowsHello':
-    'ロック中はトレイまたはショートカットから起動時に Windows Hello を優先',
+    'アプリ起動時は Windows Hello を優先し、認証アプリのコードにも切り替え可能',
   'settings.biometricUnavailableNotSupported':
     'このシステムでは生体認証解除に対応していません（macOS Touch ID と Windows Hello のみ）。',
   'settings.biometricUnavailableModuleFailed':
-    'Windows Hello コンポーネントを読み込めません。再インストールするか、マスターパスワードで解除してください。',
+    'Windows Hello コンポーネントを読み込めません。再インストールするか、認証アプリのコードをご利用ください。',
   'settings.biometricUnavailableNotConfigured':
     '先に Windows「設定 → アカウント → サインイン オプション」で PIN または Windows Hello を設定してください。',
   'settings.biometricUnavailableDeviceNotPresent':
     'Windows Hello デバイスが見つかりません。ドライバとサインイン設定を確認してください。',
   'settings.biometricUnavailableDisabledByPolicy':
-    '生体認証はシステムまたは組織のポリシーで無効になっています。マスターパスワードをご利用ください。',
+    '生体認証はシステムまたは組織のポリシーで無効になっています。認証アプリのコードをご利用ください。',
   'settings.biometricUnavailableDeviceBusy': '認証デバイスが使用中です。しばらくしてから再試行してください。',
   'settings.biometricUnavailableTouchId':
     'この Mac では Touch ID を利用できません。「システム設定 → Touch ID とパスワード」を確認してください。',
   'settings.biometricUnavailableCheckFailed':
     '生体認証の利用可否を確認できませんでした。アプリを再起動してお試しください。',
-  'settings.biometricUnavailableGeneric': '現在生体認証は利用できません。マスターパスワードで解除してください。',
+  'settings.biometricUnavailableGeneric': '現在生体認証は利用できません。認証アプリのコードで解除してください。',
   'settings.version': 'クライアントバージョン',
   'settings.officialWebsite': '公式サイト',
   'settings.officialWebsiteLink': 'BearPassword 公式サイト',

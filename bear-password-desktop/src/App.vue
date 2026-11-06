@@ -1,17 +1,16 @@
 <template>
   <el-config-provider :locale="elementLocale" :z-index="Z_INDEX_ELEMENT_PLUS">
     <router-view />
-    <VaultLocalSetupDialog />
-    <LockScreen />
   </el-config-provider>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import LockScreen from '@/components/common/LockScreen.vue'
-import VaultLocalSetupDialog from '@/components/common/VaultLocalSetupDialog.vue'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
+import { useSecurityStore } from '@/stores/security'
 import { useShortcutsStore } from '@/stores/shortcuts'
 import { useI18n } from '@/composables/useI18n'
 import { getElementPlusLocale } from '@/locales'
@@ -21,6 +20,9 @@ import { initTrayBridge } from '@/utils/trayBridge'
 import { useOfflineVaultStore } from '@/stores/offlineVault'
 
 const appStore = useAppStore()
+const authStore = useAuthStore()
+const securityStore = useSecurityStore()
+const router = useRouter()
 const { t } = useI18n()
 
 const elementLocale = computed(() => getElementPlusLocale(appStore.resolvedLocale))
@@ -28,11 +30,30 @@ const elementLocale = computed(() => getElementPlusLocale(appStore.resolvedLocal
 initGlobalShortcutBridge()
 initTrayBridge()
 
+watch(
+  () => [authStore.hasLocalVault, authStore.hasPhoneTokenBinding, securityStore.hasVaultAccess] as const,
+  ([hasVault, hasBinding, hasAccess]) => {
+    const currentName = router.currentRoute.value.name
+    if (!hasVault && currentName !== 'Setup') {
+      void router.replace({ name: 'Setup' })
+    } else if (hasVault && !hasBinding && currentName !== 'Bind') {
+      void router.replace({ name: 'Bind' })
+    } else if (
+      hasVault && hasBinding && !hasAccess &&
+      currentName !== 'Unlock' && currentName !== 'Recover'
+    ) {
+      void router.replace({ name: 'Unlock' })
+    }
+  },
+  { immediate: true, flush: 'sync' }
+)
+
 onMounted(async () => {
   void useOfflineVaultStore().loadSettings()
 
   const shortcutsStore = useShortcutsStore()
-  const result = await shortcutsStore.init()
+  await shortcutsStore.init()
+  const result = await shortcutsStore.syncToMain()
 
   if (!window.shortcutApi) return
 

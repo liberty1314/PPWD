@@ -25,18 +25,10 @@ import {
   promptBiometricUnlock
 } from './biometricAuth'
 import {
-  isSecurityKeyEncryptionAvailable,
-  loadStoredSecurityKey,
-  removeStoredSecurityKey,
-  saveStoredSecurityKey
-} from './securityKeyStorage'
-import {
-  hasStoredVaultPassword,
   isVaultPasswordEncryptionAvailable,
-  loadStoredVaultPassword,
-  removeStoredVaultPassword,
-  saveStoredVaultPassword
+  removeStoredVaultPassword
 } from './vaultPasswordStorage'
+import { hasStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
 import {
   applyWindowState,
   attachMainWindowStateListeners,
@@ -53,6 +45,9 @@ import {
 } from './extensionBridgeServer'
 import type { ExtensionBridgeMethod } from '../../shared/extensionBridge'
 import { registerOfflineVaultIpc } from './offlineVaultIpc'
+import { registerPhoneTokenIpc } from './phoneTokenIpc'
+import { deriveVerifiedVaultUnlockKey, isPhoneTokenSessionVerified } from './phoneTokenStorage'
+import { saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
 
 /** dev 与生产环境统一 userData 目录（~/Library/Application Support/BearPassword） */
 app.setName('BearPassword')
@@ -696,55 +691,44 @@ function registerBiometricIpc(): void {
   ipcMain.handle('biometric:getAvailability', async () => getBiometricAvailability())
 
   ipcMain.handle('biometric:prompt', async (_event, reason: unknown) => {
+    if (!isPhoneTokenSessionVerified()) {
+      return { ok: false as const, canceled: false, error: '请先通过手机令牌验证' }
+    }
     const message = typeof reason === 'string' ? reason : ''
     return promptBiometricUnlock(message)
   })
 }
 
-/** 注册安全密钥存储 IPC（系统钥匙串 / 凭据管理器） */
-function registerSecureStorageIpc(): void {
-  ipcMain.handle('secure-storage:isAvailable', () => isSecurityKeyEncryptionAvailable())
-
-  ipcMain.handle('secure-storage:get', async () => loadStoredSecurityKey())
-
-  ipcMain.handle('secure-storage:set', async (_event, key: unknown) => {
-    if (typeof key !== 'string') {
-      return { ok: false as const, error: '安全密钥格式无效' }
-    }
-    return saveStoredSecurityKey(key)
-  })
-
-  ipcMain.handle('secure-storage:remove', async () => {
-    await removeStoredSecurityKey()
-  })
-}
-
-/** 注册主密码存储 IPC（生物识别解锁保险库时使用，与登录密码分离） */
+/** 注册生物识别快捷解锁凭据 IPC */
 function registerVaultPasswordIpc(): void {
   ipcMain.handle('vault-password:isAvailable', () => isVaultPasswordEncryptionAvailable())
 
-  ipcMain.handle('vault-password:has', () => hasStoredVaultPassword())
+  ipcMain.handle('vault-password:has', () => hasStoredVaultUnlockKey())
 
-  ipcMain.handle('vault-password:get', async (_event, reason: unknown) => {
-    const message = typeof reason === 'string' && reason.trim()
-      ? reason.trim()
-      : '验证身份以读取保险库主密码'
-    const verified = await promptBiometricUnlock(message)
-    if (!verified.ok) {
-      return null
-    }
-    return loadStoredVaultPassword()
+  ipcMain.handle('vault-password:get', async () => {
+    return null
   })
 
   ipcMain.handle('vault-password:set', async (_event, password: unknown) => {
     if (typeof password !== 'string') {
       return { ok: false as const, error: '密码格式无效' }
     }
-    return saveStoredVaultPassword(password)
+    const vuk = await deriveVerifiedVaultUnlockKey(password)
+    if (!vuk) return { ok: false as const, error: '主密码验证失败' }
+    const stored = await saveStoredVaultUnlockKey(vuk)
+    if (!stored.ok) return stored
+    const verified = await promptBiometricUnlock('验证并启用生物识别快捷解锁')
+    if (!verified.ok) {
+      return { ok: false as const, error: verified.canceled ? '已取消生物识别验证' : '生物识别验证失败' }
+    }
+    if (!(await hasStoredVaultUnlockKey())) {
+      return { ok: false as const, error: '未找到保险库解锁凭据，请先完成手机令牌绑定' }
+    }
+    return { ok: true as const }
   })
 
   ipcMain.handle('vault-password:remove', async () => {
-    await removeStoredVaultPassword()
+    return { ok: true as const }
   })
 }
 
@@ -819,6 +803,9 @@ function registerAppLifecycleHandlers(): void {
 
 function startApp(): void {
   app.whenReady().then(() => {
+    void removeStoredVaultPassword().then((result) => {
+      if (!result.ok) console.error('[vault-password] legacy credential cleanup failed', result.error)
+    })
     applyAppIcon()
     registerWindowIpc()
     registerThemeIpc()
@@ -829,7 +816,7 @@ function startApp(): void {
     registerFileIpc()
     registerClipboardIpc()
     registerOfflineVaultIpc(() => mainWindow)
-    registerSecureStorageIpc()
+    registerPhoneTokenIpc()
     registerVaultPasswordIpc()
     registerBiometricIpc()
     registerExtensionBridgeIpc()

@@ -109,7 +109,7 @@ export const useAutoLockStore = defineStore('autoLock', () => {
 
   function lock(options?: { hideWindow?: boolean }): void {
     if (isMigrationActive()) return
-    if (!useAuthStore().isLoggedIn) return
+    if (!useAuthStore().hasLocalVault) return
     if (!useSecurityStore().canUseVaultLock) return
     clearCheckInterval()
     const wasLocked = isLocked.value
@@ -130,7 +130,7 @@ export const useAutoLockStore = defineStore('autoLock', () => {
     persistLockState(false)
     lastActivityAt = Date.now()
     startChecker()
-    if (useAuthStore().isLoggedIn) {
+    if (useAuthStore().hasLocalVault) {
       void useVaultStore().ensureLoaded()
     }
   }
@@ -161,7 +161,7 @@ export const useAutoLockStore = defineStore('autoLock', () => {
 
   /** 冷启动时若保险库已配置但未解锁，强制进入锁定态（需主密码） */
   function ensureVaultSessionLocked(): void {
-    if (!useAuthStore().isLoggedIn) return
+    if (!useAuthStore().hasLocalVault) return
 
     const securityStore = useSecurityStore()
     if (!securityStore.isVaultConfigured || !securityStore.hasPersistedSecurityKey) {

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "env -u ELECTRON_RUN_AS_NODE electron-vite dev",
     "build": "electron-vite build",
+    "test:phone-token": "node --experimental-strip-types --test tests/phoneToken.test.mjs",
     "preview": "env -u ELECTRON_RUN_AS_NODE electron-vite preview",
     "generate:icons": "node scripts/generate-icons.mjs",
     "build:mac": "pnpm run build && electron-builder --mac && node scripts/after-mac-build.mjs",
@@ -24,6 +25,7 @@
     "marked": "^18.0.5",
     "otpauth": "^9.5.1",
     "pinia": "^2.3.0",
+    "qrcode-generator": "2.0.4",
     "tssrp6a": "^3.0.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

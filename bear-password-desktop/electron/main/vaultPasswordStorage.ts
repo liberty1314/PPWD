@@ -1,26 +1,17 @@
 import { app, safeStorage } from 'electron'
 import { existsSync } from 'fs'
-import { readFile, unlink, writeFile } from 'fs/promises'
+import { randomBytes } from 'crypto'
+import { readFile, rename, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
 
 const VAULT_PASSWORD_FILE = 'vault-password.enc'
-const LEGACY_ACCOUNT_PASSWORD_FILE = 'account-password.enc'
 
 function getVaultPasswordPath(): string {
   return join(app.getPath('userData'), VAULT_PASSWORD_FILE)
 }
 
-function getLegacyAccountPasswordPath(): string {
-  return join(app.getPath('userData'), LEGACY_ACCOUNT_PASSWORD_FILE)
-}
-
 export function isVaultPasswordEncryptionAvailable(): boolean {
   return safeStorage.isEncryptionAvailable()
-}
-
-export function hasStoredVaultPassword(): boolean {
-  return safeStorage.isEncryptionAvailable()
-    && (existsSync(getVaultPasswordPath()) || existsSync(getLegacyAccountPasswordPath()))
 }
 
 async function decryptPasswordFile(filePath: string): Promise<string | null> {
@@ -39,28 +30,11 @@ async function decryptPasswordFile(filePath: string): Promise<string | null> {
 }
 
 export async function loadStoredVaultPassword(): Promise<string | null> {
-  const current = await decryptPasswordFile(getVaultPasswordPath())
-  if (current) return current
-
-  const legacy = await decryptPasswordFile(getLegacyAccountPasswordPath())
-  if (!legacy) return null
-
-  const migrated = await saveStoredVaultPassword(legacy)
-  if (migrated.ok) {
-    await removeLegacyAccountPasswordFile()
-  }
-  return legacy
+  return decryptPasswordFile(getVaultPasswordPath())
 }
 
-async function removeLegacyAccountPasswordFile(): Promise<void> {
-  const legacyPath = getLegacyAccountPasswordPath()
-  if (!existsSync(legacyPath)) return
-
-  try {
-    await unlink(legacyPath)
-  } catch (error) {
-    console.error('[vault-password] legacy remove failed', error)
-  }
+export async function hasStoredVaultPassword(): Promise<boolean> {
+  return (await loadStoredVaultPassword()) !== null
 }
 
 export async function saveStoredVaultPassword(
@@ -77,26 +51,29 @@ export async function saveStoredVaultPassword(
     return { ok: false, error: '密码不能为空' }
   }
 
+  const filePath = getVaultPasswordPath()
+  const tempPath = `${filePath}.${process.pid}.${Date.now()}.${randomBytes(4).toString('hex')}.tmp`
   try {
     const encrypted = safeStorage.encryptString(password)
-    await writeFile(getVaultPasswordPath(), encrypted)
-    await removeLegacyAccountPasswordFile()
+    await writeFile(tempPath, encrypted, { mode: 0o600, flag: 'wx' })
+    await rename(tempPath, filePath)
     return { ok: true }
   } catch (error) {
+    await unlink(tempPath).catch(() => undefined)
     console.error('[vault-password] encrypt failed', error)
     return { ok: false, error: '密码保存失败，请稍后重试' }
   }
 }
 
-export async function removeStoredVaultPassword(): Promise<void> {
+export async function removeStoredVaultPassword(): Promise<{ ok: true } | { ok: false; error: string }> {
   const filePath = getVaultPasswordPath()
   if (existsSync(filePath)) {
     try {
       await unlink(filePath)
     } catch (error) {
       console.error('[vault-password] remove failed', error)
+      return { ok: false, error: '快捷解锁凭据删除失败' }
     }
   }
-
-  await removeLegacyAccountPasswordFile()
+  return { ok: true }
 }

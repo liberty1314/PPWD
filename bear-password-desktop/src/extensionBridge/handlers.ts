@@ -25,8 +25,8 @@ function assertVaultReady(): void {
   const securityStore = useSecurityStore()
   const autoLockStore = useAutoLockStore()
 
-  if (!authStore.isLoggedIn) {
-    throw new Error('请先在桌面端登录')
+  if (!authStore.hasLocalVault) {
+    throw new Error('请先创建本地保险库')
   }
   if (autoLockStore.isLocked) {
     throw new Error('桌面端已锁定，请先解锁保险库')
@@ -38,16 +38,15 @@ function assertVaultReady(): void {
 
 export function extensionBridgeHealth(): ExtensionBridgeHealth {
   const authStore = useAuthStore()
-  const securityStore = useSecurityStore()
   const autoLockStore = useAutoLockStore()
   const appStore = useAppStore()
 
   return {
     ready: true,
-    loggedIn: authStore.isLoggedIn,
+    loggedIn: authStore.hasLocalVault,
     locked: autoLockStore.isLocked,
-    unlocked: authStore.isLoggedIn && !autoLockStore.isLocked && securityStore.hasVaultAccess,
-    username: authStore.isLoggedIn ? authStore.username : null,
+    unlocked: authStore.isUnlocked && !autoLockStore.isLocked,
+    username: authStore.hasLocalVault ? 'local' : null,
     themePreference: appStore.themePreference,
     localePreference: appStore.localePreference
   }

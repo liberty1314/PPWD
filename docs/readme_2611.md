@@ -447,6 +447,69 @@
     - scripts/release-dir.mjs
     - docs/readme_2611.md
 
+[2026-11-06 14:54] feat(desktop): 新增本地保险库与手机令牌解锁流程
+  Body: 新增本地保险库创建、手机令牌绑定与恢复，并加入生物识别优先、动态码备用的快捷解锁流程。同步更新桌面端路由、安全存储、依赖和 M2 设计及验收文档。
+  Footer: 破坏性变更: 桌面端认证由账户登录调整为本地保险库门禁，旧账户数据不会自动导入。
+  Migration: 请先导出并备份原账户数据，再按首次设置流程创建本地保险库并绑定手机令牌。
+  Files:
+    - bear-password-desktop/electron/main/index.ts
+    - bear-password-desktop/electron/main/localVaultCryptoStorage.ts
+    - bear-password-desktop/electron/main/offlineVaultIpc.ts
+    - bear-password-desktop/electron/main/phoneTokenIpc.ts
+    - bear-password-desktop/electron/main/phoneTokenStorage.ts
+    - bear-password-desktop/electron/main/recoveryKeyStorage.ts
+    - bear-password-desktop/electron/main/vaultPasswordStorage.ts
+    - bear-password-desktop/electron/main/vaultUnlockKeyStorage.ts
+    - bear-password-desktop/electron/preload/index.ts
+    - bear-password-desktop/package-lock.json
+    - bear-password-desktop/package.json
+    - bear-password-desktop/pnpm-lock.yaml
+    - bear-password-desktop/pnpm-workspace.yaml
+    - bear-password-desktop/src/App.vue
+    - bear-password-desktop/src/components/auth/EmergencyKitStep.vue
+    - bear-password-desktop/src/components/common/LockScreen.vue
+    - bear-password-desktop/src/components/common/VaultLocalSetupDialog.vue
+    - bear-password-desktop/src/components/settings/MfaSettingsPanel.vue
+    - bear-password-desktop/src/components/settings/ProfileSettingsPanel.vue
+    - bear-password-desktop/src/components/settings/SettingsDialog.vue
+    - bear-password-desktop/src/constants/settingsDialogNav.ts
+    - bear-password-desktop/src/env.d.ts
+    - bear-password-desktop/src/extensionBridge/handlers.ts
+    - bear-password-desktop/src/layouts/MainLayout.vue
+    - bear-password-desktop/src/locales/en.ts
+    - bear-password-desktop/src/locales/ja.ts
+    - bear-password-desktop/src/locales/zh-CN.ts
+    - bear-password-desktop/src/main.ts
+    - bear-password-desktop/src/router/index.ts
+    - bear-password-desktop/src/router/routes.ts
+    - bear-password-desktop/src/stores/auth.ts
+    - bear-password-desktop/src/stores/autoLock.ts
+    - bear-password-desktop/src/stores/security.ts
+    - bear-password-desktop/src/types/settingsDialog.ts
+    - bear-password-desktop/src/utils/localVaultSetup.ts
+    - bear-password-desktop/src/utils/phoneToken.ts
+    - bear-password-desktop/src/utils/vaultCrypto/emergencyKit.ts
+    - bear-password-desktop/src/utils/vaultPasswordStorage.ts
+    - bear-password-desktop/src/views/login/AuthPage.vue
+    - bear-password-desktop/src/views/login/LoginForm.vue
+    - bear-password-desktop/src/views/login/LoginMfaStep.vue
+    - bear-password-desktop/src/views/login/RegisterForm.vue
+    - bear-password-desktop/src/views/settings/SettingsView.vue
+    - bear-password-desktop/src/views/unlock/BindView.vue
+    - bear-password-desktop/src/views/unlock/RecoverView.vue
+    - bear-password-desktop/src/views/unlock/SetupView.vue
+    - bear-password-desktop/src/views/unlock/UnlockView.vue
+    - bear-password-desktop/tests/phoneToken.test.mjs
+    - docs/project/development-report-m2.md
+    - docs/project/implementation-plan-m2.md
+    - docs/project/manual-verification-m2.md
+    - docs/project/product-design-m2.md
+    - docs/project/technical-design-m2.md
+    - docs/project/test-report-m2.md
+    - docs/开发计划.md
+    - docs/需求文档.md
+    - docs/readme_2611.md
+
 [2026-11-04 16:04] feat(desktop): 将保险库数据层切换为本地存储
   Body: 将桌面端条目、收藏、最近访问与统计统一改为本地读写，移除离线模式开关并增强快照错误处理与原子写入。同步明确请求层和依赖清理须等待认证重构及设置去账号化完成。
   Footer: 破坏性变更: 桌面端数据 API 不再访问服务端，历史服务端数据不会自动同步到本地库。

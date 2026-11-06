@@ -2,27 +2,32 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { routes } from './routes'
 import { useAuthStore } from '@/stores/auth'
 
-/**
- * Vue Router 配置
- * Electron 环境使用 Hash 模式，避免 file:// 协议下 History 模式失效
- */
 const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
 
-/** 全局路由守卫：未登录跳转登录页 */
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth !== false)
-
-  if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login', replace: true })
-  } else if ((to.name === 'Login' || to.name === 'Register') && authStore.isLoggedIn) {
-    next({ name: 'Dashboard' })
-  } else {
-    next()
+  if (!authStore.initialized) return { name: 'Unlock', replace: true }
+  if (!authStore.hasLocalVault) {
+    return to.name === 'Setup' ? true : { name: 'Setup', replace: true }
   }
+  if (!authStore.hasPhoneTokenBinding) {
+    return to.name === 'Bind' ? true : { name: 'Bind', replace: true }
+  }
+  if (to.name === 'Setup' || to.name === 'Bind') {
+    return authStore.isUnlocked ? { name: 'Dashboard', replace: true } : { name: 'Unlock', replace: true }
+  }
+  if (to.name === 'Recover') return true
+  if (to.name === 'Unlock') {
+    return authStore.isUnlocked ? { name: 'Dashboard', replace: true } : true
+  }
+  if (to.matched.some((record) => record.meta.requiresUnlock) && !authStore.isUnlocked) {
+    return { name: 'Unlock', replace: true }
+  }
+  if (to.name === 'Recover') return true
+  return true
 })
 
 export default router

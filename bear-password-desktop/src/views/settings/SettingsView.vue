@@ -78,68 +78,6 @@
 
     <div v-if="showSection('security')" class="settings-view__section">
       <h3 v-if="!section">{{ t('settings.security') }}</h3>
-      <p class="settings-view__vault-crypto-intro">
-        {{ t('settings.vaultCryptoIntro') }}
-      </p>
-
-      <div class="settings-view__row settings-view__row--security">
-        <div class="settings-view__row-label">
-          <span>{{ t('settings.masterPassword') }}</span>
-          <small>{{ masterPasswordHint }}</small>
-        </div>
-        <span
-          class="settings-view__badge"
-          :class="{ 'settings-view__badge--active': masterPasswordConfigured }"
-        >
-          {{ masterPasswordConfigured ? t('settings.masterPasswordConfigured') : t('settings.masterPasswordNotConfigured') }}
-        </span>
-      </div>
-
-      <div class="settings-view__security-panel settings-view__security-panel--master-password">
-        <el-input
-            v-model="masterPasswordOld"
-            type="password"
-            show-password
-            :placeholder="t('settings.masterPasswordOldPlaceholder')"
-            size="large"
-            class="settings-view__security-input"
-            :disabled="securityStore.isMigrating"
-          />
-          <el-input
-            v-model="masterPasswordNew"
-            type="password"
-            show-password
-            :placeholder="t('settings.masterPasswordNewPlaceholder')"
-            size="large"
-            class="settings-view__security-input"
-            :disabled="securityStore.isMigrating"
-          />
-          <el-input
-            v-model="masterPasswordConfirm"
-            type="password"
-            show-password
-            :placeholder="t('settings.masterPasswordConfirmPlaceholder')"
-            size="large"
-            class="settings-view__security-input"
-            :disabled="securityStore.isMigrating"
-            @keyup.enter="handleChangeMasterPassword"
-          />
-          <div class="settings-view__security-actions">
-            <el-button
-              type="primary"
-              size="large"
-              :loading="securityStore.isMigrating"
-              :disabled="!masterPasswordConfigured || !securityStore.hasSecurityKey || securityStore.isMigrating"
-              @click="handleChangeMasterPassword"
-            >
-              {{ t('settings.masterPasswordChange') }}
-            </el-button>
-          </div>
-          <p class="settings-view__security-note">
-            {{ t('settings.masterPasswordNote') }}
-          </p>
-      </div>
-
       <MfaSettingsPanel />
 
       <div class="settings-view__row settings-view__row--auto-lock">
@@ -306,34 +244,9 @@
     <div v-if="showSection('about')" class="settings-view__section">
       <h3 v-if="!section">{{ t('settings.about') }}</h3>
 
-      <div class="settings-view__row settings-view__row--health">
-        <div class="settings-view__row-label">
-          <span>{{ t('settings.backend') }}</span>
-          <small>{{ healthStatusText }}</small>
-        </div>
-        <span
-          class="settings-view__health-dot"
-          :class="healthReady ? 'is-ready' : 'is-down'"
-          :title="healthStatusText"
-          aria-hidden="true"
-        />
-      </div>
-
       <div class="settings-view__row">
         <span>{{ t('settings.version') }}</span>
         <span class="settings-view__badge">{{ APP_VERSION }}</span>
-      </div>
-
-      <div class="settings-view__row">
-        <span>{{ t('settings.systemType') }}</span>
-        <span class="settings-view__badge">{{ versionStore.systemType }}</span>
-      </div>
-
-      <div v-if="versionStore.hasUpdate" class="settings-view__row settings-view__row--update">
-        <span>{{ t('settings.updateAvailable', { version: versionStore.latestVersion }) }}</span>
-        <button type="button" class="settings-view__update-btn" @click="versionStore.openDownload">
-          {{ t('settings.updateDownload') }}
-        </button>
       </div>
 
       <div class="settings-view__row">
@@ -366,12 +279,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { settingsMessageBoxConfirm } from '@/utils/settingsMessageBox'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import ShortcutInput from '@/components/settings/ShortcutInput.vue'
 import MfaSettingsPanel from '@/components/settings/MfaSettingsPanel.vue'
 import OfflineVaultSettingsPanel from '@/components/settings/OfflineVaultSettingsPanel.vue'
-import { getHealthApi } from '@/api'
 import { APP_VERSION, AUTHOR_GITHUB_URL, AUTHOR_NAME, OFFICIAL_WEBSITE_URL } from '@/constants/app'
 import { useAppStore } from '@/stores/app'
 import { useAutoLockStore } from '@/stores/autoLock'
@@ -385,7 +296,6 @@ import { useDockStore } from '@/stores/dock'
 import { useLaunchAtLoginStore } from '@/stores/launchAtLogin'
 import { useTrayStore } from '@/stores/tray'
 import { useSecurityStore } from '@/stores/security'
-import { useVersionStore } from '@/stores/version'
 import { useShortcutsStore } from '@/stores/shortcuts'
 import { AUTO_LOCK_OPTIONS, type AutoLockMinutes } from '@/types'
 import {
@@ -407,15 +317,11 @@ import {
 import { LOCALE_PREFERENCE_OPTIONS } from '@/utils/localePreference'
 import { FONT_OPTIONS } from '@/utils/font'
 import { THEME_OPTIONS } from '@/utils/theme'
+import { persistVaultPassword } from '@/utils/vaultPasswordStorage'
 import {
   TRAY_CLICK_ACTION_OPTIONS,
   type TrayClickAction
 } from '@/types/tray'
-import {
-  changeMasterPassword,
-  MasterPasswordChangeError
-} from '@/utils/masterPasswordChange'
-import { loadPersistedVaultPassword, persistVaultPassword } from '@/utils/vaultPasswordStorage'
 import type { SettingsContentSection } from '@/types/settingsDialog'
 
 const props = withDefaults(
@@ -434,23 +340,16 @@ function showSection(id: SettingsContentSection): boolean {
   return !props.section || props.section === id
 }
 
-const HEALTH_CHECK_INTERVAL = 15000
-
 const { t } = useI18n()
 const appStore = useAppStore()
 const securityStore = useSecurityStore()
 const autoLockStore = useAutoLockStore()
 const clipboardClearStore = useClipboardClearStore()
 const biometricUnlockStore = useBiometricUnlockStore()
-const versionStore = useVersionStore()
 const shortcutsStore = useShortcutsStore()
 const launchAtLoginStore = useLaunchAtLoginStore()
 const trayStore = useTrayStore()
 const dockStore = useDockStore()
-const healthReady = ref(false)
-const masterPasswordOld = ref('')
-const masterPasswordNew = ref('')
-const masterPasswordConfirm = ref('')
 const shortcutSaving = ref<ShortcutActionId | null>(null)
 const resettingShortcuts = ref(false)
 const isDesktopApp = computed(() => !!window.shortcutApi)
@@ -470,12 +369,6 @@ const shortcutRegisterWarning = computed(() => {
   }
   return ''
 })
-
-let healthTimer: ReturnType<typeof setInterval> | null = null
-
-const healthStatusText = computed(() =>
-  healthReady.value ? t('settings.backendOk') : t('settings.backendDown')
-)
 
 const themeDescription = computed(() => t(getThemeDescKey(appStore.themePreference)))
 
@@ -506,8 +399,43 @@ const biometricUnavailableHint = computed(() => {
   return t(key)
 })
 
-function handlePreferBiometricUnlockChange(enabled: boolean | string | number): void {
-  biometricUnlockStore.setPreferBiometricUnlock(enabled === true)
+async function handlePreferBiometricUnlockChange(enabled: boolean | string | number): Promise<void> {
+  if (enabled !== true) {
+    biometricUnlockStore.setPreferBiometricUnlock(false)
+    return
+  }
+
+  let password: string
+  try {
+    const result = await ElMessageBox.prompt(
+      t('settings.biometricEnablePasswordPrompt'),
+      t('settings.biometricEnableTitle'),
+      {
+        inputType: 'password',
+        inputPlaceholder: t('settings.biometricEnablePasswordPlaceholder'),
+        inputValidator: (value) => value.trim().length > 0 || t('settings.biometricEnablePasswordRequired'),
+        confirmButtonText: t('settings.biometricEnableConfirm'),
+        cancelButtonText: t('msg.cancel'),
+        distinguishCancelAndClose: true
+      }
+    )
+    password = result.value
+  } catch {
+    return
+  }
+
+  try {
+    const persisted = await persistVaultPassword(password)
+    if (!persisted.ok) {
+      ElMessage.error(persisted.error ?? t('settings.biometricEnableFailed'))
+      return
+    }
+  } catch {
+    ElMessage.error(t('settings.biometricEnableFailed'))
+    return
+  }
+
+  biometricUnlockStore.setPreferBiometricUnlock(true)
 }
 
 async function refreshBiometricUnlockSupport(): Promise<void> {
@@ -516,18 +444,22 @@ async function refreshBiometricUnlockSupport(): Promise<void> {
   biometricUnlockKind.value = null
   biometricUnavailableReason.value = null
 
-  if (!window.biometricApi) return
+  if (!window.biometricApi) {
+    biometricUnlockStore.setPreferBiometricUnlock(false)
+    return
+  }
 
   biometricUnlockSectionVisible.value = true
 
   try {
-    const availability = await window.biometricApi.getAvailability()
+    const [availability, hasStoredPassword] = await Promise.all([
+      window.biometricApi.getAvailability(),
+      window.vaultPasswordApi?.has() ?? Promise.resolve(false)
+    ])
     biometricUnlockSupported.value = availability.available
     biometricUnlockKind.value = availability.kind
     biometricUnavailableReason.value = availability.unavailableReason
-    if (!availability.available) {
-      biometricUnlockStore.setPreferBiometricUnlock(false)
-    }
+    if (!availability.available || !hasStoredPassword) biometricUnlockStore.setPreferBiometricUnlock(false)
   } catch {
     biometricUnlockSupported.value = false
     biometricUnlockKind.value = null
@@ -550,40 +482,16 @@ const clipboardClearOptions = computed(() =>
   }))
 )
 
-async function checkHealth(): Promise<void> {
-  try {
-    const data = await getHealthApi()
-    healthReady.value = data.status === 'UP'
-  } catch {
-    healthReady.value = false
-  }
-}
-
 onMounted(() => {
   void refreshBiometricUnlockSupport()
-  void versionStore.refreshSystemType()
-  void versionStore.checkForUpdate()
-  void checkHealth()
   void shortcutsStore.syncToMain()
   void launchAtLoginStore.refresh()
   void trayStore.refresh()
   void dockStore.refresh()
-  healthTimer = setInterval(() => {
-    void checkHealth()
-  }, HEALTH_CHECK_INTERVAL)
 })
 
 onUnmounted(() => {
-  if (healthTimer) clearInterval(healthTimer)
 })
-
-const masterPasswordConfigured = computed(() => !!securityStore.vaultSalt)
-
-const masterPasswordHint = computed(() =>
-  masterPasswordConfigured.value
-    ? t('settings.masterPasswordConfiguredHint')
-    : t('settings.masterPasswordNotConfiguredHint')
-)
 
 const autoLockMinutes = computed({
   get: () => autoLockStore.lockMinutes,
@@ -668,77 +576,6 @@ async function handleResetShortcuts(): Promise<void> {
     ElMessage.error(t('msg.shortcutResetPartial'))
   } finally {
     resettingShortcuts.value = false
-  }
-}
-
-async function handleChangeMasterPassword(): Promise<void> {
-  if (securityStore.isMigrating) return
-
-  if (!masterPasswordConfigured.value) {
-    ElMessage.warning(t('settings.masterPasswordNotConfiguredHint'))
-    return
-  }
-
-  if (!securityStore.hasSecurityKey) {
-    ElMessage.warning(t('settings.masterPasswordNeedSecurityKey'))
-    return
-  }
-
-  const oldPassword = masterPasswordOld.value
-  const newPassword = masterPasswordNew.value.trim()
-  const confirmPassword = masterPasswordConfirm.value.trim()
-
-  if (!oldPassword) {
-    ElMessage.warning(t('settings.masterPasswordOldRequired'))
-    return
-  }
-  if (!newPassword) {
-    ElMessage.warning(t('settings.masterPasswordNewRequired'))
-    return
-  }
-  if (newPassword.length < 6 || newPassword.length > 64) {
-    ElMessage.warning(t('register.passwordLength'))
-    return
-  }
-  if (newPassword !== confirmPassword) {
-    ElMessage.warning(t('settings.masterPasswordMismatch'))
-    return
-  }
-  if (newPassword === oldPassword) {
-    ElMessage.info(t('settings.masterPasswordUnchanged'))
-    return
-  }
-
-  try {
-    await settingsMessageBoxConfirm(
-      t('settings.masterPasswordChangeBody'),
-      t('settings.masterPasswordChangeTitle'),
-      { type: 'warning', confirmButtonText: t('msg.confirm'), cancelButtonText: t('msg.cancel') }
-    )
-  } catch {
-    return
-  }
-
-  try {
-    const count = await changeMasterPassword(oldPassword, newPassword, (progress) => {
-      securityStore.updateMigrationProgress(progress)
-    })
-    masterPasswordOld.value = ''
-    masterPasswordNew.value = ''
-    masterPasswordConfirm.value = ''
-    ElMessage.success(
-      count > 0
-        ? t('settings.masterPasswordChangedWithCount', { count })
-        : t('settings.masterPasswordChanged')
-    )
-  } catch (err) {
-    const message =
-      err instanceof MasterPasswordChangeError
-        ? err.message
-        : err instanceof Error
-          ? err.message
-          : t('settings.masterPasswordChangeFailed')
-    ElMessage.error(message)
   }
 }
 

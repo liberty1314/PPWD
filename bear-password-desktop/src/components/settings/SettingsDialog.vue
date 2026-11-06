@@ -51,8 +51,7 @@
 
             <div class="settings-modal__main">
               <div class="settings-modal__scroll">
-                <ProfileSettingsPanel v-if="activeSection === 'account'" embedded />
-                <SettingsView v-else embedded dialog :section="activeSection" />
+                <SettingsView embedded dialog :section="activeSection" />
               </div>
             </div>
           </div>
@@ -66,7 +65,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue'
 import SettingsView from '@/views/settings/SettingsView.vue'
-import ProfileSettingsPanel from '@/components/settings/ProfileSettingsPanel.vue'
 import { SETTINGS_DIALOG_NAV } from '@/constants/settingsDialogNav'
 import { Z_INDEX_SETTINGS_MODAL, Z_INDEX_SETTINGS_OVERLAY } from '@/constants/zIndex'
 import { useI18n } from '@/composables/useI18n'
@@ -79,14 +77,14 @@ import type { SettingsDialogSection } from '@/types/settingsDialog'
 
 const { t } = useI18n()
 const settingsDialog = useSettingsDialogStore()
-const activeSection = ref<SettingsDialogSection>('account')
+const activeSection = ref<SettingsDialogSection>('general')
 
 watch(
   () => settingsDialog.visible,
   (visible) => {
     setSettingsDialogBodyClass(visible)
     if (visible) {
-      activeSection.value = 'account'
+      activeSection.value = 'general'
     }
   },
   { immediate: true }

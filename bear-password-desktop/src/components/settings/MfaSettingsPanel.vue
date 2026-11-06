@@ -1,251 +1,130 @@
 <template>
-  <div class="mfa-settings">
-    <div class="mfa-settings__row">
-      <div class="mfa-settings__row-label">
-        <span>{{ t('settings.mfaTotp') }}</span>
-        <small>{{ t('settings.mfaTotpDesc') }}</small>
-      </div>
-      <span
-        class="mfa-settings__badge"
-        :class="{ 'mfa-settings__badge--active': mfaStatus?.totpEnabled }"
-      >
-        {{ mfaStatus?.totpEnabled ? t('settings.mfaEnabled') : t('settings.mfaDisabled') }}
-      </span>
+  <section class="phone-token-settings" aria-labelledby="phone-token-title">
+    <h3 id="phone-token-title">手机令牌</h3>
+    <p class="phone-token-settings__status">
+      {{ authStore.hasPhoneTokenBinding ? '已绑定' : '未绑定' }}
+      <span v-if="authStore.status?.fingerprint">· 恢复密钥指纹 {{ authStore.status.fingerprint }}</span>
+    </p>
+
+    <div v-if="authStore.hasPhoneTokenBinding" class="phone-token-settings__section">
+      <h4>换绑验证器</h4>
+      <p>先使用旧验证器动态码和主密码验证。旧绑定作废后需完成新的二维码绑定。</p>
+      <el-input v-model="password" type="password" show-password autocomplete="current-password" placeholder="主密码" />
+      <el-input v-model="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="旧验证器 6 位动态码" />
+      <el-button type="primary" :loading="loading" @click="startRebind">验证并换绑</el-button>
     </div>
 
-    <div class="mfa-settings__panel">
-      <template v-if="!mfaStatus?.totpEnabled">
-        <div class="mfa-settings__actions">
-          <el-button type="primary" size="large" :loading="totpSetupLoading" @click="handleSetupTotp">
-            {{ t('settings.mfaTotpSetup') }}
-          </el-button>
-        </div>
+    <div v-if="authStore.hasRecoveryKey" class="phone-token-settings__section">
+      <h4>恢复密钥</h4>
+      <p>已配置。查看完整密钥前需再次验证主密码和手机令牌。</p>
+      <template v-if="!revealedKey">
+        <el-input v-model="revealPassword" type="password" show-password autocomplete="current-password" placeholder="主密码" />
+        <el-input v-model="revealCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位动态码" />
+        <el-button :loading="revealing" @click="revealRecoveryKey">验证并查看</el-button>
       </template>
       <template v-else>
-        <div class="mfa-settings__disable-row">
-          <el-input
-            v-model="disableTotpCode"
-            :placeholder="t('settings.mfaTotpDisablePlaceholder')"
-            size="large"
-            class="mfa-settings__input"
-            maxlength="6"
-            @keyup.enter="handleDisableTotp"
-          />
-          <el-button size="large" :loading="disableTotpLoading" @click="handleDisableTotp">
-            {{ t('settings.mfaTotpDisable') }}
-          </el-button>
-        </div>
+        <el-input :model-value="revealedKey" type="textarea" readonly :rows="3" resize="none" />
+        <el-button @click="clearRevealedKey">隐藏恢复密钥</el-button>
       </template>
     </div>
 
-    <el-dialog
-      v-model="totpDialogVisible"
-      :title="t('settings.mfaTotpSetupTitle')"
-      :z-index="Z_INDEX_SETTINGS_OVERLAY"
-      width="420px"
-      class="mfa-settings__dialog"
-      :close-on-click-modal="false"
-      append-to-body
-      @closed="resetTotpSetup"
-    >
-      <p class="mfa-settings__dialog-tip">{{ t('settings.mfaTotpSetupBody') }}</p>
-      <img
-        v-if="totpSetup?.qrCodeBase64"
-        class="mfa-settings__qr"
-        :src="`data:image/png;base64,${totpSetup.qrCodeBase64}`"
-        alt="TOTP QR"
-      />
-      <el-input :model-value="totpSetup?.secret ?? ''" readonly class="mfa-settings__secret" />
-      <el-input
-        v-model="enableTotpCode"
-        :placeholder="t('settings.mfaTotpEnablePlaceholder')"
-        size="large"
-        maxlength="6"
-        @keyup.enter="handleEnableTotp"
-      />
-      <template #footer>
-        <el-button @click="totpDialogVisible = false">{{ t('msg.cancel') }}</el-button>
-        <el-button type="primary" :loading="enableTotpLoading" @click="handleEnableTotp">
-          {{ t('settings.mfaTotpEnable') }}
-        </el-button>
-      </template>
-    </el-dialog>
-  </div>
+    <p v-if="error" class="phone-token-settings__error" role="alert">{{ error }}</p>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import {
-  disableTotpApi,
-  enableTotpApi,
-  getMfaStatusApi,
-  setupTotpApi,
-  type MfaStatus,
-  type TotpSetupResult
-} from '@/api/mfa'
-import { useI18n } from '@/composables/useI18n'
-import { Z_INDEX_SETTINGS_OVERLAY } from '@/constants/zIndex'
+import { useAuthStore } from '@/stores/auth'
+import { useSettingsDialogStore } from '@/stores/settingsDialog'
 
-const { t } = useI18n()
+const router = useRouter()
+const authStore = useAuthStore()
+const settingsDialog = useSettingsDialogStore()
+const password = ref('')
+const code = ref('')
+const revealPassword = ref('')
+const revealCode = ref('')
+const revealedKey = ref('')
+const loading = ref(false)
+const revealing = ref(false)
+const error = ref('')
 
-const mfaStatus = ref<MfaStatus | null>(null)
-
-const totpSetupLoading = ref(false)
-const disableTotpLoading = ref(false)
-const enableTotpLoading = ref(false)
-
-const totpDialogVisible = ref(false)
-const totpSetup = ref<TotpSetupResult | null>(null)
-const enableTotpCode = ref('')
-const disableTotpCode = ref('')
-
-async function refreshMfa(): Promise<void> {
-  mfaStatus.value = await getMfaStatusApi()
-}
-
-async function handleSetupTotp(): Promise<void> {
-  totpSetupLoading.value = true
+async function startRebind(): Promise<void> {
+  if (loading.value) return
+  loading.value = true
+  error.value = ''
   try {
-    totpSetup.value = await setupTotpApi()
-    enableTotpCode.value = ''
-    totpDialogVisible.value = true
-  } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : String(err))
+    const authorized = await window.phoneTokenApi!.rebind(code.value, password.value)
+    if (!authorized.ok) {
+      error.value = authorized.reason === 'unavailable'
+        ? '系统安全存储不可用'
+        : authorized.reason === 'locked'
+          ? '尝试次数过多，请稍后重试'
+          : '验证失败'
+      code.value = ''
+      return
+    }
+    password.value = ''
+    code.value = ''
+    await authStore.refreshStatus()
+    settingsDialog.close()
+    void router.replace({ name: 'Bind', query: { rebind: '1' } })
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : '换绑失败'
   } finally {
-    totpSetupLoading.value = false
+    loading.value = false
   }
 }
 
-async function handleEnableTotp(): Promise<void> {
-  if (!totpSetup.value) return
-  enableTotpLoading.value = true
+async function revealRecoveryKey(): Promise<void> {
+  if (revealing.value) return
+  revealing.value = true
+  error.value = ''
   try {
-    await enableTotpApi(totpSetup.value.pendingToken, enableTotpCode.value.trim())
-    totpDialogVisible.value = false
-    ElMessage.success(t('settings.mfaTotpEnabledMsg'))
-    await refreshMfa()
-  } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : String(err))
+    const result = await window.recoveryKeyApi!.authorize(revealCode.value, revealPassword.value)
+    if (!result.ok) {
+      error.value = result.reason === 'unavailable'
+        ? '系统安全存储不可用'
+        : result.reason === 'locked'
+          ? '尝试次数过多，请稍后重试'
+          : '验证失败'
+      revealCode.value = ''
+      return
+    }
+    const key = await window.recoveryKeyApi!.get()
+    if (!key) throw new Error('恢复密钥读取失败')
+    revealedKey.value = key
+    revealPassword.value = ''
+    revealCode.value = ''
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : '恢复密钥读取失败'
   } finally {
-    enableTotpLoading.value = false
+    revealing.value = false
   }
 }
 
-async function handleDisableTotp(): Promise<void> {
-  disableTotpLoading.value = true
-  try {
-    await disableTotpApi(disableTotpCode.value.trim())
-    disableTotpCode.value = ''
-    ElMessage.success(t('settings.mfaTotpDisabledMsg'))
-    await refreshMfa()
-  } catch (err) {
-    ElMessage.error(err instanceof Error ? err.message : String(err))
-  } finally {
-    disableTotpLoading.value = false
-  }
+function clearRevealedKey(): void {
+  revealedKey.value = ''
+  ElMessage.success('恢复密钥已隐藏')
 }
 
-function resetTotpSetup(): void {
-  totpSetup.value = null
-  enableTotpCode.value = ''
-}
-
-onMounted(() => {
-  void refreshMfa()
+onUnmounted(() => {
+  revealedKey.value = ''
+  revealPassword.value = ''
+  revealCode.value = ''
+  password.value = ''
+  code.value = ''
 })
 </script>
 
 <style scoped lang="scss">
-.mfa-settings {
-  padding-bottom: $spacing-md;
-  margin-bottom: $spacing-sm;
-  border-bottom: 1px solid $color-border;
-
-  &__row {
-    @include flex-between;
-    align-items: flex-start;
-    gap: $spacing-lg;
-    padding: $spacing-md 0 $spacing-sm;
-  }
-
-  &__row-label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-
-    span {
-      color: $color-text-primary;
-      font-size: $font-size-md;
-    }
-
-    small {
-      color: $color-text-muted;
-      font-size: $font-size-sm;
-      line-height: 1.5;
-    }
-  }
-
-  &__badge {
-    flex-shrink: 0;
-    font-size: $font-size-sm;
-    color: $color-text-secondary;
-    background: $color-badge-bg;
-    padding: 4px 12px;
-    border-radius: $radius-sm;
-
-    &--active {
-      color: $color-success;
-      background: rgba(82, 196, 26, 0.12);
-    }
-  }
-
-  &__panel {
-    padding: 0 0 $spacing-md;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-  }
-
-  &__disable-row {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    width: 100%;
-
-    .el-button {
-      flex-shrink: 0;
-    }
-  }
-
-  &__input {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-sm;
-  }
-
-  &__dialog-tip {
-    margin: 0 0 $spacing-md;
-    font-size: $font-size-sm;
-    color: $color-text-secondary;
-    line-height: 1.6;
-  }
-
-  &__qr {
-    display: block;
-    width: 180px;
-    height: 180px;
-    margin: 0 auto $spacing-md;
-  }
-
-  &__secret {
-    margin-bottom: $spacing-md;
-  }
-}
+.phone-token-settings { margin: 22px 0; padding-top: 20px; border-top: 1px solid $color-border; }
+h3, h4 { margin: 0 0 8px; color: $color-text-primary; }
+h3 { font-size: $font-size-md; }
+h4 { font-size: $font-size-sm; }
+.phone-token-settings__status, .phone-token-settings__section p { color: $color-text-secondary; font-size: $font-size-sm; line-height: 1.6; }
+.phone-token-settings__section { display: grid; gap: 10px; padding: 14px 0; border-top: 1px solid $color-border; }
+.phone-token-settings__error { color: $color-danger; font-size: $font-size-sm; }
 </style>

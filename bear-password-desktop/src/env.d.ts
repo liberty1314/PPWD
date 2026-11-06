@@ -135,12 +135,53 @@ interface ClipboardApi {
   readImageDataUrl: () => Promise<{ ok: true; dataUrl: string } | { ok: false; reason: 'empty' }>
 }
 
-/** Electron preload 暴露的安全密钥存储 API（系统钥匙串） */
-interface SecureStorageApi {
+interface LocalVaultAuthStatus {
+  available: boolean
+  hasBinding: boolean
+  hasLocalVault: boolean
+  hasRecoveryKey: boolean
+  fingerprint: string | null
+  vaultSalt: string | null
+  tokenVerifiedThisSession: boolean
+  hasExistingData: boolean
+}
+
+type PhoneTokenOperationResult =
+  | { ok: true }
+  | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'unbound' }
+
+type PhoneTokenAuthResult =
+  | { ok: true; vuk: string }
+  | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'unbound' | 'alreadyBound' }
+
+/** 本地保险库首次初始化 API */
+interface LocalVaultApi {
+  getStatus: () => Promise<LocalVaultAuthStatus>
+  create: (masterPassword: string, recoveryKey: string) => Promise<
+    | { ok: true }
+    | { ok: false; reason: 'invalid' | 'unavailable' | 'alreadyConfigured' | 'existingData' }
+  >
+  biometricUnlock: (reason: string) => Promise<
+    | { ok: true; vuk: string }
+    | { ok: false; reason: 'canceled' | 'unavailable' }
+  >
+}
+
+/** 手机令牌的主进程安全 API；不会返回已绑定的令牌密钥 */
+interface PhoneTokenApi {
   isAvailable: () => Promise<boolean>
+  has: () => Promise<boolean>
+  set: (secret: string, code: string, masterPassword: string) => Promise<PhoneTokenAuthResult>
+  verify: (code: string) => Promise<PhoneTokenAuthResult>
+  rebind: (code: string, masterPassword: string) => Promise<PhoneTokenOperationResult>
+  recover: (masterPassword: string, recoveryKey: string) => Promise<PhoneTokenOperationResult>
+}
+
+/** 恢复密钥只允许在本进程已验证手机令牌后读取 */
+interface RecoveryKeyApi {
+  has: () => Promise<boolean>
+  authorize: (code: string, password: string) => Promise<PhoneTokenOperationResult>
   get: () => Promise<string | null>
-  set: (key: string) => Promise<{ ok: true } | { ok: false; error: string }>
-  remove: () => Promise<void>
 }
 
 /** Electron preload 暴露的主密码存储 API（生物识别解锁保险库时使用） */
@@ -149,7 +190,7 @@ interface VaultPasswordApi {
   has: () => Promise<boolean>
   get: (reason?: string) => Promise<string | null>
   set: (password: string) => Promise<{ ok: true } | { ok: false; error: string }>
-  remove: () => Promise<void>
+  remove: () => Promise<{ ok: true } | { ok: false; error: string }>
 }
 
 /** Electron preload 暴露的生物识别解锁 API */
@@ -194,6 +235,10 @@ interface OfflineVaultApi {
     | { ok: false; error: string }
   >
   pickDataDir: (currentDir?: string) => Promise<string | null>
+  pickEmptyDataDir: (currentDir?: string) => Promise<
+    | { ok: true; settings: OfflineVaultSettingsState }
+    | { ok: false; canceled: boolean; error?: string }
+  >
   readSnapshot: () => Promise<unknown>
   importSnapshot: (snapshot: unknown) => Promise<
     | { ok: true; snapshot: unknown }
@@ -224,6 +269,13 @@ interface OfflineVaultApi {
   recordRecent: (passwordId: string) => Promise<{ ok: true } | { ok: false; error: string }>
 }
 
+interface SecureStorageApi {
+  isAvailable: () => Promise<boolean>
+  get: () => Promise<string | null>
+  set: (key: string) => Promise<{ ok: true } | { ok: false; error: string }>
+  remove: () => Promise<void>
+}
+
 declare global {
   interface Window {
     windowApi?: WindowApi
@@ -234,7 +286,10 @@ declare global {
     dockApi?: DockApi
     fileApi?: FileApi
     clipboardApi?: ClipboardApi
+    localVaultApi?: LocalVaultApi
     secureStorageApi?: SecureStorageApi
+    phoneTokenApi?: PhoneTokenApi
+    recoveryKeyApi?: RecoveryKeyApi
     vaultPasswordApi?: VaultPasswordApi
     biometricApi?: BiometricApi
     extensionBridgeApi?: ExtensionBridgeApi

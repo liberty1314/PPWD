@@ -161,15 +161,43 @@ const clipboardApi = {
 
 contextBridge.exposeInMainWorld('clipboardApi', clipboardApi)
 
-const secureStorageApi = {
-  isAvailable: (): Promise<boolean> => ipcRenderer.invoke('secure-storage:isAvailable'),
-  get: (): Promise<string | null> => ipcRenderer.invoke('secure-storage:get'),
-  set: (key: string): Promise<{ ok: true } | { ok: false; error: string }> =>
-    ipcRenderer.invoke('secure-storage:set', key),
-  remove: (): Promise<void> => ipcRenderer.invoke('secure-storage:remove')
+const localVaultApi = {
+  getStatus: () => ipcRenderer.invoke('local-vault:getStatus') as Promise<LocalVaultAuthStatus>,
+  create: (masterPassword: string, recoveryKey: string) =>
+    ipcRenderer.invoke('local-vault:create', masterPassword, recoveryKey) as Promise<
+      | { ok: true }
+      | { ok: false; reason: 'invalid' | 'unavailable' | 'alreadyConfigured' | 'existingData' }
+    >,
+  biometricUnlock: (reason: string) => ipcRenderer.invoke('local-vault:biometricUnlock', reason) as Promise<
+    | { ok: true; vuk: string }
+    | { ok: false; reason: 'canceled' | 'unavailable' }
+  >
 }
 
-contextBridge.exposeInMainWorld('secureStorageApi', secureStorageApi)
+contextBridge.exposeInMainWorld('localVaultApi', localVaultApi)
+
+const phoneTokenApi = {
+  isAvailable: (): Promise<boolean> => ipcRenderer.invoke('phone-token:isAvailable'),
+  has: (): Promise<boolean> => ipcRenderer.invoke('phone-token:has'),
+  set: (secret: string, code: string, masterPassword: string) =>
+    ipcRenderer.invoke('phone-token:set', secret, code, masterPassword) as Promise<PhoneTokenAuthResult>,
+  verify: (code: string) =>
+    ipcRenderer.invoke('phone-token:verify', code) as Promise<PhoneTokenAuthResult>,
+  rebind: (code: string, masterPassword: string) =>
+    ipcRenderer.invoke('phone-token:rebind', code, masterPassword) as Promise<PhoneTokenOperationResult>,
+  recover: (masterPassword: string, recoveryKey: string) =>
+    ipcRenderer.invoke('phone-token:recover', masterPassword, recoveryKey) as Promise<PhoneTokenOperationResult>
+}
+
+contextBridge.exposeInMainWorld('phoneTokenApi', phoneTokenApi)
+
+const recoveryKeyApi = {
+  has: (): Promise<boolean> => ipcRenderer.invoke('recovery-key:has'),
+  authorize: (code: string, password: string) => ipcRenderer.invoke('recovery-key:authorize', code, password) as Promise<PhoneTokenOperationResult>,
+  get: (): Promise<string | null> => ipcRenderer.invoke('recovery-key:get')
+}
+
+contextBridge.exposeInMainWorld('recoveryKeyApi', recoveryKeyApi)
 
 const vaultPasswordApi = {
   isAvailable: (): Promise<boolean> => ipcRenderer.invoke('vault-password:isAvailable'),
@@ -177,7 +205,8 @@ const vaultPasswordApi = {
   get: (reason?: string): Promise<string | null> => ipcRenderer.invoke('vault-password:get', reason ?? null),
   set: (password: string): Promise<{ ok: true } | { ok: false; error: string }> =>
     ipcRenderer.invoke('vault-password:set', password),
-  remove: (): Promise<void> => ipcRenderer.invoke('vault-password:remove')
+  remove: (): Promise<{ ok: true } | { ok: false; error: string }> =>
+    ipcRenderer.invoke('vault-password:remove')
 }
 
 contextBridge.exposeInMainWorld('vaultPasswordApi', vaultPasswordApi)
@@ -224,6 +253,11 @@ const offlineVaultApi = {
     >,
   pickDataDir: (currentDir?: string) =>
     ipcRenderer.invoke('offline-vault:pickDataDir', currentDir ?? null) as Promise<string | null>,
+  pickEmptyDataDir: (currentDir?: string) =>
+    ipcRenderer.invoke('offline-vault:pickEmptyDataDir', currentDir ?? null) as Promise<
+      | { ok: true; settings: { dataDir: string } }
+      | { ok: false; canceled: boolean; error?: string }
+    >,
   readSnapshot: () => ipcRenderer.invoke('offline-vault:readSnapshot') as Promise<unknown>,
   importSnapshot: (snapshot: unknown) =>
     ipcRenderer.invoke('offline-vault:importSnapshot', snapshot) as Promise<

@@ -318,26 +318,32 @@ const messages: MessageDict = {
   'settings.clipboardClear': 'Auto-clear clipboard',
   'settings.clipboardClearDesc': 'Clear copied passwords and other sensitive data after a delay; clears immediately when the app locks',
   'settings.preferBiometricUnlock': 'Prefer biometric unlock',
-  'settings.preferBiometricUnlockDesc': 'When locked, try biometrics first from tray or shortcut',
-  'settings.preferBiometricUnlockDescTouchId': 'When locked, try Touch ID first from tray or shortcut',
+  'settings.biometricEnableTitle': 'Enable biometric quick unlock',
+  'settings.biometricEnablePasswordPrompt': 'Enter your vault master password and complete one system biometric check. Future launches will prefer biometrics, with phone authenticator codes available as an alternative. The master password will not be stored for unlocking.',
+  'settings.biometricEnablePasswordPlaceholder': 'Vault master password',
+  'settings.biometricEnablePasswordRequired': 'Enter your vault master password',
+  'settings.biometricEnableConfirm': 'Verify and enable',
+  'settings.biometricEnableFailed': 'Verification did not complete. Biometric quick unlock was not enabled.',
+  'settings.preferBiometricUnlockDesc': 'Prefer biometrics when opening the app, with phone codes as an alternative',
+  'settings.preferBiometricUnlockDescTouchId': 'Prefer Touch ID when opening the app, with phone codes as an alternative',
   'settings.preferBiometricUnlockDescWindowsHello':
-    'When locked, try Windows Hello first from tray or shortcut',
+    'Prefer Windows Hello when opening the app, with phone codes as an alternative',
   'settings.biometricUnavailableNotSupported':
     'Biometric unlock is not supported on this system (macOS Touch ID and Windows Hello only).',
   'settings.biometricUnavailableModuleFailed':
-    'Could not load the Windows Hello module. Try reinstalling the app, or use your master password.',
+    'Could not load the Windows Hello module. Try reinstalling the app, or use a phone authenticator code.',
   'settings.biometricUnavailableNotConfigured':
     'Set up a PIN or Windows Hello fingerprint/face in Windows Settings → Accounts → Sign-in options first.',
   'settings.biometricUnavailableDeviceNotPresent':
     'No Windows Hello device found. Check drivers and sign-in options.',
   'settings.biometricUnavailableDisabledByPolicy':
-    'Biometric verification is disabled by system or organization policy. Use your master password instead.',
+    'Biometric verification is disabled by system or organization policy. Use a phone authenticator code instead.',
   'settings.biometricUnavailableDeviceBusy': 'The authentication device is busy. Try again in a moment.',
   'settings.biometricUnavailableTouchId':
     'Touch ID is not available on this Mac. Check System Settings → Touch ID & Password.',
   'settings.biometricUnavailableCheckFailed':
     'Could not check biometric availability. Restart the app and try again.',
-  'settings.biometricUnavailableGeneric': 'Biometrics are unavailable right now. Use your master password.',
+  'settings.biometricUnavailableGeneric': 'Biometrics are unavailable right now. Use a phone authenticator code.',
   'settings.version': 'App version',
   'settings.officialWebsite': 'Website',
   'settings.officialWebsiteLink': 'BearPassword Website',

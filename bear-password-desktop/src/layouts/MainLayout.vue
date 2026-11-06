@@ -21,17 +21,10 @@
             @click="openSettings"
           >
             <div class="main-layout__avatar">
-              <img
-                v-if="showAvatarImage"
-                :src="authStore.avatar"
-                :alt="authStore.displayName"
-                class="main-layout__avatar-img"
-                @error="onAvatarError"
-              />
-              <span v-else>{{ avatarLetter }}</span>
+              <span>{{ avatarLetter }}</span>
             </div>
             <div class="main-layout__user-meta">
-              <span class="main-layout__username">{{ authStore.displayName }}</span>
+              <span class="main-layout__username">本地保险库</span>
             </div>
           </button>
         </div>
@@ -80,27 +73,22 @@
       </div>
     </Teleport>
 
-    <AnnouncementDialog />
     <SettingsDialog />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import TitleBar from '@/components/window/TitleBar.vue'
 import AppLogo from '@/components/common/AppLogo.vue'
-import AnnouncementDialog from '@/components/common/AnnouncementDialog.vue'
 import SettingsDialog from '@/components/settings/SettingsDialog.vue'
 import SideNav from '@/components/common/SideNav.vue'
-import { getCurrentUserApi } from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useSecurityStore } from '@/stores/security'
-import { useServerStore } from '@/stores/server'
 import { useSettingsDialogStore } from '@/stores/settingsDialog'
-import { useVersionStore } from '@/stores/version'
 import { useVaultStore } from '@/stores/vault'
 import { preloadVaultViewChunk } from '@/utils/vaultViewPreload'
 import { useAutoLockActivity } from '@/composables/useAutoLockActivity'
@@ -110,9 +98,7 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 const autoLockStore = useAutoLockStore()
 const securityStore = useSecurityStore()
-const serverStore = useServerStore()
 const settingsDialog = useSettingsDialogStore()
-const versionStore = useVersionStore()
 const vaultStore = useVaultStore()
 const route = useRoute()
 
@@ -138,25 +124,10 @@ const migrationPercent = computed(() => {
   return Math.min(100, Math.round((current / total) * 100))
 })
 
-/** 用户名首字母作为头像占位 */
-const avatarLetter = computed(() => {
-  return authStore.displayName.charAt(0).toUpperCase() || 'B'
-})
-
-const avatarLoadFailed = ref(false)
-
-const showAvatarImage = computed(() => !!authStore.avatar && !avatarLoadFailed.value)
-
-watch(() => authStore.avatar, () => {
-  avatarLoadFailed.value = false
-})
+const avatarLetter = computed(() => 'B')
 
 function openSettings(): void {
   settingsDialog.open()
-}
-
-function onAvatarError(): void {
-  avatarLoadFailed.value = true
 }
 
 function isRecordingShortcut(event: KeyboardEvent): boolean {
@@ -171,13 +142,6 @@ function onSettingsHotkey(event: KeyboardEvent): void {
   event.preventDefault()
   openSettings()
 }
-
-watch(
-  () => serverStore.revision,
-  () => {
-    void versionStore.checkForUpdate()
-  }
-)
 
 /** 登录后预加载密码库壳与数据，减少首次进入等待 */
 function prefetchVaultResources(): void {
@@ -204,7 +168,7 @@ function scheduleVaultDataWarmup(): void {
 }
 
 watch(
-  () => [authStore.isLoggedIn, securityStore.hasVaultAccess] as const,
+  () => [authStore.hasLocalVault, securityStore.hasVaultAccess] as const,
   ([loggedIn, hasVaultAccess]) => {
     if (!loggedIn) return
     prefetchVaultResources()
@@ -217,10 +181,6 @@ watch(
 
 onMounted(() => {
   window.addEventListener('keydown', onSettingsHotkey)
-  void getCurrentUserApi()
-    .then((profile) => authStore.syncProfile(profile))
-    .catch(() => {})
-  void versionStore.checkForUpdate()
 })
 
 onUnmounted(() => {

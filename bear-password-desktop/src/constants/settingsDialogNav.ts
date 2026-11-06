@@ -8,11 +8,6 @@ export interface SettingsDialogNavItem {
 
 export const SETTINGS_DIALOG_NAV: SettingsDialogNavItem[] = [
   {
-    id: 'account',
-    labelKey: 'settings.tab.account',
-    icon: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
-  },
-  {
     id: 'general',
     labelKey: 'settings.general',
     icon: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.5V3.5M9 14.5V16.5M1.5 9H3.5M14.5 9H16.5M3.6 3.6L5 5M13 13L14.4 14.4M3.6 14.4L5 13M13 5L14.4 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
