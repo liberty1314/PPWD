@@ -655,3 +655,24 @@
     - docs/project/release-acceptance-m4.md
     - docs/开发计划.md
     - docs/readme_2611.md
+[2026-11-07 17:15] docs(ui): 更新桌面端视觉改版方案与页面原型
+  Body: 新增桌面端 UI 改版提案、可交互全页面原型及页面预览图，供后续设计评审和实施参考。
+  Files:
+    - docs/design-proposal.md
+    - docs/prototypes/all-pages.html
+    - docs/prototypes/all-pages/bind.png
+    - docs/prototypes/all-pages/dashboard.png
+    - docs/prototypes/all-pages/favorites.png
+    - docs/prototypes/all-pages/island.png
+    - docs/prototypes/all-pages/recent.png
+    - docs/prototypes/all-pages/recover.png
+    - docs/prototypes/all-pages/settings-appearance.png
+    - docs/prototypes/all-pages/settings-general.png
+    - docs/prototypes/all-pages/settings-security.png
+    - docs/prototypes/all-pages/settings-shortcuts.png
+    - docs/prototypes/all-pages/setup.png
+    - docs/prototypes/all-pages/unlock.png
+    - docs/prototypes/all-pages/vault.png
+    - docs/prototypes/bearpassword-vault-concept.html
+    - docs/prototypes/bearpassword-vault-concept.png
+    - docs/readme_2611.md
