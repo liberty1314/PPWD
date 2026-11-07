@@ -7,6 +7,10 @@ import {
 } from '@/utils/vaultCrypto/constants'
 import { concatBytes, fromBase64, toBase64 } from '@/utils/vaultCrypto/encoding'
 
+function toCryptoBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.slice().buffer as ArrayBuffer
+}
+
 export function generateAccountSecretKey(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(96))
   return toBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_')
@@ -31,7 +35,7 @@ export async function computeSecretKeyFingerprint(accountSecretKey: string): Pro
 async function deriveMasterPasswordKey(masterPassword: string): Promise<Uint8Array> {
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(masterPassword),
+    toCryptoBuffer(new TextEncoder().encode(masterPassword)),
     'PBKDF2',
     false,
     ['deriveBits']
@@ -39,7 +43,7 @@ async function deriveMasterPasswordKey(masterPassword: string): Promise<Uint8Arr
   const bits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: MASTER_PASSWORD_PEPPER,
+      salt: toCryptoBuffer(MASTER_PASSWORD_PEPPER),
       iterations: MASTER_PASSWORD_ITERATIONS,
       hash: 'SHA-256'
     },
@@ -60,13 +64,13 @@ export async function deriveVaultUnlockKey(
   const vaultSalt = fromBase64(vaultSaltBase64)
   const ikm = concatBytes(mpKey, secretKeyBytes)
 
-  const baseKey = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits'])
+  const baseKey = await crypto.subtle.importKey('raw', toCryptoBuffer(ikm), 'HKDF', false, ['deriveBits'])
   const bits = await crypto.subtle.deriveBits(
     {
       name: 'HKDF',
       hash: 'SHA-256',
-      salt: vaultSalt,
-      info: VUK_HKDF_INFO
+      salt: toCryptoBuffer(vaultSalt),
+      info: toCryptoBuffer(VUK_HKDF_INFO)
     },
     baseKey,
     256
@@ -76,13 +80,13 @@ export async function deriveVaultUnlockKey(
 
 export async function deriveItemAesKey(vuk: Uint8Array, itemSaltBase64: string): Promise<CryptoKey> {
   const itemSalt = fromBase64(itemSaltBase64)
-  const baseKey = await crypto.subtle.importKey('raw', vuk, 'HKDF', false, ['deriveKey'])
+  const baseKey = await crypto.subtle.importKey('raw', toCryptoBuffer(vuk), 'HKDF', false, ['deriveKey'])
   return crypto.subtle.deriveKey(
     {
       name: 'HKDF',
       hash: 'SHA-256',
-      salt: itemSalt,
-      info: ITEM_KEY_HKDF_INFO
+      salt: toCryptoBuffer(itemSalt),
+      info: toCryptoBuffer(ITEM_KEY_HKDF_INFO)
     },
     baseKey,
     { name: 'AES-GCM', length: 256 },

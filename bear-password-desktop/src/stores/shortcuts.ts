@@ -14,8 +14,8 @@ import { storage } from '@/utils/storage'
 const STORAGE_KEY = 'shortcuts'
 
 const LEGACY_DEFAULTS: Record<string, string> = {
-  'CommandOrControl+Shift+B': DEFAULT_SHORTCUT_SETTINGS.open,
-  'CommandOrControl+Shift+L': DEFAULT_SHORTCUT_SETTINGS.lock
+  'CommandOrControl+Shift+B': DEFAULT_SHORTCUT_SETTINGS.open ?? 'Alt+B',
+  'CommandOrControl+Shift+L': DEFAULT_SHORTCUT_SETTINGS.lock ?? 'Alt+L'
 }
 
 function normalizeAccelerator(value: unknown, fallback: string | null): string | null {

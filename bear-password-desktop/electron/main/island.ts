@@ -209,7 +209,7 @@ export function registerIslandIpc(handlers: {
   })
 
   ipcMain.on('island:openEntry', (_event, entryId: unknown) => {
-    if (typeof entryId !== 'number' || !Number.isFinite(entryId)) return
+    if (typeof entryId !== 'string' || !entryId || entryId.length > 128) return
     focusMainWindowHandler?.()
     getMainWindowHandler?.()?.webContents.send('island:openEntry', entryId)
   })

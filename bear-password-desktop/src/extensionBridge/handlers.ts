@@ -9,7 +9,6 @@ import type { LoginContent, PasswordEntry, PasswordEntryParams } from '@/types'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
-import { useSecurityStore } from '@/stores/security'
 import { useVaultStore } from '@/stores/vault'
 import type { ExtensionBridgeHealth } from '../../shared/extensionBridge'
 import {
@@ -22,7 +21,6 @@ import { resolveEntryType } from '@/utils/vaultEntryDisplay'
 
 function assertVaultReady(): void {
   const authStore = useAuthStore()
-  const securityStore = useSecurityStore()
   const autoLockStore = useAutoLockStore()
 
   if (!authStore.hasLocalVault) {
@@ -31,7 +29,7 @@ function assertVaultReady(): void {
   if (autoLockStore.isLocked) {
     throw new Error('桌面端已锁定，请先解锁保险库')
   }
-  if (!securityStore.hasVaultAccess) {
+  if (!authStore.isUnlocked) {
     throw new Error('桌面端保险库未解锁，请先完成本机配置并解锁')
   }
 }
@@ -71,6 +69,7 @@ export async function extensionBridgeMatchCredentials(params: {
     getLoginEntriesForMatch(),
     getFavoriteIdsApi().catch(() => [] as string[])
   ])
+  assertVaultReady()
 
   const result = url
     ? buildMatchingCredentialsResult(entries, url, matchBy)
@@ -81,6 +80,7 @@ export async function extensionBridgeMatchCredentials(params: {
         needsSecurityKey: false
       }
 
+  assertVaultReady()
   return {
     credentials: applyFavoriteState(result.credentials, favoriteIds),
     needsSecurityKey: result.needsSecurityKey
@@ -90,6 +90,7 @@ export async function extensionBridgeMatchCredentials(params: {
 export async function extensionBridgeGetCredential(params: { id: string }): Promise<FillCredential> {
   assertVaultReady()
   const entry = await getPasswordDetailApi(params.id)
+  assertVaultReady()
   const credential = toFillCredential(entry)
   if (!credential) {
     throw new Error('无法读取该登录项')
@@ -133,6 +134,7 @@ export async function extensionBridgeCreateCredential(params: {
   await createPasswordApi(
     buildLoginEntryParams(params.title, params.username, params.password, params.websites)
   )
+  assertVaultReady()
   await useVaultStore().refreshAfterMutation()
 }
 
@@ -145,6 +147,7 @@ export async function extensionBridgeUpdateCredential(params: {
 }): Promise<void> {
   assertVaultReady()
   const existing = await getPasswordDetailApi(params.credentialId)
+  assertVaultReady()
   const content = existing.content as LoginContent
   await updatePasswordApi(
     params.credentialId,
@@ -153,12 +156,14 @@ export async function extensionBridgeUpdateCredential(params: {
       remark: existing.remark ?? ''
     })
   )
+  assertVaultReady()
   await useVaultStore().refreshAfterMutation()
 }
 
 export async function extensionBridgeDeleteCredential(params: { id: string }): Promise<void> {
   assertVaultReady()
   await deletePasswordApi(params.id)
+  assertVaultReady()
   await useVaultStore().refreshAfterMutation()
 }
 

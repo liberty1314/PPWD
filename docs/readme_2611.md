@@ -538,6 +538,32 @@
     - docs/开发计划.md
     - docs/readme_2611.md
 
+[2026-11-07 10:13] fix(desktop): 修复全量类型检查并加固扩展桥接
+  Body: 修复桌面端全量类型检查中的类型漂移并补齐灵动岛 IPC；扩展锁定后清除凭据并禁用后台缓存，桥接异步操作复核解锁状态。验证通过桌面端 typecheck、build 与扩展 typecheck、build。
+  Files:
+    - bear-password-desktop/electron/main/island.ts
+    - bear-password-desktop/electron/preload/index.ts
+    - bear-password-desktop/src/components/vault/CustomEntryForm.vue
+    - bear-password-desktop/src/components/vault/LoginEntryForm.vue
+    - bear-password-desktop/src/env.d.ts
+    - bear-password-desktop/src/extensionBridge/handlers.ts
+    - bear-password-desktop/src/stores/app.ts
+    - bear-password-desktop/src/stores/shortcuts.ts
+    - bear-password-desktop/src/stores/tray.ts
+    - bear-password-desktop/src/utils/appMessageBox.ts
+    - bear-password-desktop/src/utils/contentCrypto.ts
+    - bear-password-desktop/src/utils/islandBridge.ts
+    - bear-password-desktop/src/utils/passwordTitle.ts
+    - bear-password-desktop/src/utils/settingsMessageBox.ts
+    - bear-password-desktop/src/utils/vaultCrypto/vaultKeyDerivation.ts
+    - bear-password-desktop/src/utils/vaultViewPreload.ts
+    - bear-password-desktop/src/views/island/IslandView.vue
+    - bear-password-desktop/src/views/vault/VaultView.vue
+    - bear-password-desktop/src/views/vault/VaultViewHost.vue
+    - bear-password-extension/src/background/index.ts
+    - bear-password-extension/src/content/index.ts
+    - bear-password-extension/src/popup/stores/session.ts
+
 [2026-11-06 17:10] feat(desktop): 完善本地设置、加密备份与账号功能清理
   Body: 设置页新增手机令牌管理、加密备份导入导出和清空保险库确认，补齐本地解锁流程的中英日文案。移除桌面端无调用方的服务端认证、更新与公告代码，并同步阶段 2 人工验收状态。
   Footer: 破坏性变更: 桌面端不再提供服务端账号认证与同步路径；本地版不承诺旧云端数据迁移。

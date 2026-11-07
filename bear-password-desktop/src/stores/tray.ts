@@ -16,6 +16,7 @@ export const useTrayStore = defineStore('tray', () => {
   const openCreateToken = ref(0)
   /** 递增后通知密码库页打开导入密码对话框 */
   const openImportToken = ref(0)
+  const openEntryRequest = ref<{ token: number; entryId: string } | null>(null)
 
   async function refresh(): Promise<void> {
     if (!window.trayApi) {
@@ -64,6 +65,13 @@ export const useTrayStore = defineStore('tray', () => {
     openImportToken.value += 1
   }
 
+  function requestOpenEntry(entryId: string): void {
+    openEntryRequest.value = {
+      token: (openEntryRequest.value?.token ?? 0) + 1,
+      entryId
+    }
+  }
+
   return {
     available,
     enabled,
@@ -72,10 +80,12 @@ export const useTrayStore = defineStore('tray', () => {
     quickSearchFocusToken,
     openCreateToken,
     openImportToken,
+    openEntryRequest,
     refresh,
     updateSettings,
     requestQuickSearchFocus,
     requestOpenCreate,
-    requestOpenImport
+    requestOpenImport,
+    requestOpenEntry
   }
 })

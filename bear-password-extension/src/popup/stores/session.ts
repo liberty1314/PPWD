@@ -47,6 +47,9 @@ export const useSessionStore = defineStore('session', () => {
       desktopState.value = await sendMessage<DesktopConnectionState>({
         type: 'GET_DESKTOP_STATE'
       })
+      if (!desktopState.value.unlocked) {
+        useVaultStore().clearSensitiveData()
+      }
     } catch (err) {
       desktopState.value = {
         ready: false,
@@ -57,6 +60,7 @@ export const useSessionStore = defineStore('session', () => {
         themePreference: null,
         localePreference: null
       }
+      useVaultStore().clearSensitiveData()
       if (!silent) {
         error.value = err instanceof Error ? err.message : t('session.desktopFailed')
       }
@@ -122,6 +126,14 @@ export const useVaultStore = defineStore('vault', () => {
   const editingCredential = ref<FillCredential | null>(null)
   const entrySaving = ref(false)
   let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+  function clearSensitiveData(): void {
+    matching.value = []
+    needsSecurityKey.value = false
+    pendingDelete.value = null
+    editingCredential.value = null
+    entryDialogOpen.value = false
+  }
 
   function showToast(message: string): void {
     toast.value = message
@@ -311,6 +323,7 @@ export const useVaultStore = defineStore('vault', () => {
     editingCredential,
     entrySaving,
     filtered,
+    clearSensitiveData,
     refresh,
     autofill,
     showToast,

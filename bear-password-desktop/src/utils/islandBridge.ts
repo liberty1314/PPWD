@@ -1,4 +1,3 @@
-import router from '@/router'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useTrayStore } from '@/stores/tray'
 import { openVaultQuickSearch } from '@/utils/vaultQuickSearch'

@@ -24,6 +24,10 @@ export interface VaultUnlockContext {
   vuk: Uint8Array
 }
 
+function toCryptoBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.slice().buffer as ArrayBuffer
+}
+
 /** @deprecated 使用 ACCOUNT_SECRET_KEY_LENGTH */
 export const SECURITY_KEY_LENGTH = 128
 
@@ -56,7 +60,11 @@ export async function encryptContentObject(
   const plaintext = new TextEncoder().encode(JSON.stringify(content))
   const itemSalt = toBase64(crypto.getRandomValues(new Uint8Array(16)))
   const key = await deriveItemAesKey(unlock.vuk, itemSalt)
-  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext)
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: toCryptoBuffer(iv) },
+    key,
+    toCryptoBuffer(plaintext)
+  )
   return {
     [ENCRYPTED_CONTENT_MARKER]: true,
     v: CRYPTO_VERSION_V2,
@@ -81,6 +89,10 @@ export async function decryptContentObject(
   const key = await deriveItemAesKey(unlock.vuk, content.itemSalt)
   const iv = fromBase64(content.iv)
   const ciphertext = fromBase64(content.data)
-  const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext)
+  const plaintext = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: toCryptoBuffer(iv) },
+    key,
+    toCryptoBuffer(ciphertext)
+  )
   return JSON.parse(new TextDecoder().decode(plaintext)) as PasswordContent
 }

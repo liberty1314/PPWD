@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import type { TrayAppearanceSnapshot as SharedTrayAppearanceSnapshot } from '../shared/trayMenu'
 
 /** Vue 单文件组件类型声明 */
 declare module '*.vue' {
@@ -63,10 +64,33 @@ interface TraySettingsState {
 }
 
 interface TrayAppearanceSnapshot {
-  theme: string
-  locale: string
-  font: string
-  labels: Record<string, unknown>
+  theme: SharedTrayAppearanceSnapshot['theme']
+  locale: SharedTrayAppearanceSnapshot['locale']
+  font: SharedTrayAppearanceSnapshot['font']
+  labels: SharedTrayAppearanceSnapshot['labels']
+}
+
+interface IslandSettingsState {
+  available: boolean
+  enabled: boolean
+}
+
+interface IslandAppState {
+  loggedIn: boolean
+  locked: boolean
+}
+
+interface IslandApi {
+  getSettings: () => Promise<IslandSettingsState>
+  setSettings: (partial: { enabled?: boolean }) => Promise<
+    | { ok: true; settings: IslandSettingsState }
+    | { ok: false; error: string }
+  >
+  setExpanded: (expanded: boolean) => void
+  openEntry: (entryId: string) => void
+  touchActivity: () => void
+  onOpenEntry: (callback: (entryId: string) => void) => () => void
+  onTouchActivity: (callback: () => void) => () => void
 }
 
 type TrayRendererCommand =
@@ -214,7 +238,18 @@ interface BiometricApi {
 
 interface ExtensionBridgeApi {
   onRequest: (
-    callback: (payload: { id: string; method: string; params: unknown }) => void
+    callback: (payload: {
+      id: string
+      method:
+        | 'health'
+        | 'matchCredentials'
+        | 'getCredential'
+        | 'createCredential'
+        | 'updateCredential'
+        | 'deleteCredential'
+        | 'toggleFavorite'
+      params: unknown
+    }) => void
   ) => () => void
   sendResponse: (id: string, result: { ok: boolean; data?: unknown; error?: string }) => void
 }
@@ -288,6 +323,7 @@ declare global {
     recoveryKeyApi?: RecoveryKeyApi
     vaultPasswordApi?: VaultPasswordApi
     biometricApi?: BiometricApi
+    islandApi?: IslandApi
     extensionBridgeApi?: ExtensionBridgeApi
     offlineVaultApi?: OfflineVaultApi
   }

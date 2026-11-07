@@ -257,12 +257,6 @@ onMounted(async () => {
   }
   window.addEventListener('storage', storageListener)
 
-  window.islandApi?.onAppState((state) => {
-    autoLockStore.isLocked = state.locked
-    if (state.locked || !state.loggedIn) {
-      collapse()
-    }
-  })
 })
 
 onUnmounted(() => {

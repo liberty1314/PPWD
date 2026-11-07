@@ -16,11 +16,15 @@ import { getPreloadedVaultView, preloadVaultViewChunk } from '@/utils/vaultViewP
 
 const vaultViewComponent = shallowRef<Component | null>(getPreloadedVaultView())
 
+function setVaultViewComponent(component: Component): void {
+  vaultViewComponent.value = component
+}
+
 onMounted(() => {
   if (vaultViewComponent.value) return
   requestAnimationFrame(() => {
     void preloadVaultViewChunk().then((component) => {
-      vaultViewComponent.value = component
+      setVaultViewComponent(component)
     })
   })
 })

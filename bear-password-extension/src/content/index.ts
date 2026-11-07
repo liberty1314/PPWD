@@ -1,4 +1,9 @@
-import type { FillCredential, MatchingCredentialsResult, SaveCredentialPayload } from '@/shared/types'
+import type {
+  DesktopConnectionState,
+  FillCredential,
+  MatchingCredentialsResult,
+  SaveCredentialPayload
+} from '@/shared/types'
 import { autofillCredential, autofillInContext, getDetectedForms, insertTextAtActiveElement } from '@/content/autofill'
 import {
   detectLoginInputs,
@@ -69,7 +74,21 @@ function refreshContentAppearanceUI(): void {
 function startAppearanceSync(): void {
   if (appearanceSyncTimer) return
   appearanceSyncTimer = setInterval(() => {
-    void syncContentAppearanceFromDesktop()
+    void sendMessage<DesktopConnectionState>({ type: 'GET_DESKTOP_STATE' })
+      .then((state) => {
+        syncContentAppearanceFromHealth(state)
+        if (state.unlocked) return
+        matchingCredentials = []
+        needsSecurityKey = false
+        desktopUnlocked = false
+        void syncOpenPickerAfterRefresh()
+      })
+      .catch(() => {
+        matchingCredentials = []
+        needsSecurityKey = false
+        desktopUnlocked = false
+        void syncOpenPickerAfterRefresh()
+      })
   }, APPEARANCE_SYNC_MS)
 }
 

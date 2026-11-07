@@ -56,15 +56,15 @@
     <!-- 网站列表 / 主机 -->
     <div v-if="variant === 'login'" class="login-entry-form__card login-entry-form__card--soft">
       <div
-        v-for="(url, index) in content.websites"
+        v-for="index in content.websites.length"
         :key="index"
       >
-        <div v-if="index > 0" class="login-entry-form__divider" />
+        <div v-if="index > 1" class="login-entry-form__divider" />
         <div class="login-entry-form__row">
-          <label v-if="index === 0" class="login-entry-form__block-label">{{ t('entry.form.login.website') }}</label>
+          <label v-if="index === 1" class="login-entry-form__block-label">{{ t('entry.form.login.website') }}</label>
           <div class="login-entry-form__field-wrap">
             <input
-              v-model="content.websites[index]"
+              v-model="content.websites[index - 1]"
               class="login-entry-form__input"
               :placeholder="t('entry.form.login.websitePlaceholder')"
               type="url"

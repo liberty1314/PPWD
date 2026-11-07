@@ -23,19 +23,7 @@ import type {
 } from '@/shared/types'
 import { generatePassword } from '@/shared/utils/passwordGenerator'
 
-interface CredentialsCacheEntry {
-  result: MatchingCredentialsResult
-  timestamp: number
-}
-
-const credentialsCache = new Map<string, CredentialsCacheEntry>()
-const CACHE_TTL = 60_000
-
 let cachedHealth: DesktopConnectionState | null = null
-
-function clearCredentialsCache(): void {
-  credentialsCache.clear()
-}
 
 async function getDesktopState(force = false): Promise<DesktopConnectionState | null> {
   if (force) {
@@ -87,26 +75,33 @@ async function refreshMatchingCredentials(
     localePreference: state?.localePreference ?? null
   }
   if (!state?.unlocked) {
-    clearCredentialsCache()
     return { credentials: [], needsSecurityKey: false, desktopUnlocked: false, ...appearance }
-  }
-
-  const keyword = url?.trim() ?? ''
-  const cacheKey = `${matchBy}:${keyword || '__all__'}`
-  const cached = credentialsCache.get(cacheKey)
-  const now = Date.now()
-
-  if (!force && cached && now - cached.timestamp < CACHE_TTL) {
-    return { ...cached.result, ...appearance }
   }
 
   try {
     const result = url
       ? await getMatchingCredentialsApi(url, matchBy)
       : await getMatchingCredentialsApi('', matchBy)
-    const merged: MatchingCredentialsResult = { ...result, desktopUnlocked: true, ...appearance }
-    credentialsCache.set(cacheKey, { result: merged, timestamp: now })
-    return merged
+    // Do not hand credentials to the extension if the desktop locked while the
+    // asynchronous vault read was in flight.
+    const latestState = await getDesktopState(true)
+    if (!latestState?.unlocked) {
+      return {
+        credentials: [],
+        needsSecurityKey: false,
+        desktopUnlocked: false,
+        desktopReady: latestState?.ready ?? false,
+        themePreference: latestState?.themePreference ?? null,
+        localePreference: latestState?.localePreference ?? null
+      }
+    }
+    return {
+      ...result,
+      desktopUnlocked: true,
+      desktopReady: latestState.ready,
+      themePreference: latestState.themePreference,
+      localePreference: latestState.localePreference
+    }
   } catch (err) {
     if (err instanceof Error && err.message.includes('桌面端')) {
       cachedHealth = null
@@ -169,6 +164,7 @@ async function handleAutofill(payload: AutofillPayload): Promise<void> {
   }
 
   const credential = await resolveFillCredential(payload.credentialId, pageUrl)
+  await assertDesktopUnlocked()
 
   let filled = false
   try {
@@ -189,7 +185,6 @@ async function handleAutofill(payload: AutofillPayload): Promise<void> {
 async function handleCreateCredential(payload: UpsertCredentialPayload): Promise<void> {
   await assertDesktopUnlocked()
   await createCredentialApi(payload)
-  clearCredentialsCache()
   await updateBadgeForActiveTab()
 }
 
@@ -205,7 +200,6 @@ async function handleSaveCredential(payload: SaveCredentialPayload): Promise<voi
 async function handleUpdateCredential(payload: UpdateCredentialPayload): Promise<void> {
   await assertDesktopUnlocked()
   await updateCredentialApi(payload)
-  clearCredentialsCache()
   await updateBadgeForActiveTab()
 }
 
@@ -284,7 +278,6 @@ async function handleMessage(message: ExtensionMessage, sender?: chrome.runtime.
 
     case 'REFRESH_DESKTOP_STATE': {
       cachedHealth = null
-      clearCredentialsCache()
       const state = await getDesktopState(true)
       await updateBadgeForActiveTab()
       return state
@@ -323,7 +316,6 @@ async function handleMessage(message: ExtensionMessage, sender?: chrome.runtime.
       await assertDesktopUnlocked()
       const { credentialId, favorite } = message.payload as { credentialId: string; favorite: boolean }
       await toggleFavoriteApi(credentialId, favorite)
-      clearCredentialsCache()
       return true
     }
 
@@ -331,7 +323,6 @@ async function handleMessage(message: ExtensionMessage, sender?: chrome.runtime.
       await assertDesktopUnlocked()
       const { credentialId } = message.payload as { credentialId: string }
       await deleteCredentialApi(credentialId)
-      clearCredentialsCache()
       await updateBadgeForActiveTab()
       return true
     }

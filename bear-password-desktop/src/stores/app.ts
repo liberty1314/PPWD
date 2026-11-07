@@ -21,8 +21,6 @@ import {
   DEFAULT_FONT_PREFERENCE
 } from '@/utils/font'
 import {
-  type LocalePreference,
-  type ResolvedLocale,
   resolveLocale,
   applyResolvedLocale,
   initLocaleOnBoot,
@@ -30,6 +28,7 @@ import {
   syncSystemLocale,
   systemLocaleRevision
 } from '@/utils/localePreference'
+import type { LocalePreference, ResolvedLocale } from '@/locales/types'
 import { syncTrayAppearanceToMain } from '@/utils/trayAppearanceSync'
 
 /**

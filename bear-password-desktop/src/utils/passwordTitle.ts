@@ -5,7 +5,6 @@ import type {
   DatabaseContent,
   IdentityContent,
   LoginContent,
-  PasswordContent,
   PasswordEntry,
   PasswordType,
   SecureNoteContent

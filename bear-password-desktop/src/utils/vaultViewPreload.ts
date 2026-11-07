@@ -3,6 +3,10 @@ import { shallowRef, type Component } from 'vue'
 const vaultViewComponent = shallowRef<Component | null>(null)
 let loadPromise: Promise<Component> | null = null
 
+function cacheVaultViewComponent(component: Component): void {
+  vaultViewComponent.value = component
+}
+
 export function getPreloadedVaultView(): Component | null {
   return vaultViewComponent.value
 }
@@ -17,7 +21,7 @@ export function preloadVaultViewChunk(): Promise<Component> {
   }
 
   loadPromise = import('@/views/vault/VaultView.vue').then((mod) => {
-    vaultViewComponent.value = mod.default
+    cacheVaultViewComponent(mod.default)
     return mod.default
   })
 

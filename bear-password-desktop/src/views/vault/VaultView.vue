@@ -245,11 +245,11 @@
 
               <el-dropdown
                 v-if="!selectionMode"
-                :ref="(el) => setEntryDropdownRef(entry.id, el)"
+                :ref="(el: unknown) => setEntryDropdownRef(entry.id, el)"
                 trigger="click"
                 placement="bottom-end"
-                @visible-change="(visible) => onEntryMenuVisibleChange(visible, entry.id)"
-                @command="(cmd) => handleEntryMenuCommand(cmd as EntryMenuCommand, entry)"
+                @visible-change="(visible: boolean) => onEntryMenuVisibleChange(visible, entry.id)"
+                @command="(cmd: unknown) => handleEntryMenuCommand(cmd as EntryMenuCommand, entry)"
               >
                 <button
                   type="button"
@@ -641,11 +641,6 @@ interface PreviewField {
   links?: string[]
   extraFieldType?: ExtraFieldTypeId
   authenticator?: AuthenticatorContent
-}
-
-interface EntryGroup {
-  label: string
-  entries: PasswordEntry[]
 }
 
 /** 列表每次增量渲染条数（数据仍一次性拉取，仅控制 DOM 展示） */
@@ -1575,7 +1570,7 @@ function formatDateTime(dateStr?: string): string {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
   if (Number.isNaN(date.getTime())) return dateStr
-  return date.toLocaleString(INTL_LOCALE_MAP[locale.value], {
+  return date.toLocaleString(INTL_LOCALE_MAP[locale.value as keyof typeof INTL_LOCALE_MAP] ?? locale.value, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -1620,6 +1615,17 @@ watch(
     if (trayStore.openImportToken === 0) return
     await nextTick()
     openImportDialog()
+  }
+)
+
+watch(
+  () => trayStore.openEntryRequest,
+  async (request) => {
+    if (!request) return
+    await vaultStore.ensureLoaded()
+    if (entries.value.some((entry) => entry.id === request.entryId)) {
+      selectedEntryId.value = request.entryId
+    }
   }
 )
 

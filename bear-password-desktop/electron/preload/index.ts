@@ -1,4 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import type {
+  ExtensionBridgeCallPayload,
+  ExtensionBridgeCallResult
+} from '../../shared/extensionBridge'
 
 /**
  * 窗口控制 API — 通过 contextBridge 安全暴露给渲染进程
@@ -134,6 +138,30 @@ const dockApi = {
 
 contextBridge.exposeInMainWorld('dockApi', dockApi)
 
+const islandApi = {
+  getSettings: () => ipcRenderer.invoke('island:get') as Promise<{ available: boolean; enabled: boolean }>,
+  setSettings: (partial: { enabled?: boolean }) =>
+    ipcRenderer.invoke('island:set', partial) as Promise<
+      | { ok: true; settings: { available: boolean; enabled: boolean } }
+      | { ok: false; error: string }
+    >,
+  setExpanded: (expanded: boolean): void => ipcRenderer.send('island:setExpanded', expanded),
+  openEntry: (entryId: string): void => ipcRenderer.send('island:openEntry', entryId),
+  touchActivity: (): void => ipcRenderer.send('island:touchActivity'),
+  onOpenEntry: (callback: (entryId: string) => void): (() => void) => {
+    const handler = (_event: unknown, entryId: string): void => callback(entryId)
+    ipcRenderer.on('island:openEntry', handler)
+    return () => ipcRenderer.removeListener('island:openEntry', handler)
+  },
+  onTouchActivity: (callback: () => void): (() => void) => {
+    const handler = (): void => callback()
+    ipcRenderer.on('island:touchActivity', handler)
+    return () => ipcRenderer.removeListener('island:touchActivity', handler)
+  }
+}
+
+contextBridge.exposeInMainWorld('islandApi', islandApi)
+
 const fileApi = {
   pickPasswordCsv: () =>
     ipcRenderer.invoke('file:pickPasswordCsv') as Promise<{
@@ -230,18 +258,18 @@ contextBridge.exposeInMainWorld('biometricApi', biometricApi)
 
 const extensionBridgeApi = {
   onRequest: (
-    callback: (payload: { id: string; method: string; params: unknown }) => void
+    callback: (payload: ExtensionBridgeCallPayload) => void
   ): (() => void) => {
     const handler = (
       _event: unknown,
-      payload: { id: string; method: string; params: unknown }
+      payload: ExtensionBridgeCallPayload
     ): void => {
       callback(payload)
     }
     ipcRenderer.on('extension-bridge:request', handler)
     return () => ipcRenderer.removeListener('extension-bridge:request', handler)
   },
-  sendResponse: (id: string, result: { ok: boolean; data?: unknown; error?: string }): void => {
+  sendResponse: (id: string, result: ExtensionBridgeCallResult): void => {
     ipcRenderer.send('extension-bridge:response', id, result)
   }
 }

@@ -50,7 +50,7 @@
           <textarea
             v-model="field.value"
             class="custom-form__field-value"
-            :class="{ 'custom-form__field-value--secret': isSecretField(field) }"
+            :class="{ 'custom-form__field-value--secret': isSecretExtraField(field) }"
             :placeholder="t('entry.form.fieldContent')"
             rows="1"
           />
@@ -111,10 +111,6 @@ function addField(type: ExtraFieldTypeId): void {
 
 function removeField(index: number): void {
   props.content.fields.splice(index, 1)
-}
-
-function isSecretField(label: string): boolean {
-  return isSecretExtraFieldLabel(label)
 }
 
 function onRemarkInput(event: Event): void {

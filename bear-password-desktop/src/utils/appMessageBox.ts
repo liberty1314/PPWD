@@ -9,9 +9,12 @@ export function appMessageBoxConfirm(
   title: MessageBoxTitle,
   options?: ElMessageBoxOptions
 ): Promise<MessageBoxData> {
-  return ElMessageBox.confirm(message, title, {
+  const confirmOptions = {
     ...options,
     zIndex: Z_INDEX_TOAST,
     appendTo: document.body
-  })
+  }
+  return ElMessageBox.confirm(message, title, {
+    ...confirmOptions
+  } as ElMessageBoxOptions & { zIndex: number })
 }
