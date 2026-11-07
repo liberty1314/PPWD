@@ -28,8 +28,8 @@ export async function loadStoredSecurityKey(): Promise<string | null> {
     const decrypted = safeStorage.decryptString(encrypted)
     const normalized = decrypted.trim()
     return normalized || null
-  } catch (error) {
-    console.error('[security-key] decrypt failed', error)
+  } catch {
+    console.error('[security-key] decrypt failed')
     return null
   }
 }
@@ -51,8 +51,8 @@ export async function saveStoredSecurityKey(key: string): Promise<{ ok: true } |
     const encrypted = safeStorage.encryptString(normalized)
     await writeFile(getSecurityKeyPath(), encrypted)
     return { ok: true }
-  } catch (error) {
-    console.error('[security-key] encrypt failed', error)
+  } catch {
+    console.error('[security-key] encrypt failed')
     return { ok: false, error: '安全密钥保存失败，请稍后重试' }
   }
 }
@@ -65,7 +65,7 @@ export async function removeStoredSecurityKey(): Promise<void> {
 
   try {
     await unlink(filePath)
-  } catch (error) {
-    console.error('[security-key] remove failed', error)
+  } catch {
+    console.error('[security-key] remove failed')
   }
 }

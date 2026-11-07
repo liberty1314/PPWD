@@ -23,8 +23,8 @@ async function decryptPasswordFile(filePath: string): Promise<string | null> {
     const encrypted = await readFile(filePath)
     const decrypted = safeStorage.decryptString(encrypted)
     return decrypted || null
-  } catch (error) {
-    console.error('[vault-password] decrypt failed', error)
+  } catch {
+    console.error('[vault-password] decrypt failed')
     return null
   }
 }
@@ -58,9 +58,9 @@ export async function saveStoredVaultPassword(
     await writeFile(tempPath, encrypted, { mode: 0o600, flag: 'wx' })
     await rename(tempPath, filePath)
     return { ok: true }
-  } catch (error) {
+  } catch {
     await unlink(tempPath).catch(() => undefined)
-    console.error('[vault-password] encrypt failed', error)
+    console.error('[vault-password] encrypt failed')
     return { ok: false, error: '密码保存失败，请稍后重试' }
   }
 }
@@ -70,8 +70,8 @@ export async function removeStoredVaultPassword(): Promise<{ ok: true } | { ok: 
   if (existsSync(filePath)) {
     try {
       await unlink(filePath)
-    } catch (error) {
-      console.error('[vault-password] remove failed', error)
+    } catch {
+      console.error('[vault-password] remove failed')
       return { ok: false, error: '快捷解锁凭据删除失败' }
     }
   }

@@ -16,8 +16,8 @@ export async function loadStoredVaultUnlockKey(): Promise<Buffer | null> {
     const serialized = safeStorage.decryptString(await readFile(getVaultUnlockKeyPath()))
     const key = Buffer.from(serialized, 'base64')
     return key.length === 32 ? key : null
-  } catch (error) {
-    console.error('[vault-unlock-key] decrypt failed', error)
+  } catch {
+    console.error('[vault-unlock-key] decrypt failed')
     return null
   }
 }
@@ -36,9 +36,9 @@ export async function saveStoredVaultUnlockKey(vuk: Buffer): Promise<{ ok: true 
     await writeFile(tempPath, safeStorage.encryptString(vuk.toString('base64')), { mode: 0o600, flag: 'wx' })
     await rename(tempPath, filePath)
     return { ok: true }
-  } catch (error) {
+  } catch {
     await unlink(tempPath).catch(() => undefined)
-    console.error('[vault-unlock-key] save failed', error)
+    console.error('[vault-unlock-key] save failed')
     return { ok: false, error: '保险库解锁密钥保存失败' }
   }
 }

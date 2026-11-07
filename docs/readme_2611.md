@@ -645,3 +645,13 @@
     - bear-password-extension/src/popup/components/AppLogo.vue
     - bear-password-extension/src/wake/main.ts
     - docs/img/logo.png
+[2026-11-07 13:16] fix(security): 限制敏感凭据错误日志并更新发布说明
+  Body: 移除安全密钥、快捷解锁密码及 VUK 存储流程中的原始异常日志，避免异常消息携带敏感信息；同步更新本地版说明和 M4 发布验收状态。
+  Files:
+    - bear-password-desktop/README.md
+    - bear-password-desktop/electron/main/securityKeyStorage.ts
+    - bear-password-desktop/electron/main/vaultPasswordStorage.ts
+    - bear-password-desktop/electron/main/vaultUnlockKeyStorage.ts
+    - docs/project/release-acceptance-m4.md
+    - docs/开发计划.md
+    - docs/readme_2611.md
