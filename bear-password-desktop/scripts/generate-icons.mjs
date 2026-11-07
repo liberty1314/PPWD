@@ -8,13 +8,23 @@ import pngToIco from 'png-to-ico'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 const resourcesDir = join(root, 'resources')
-const svgPath = join(resourcesDir, 'icon.svg')
-const logoMarkPath = join(resourcesDir, 'logo-mark.svg')
+const logoPngPath = join(root, '..', 'docs', 'img', 'logo.png')
 const traySvgPath = join(resourcesDir, 'tray-icon.svg')
 const publicDir = join(root, 'public')
+const desktopLogoPath = join(root, 'src', 'assets', 'logo.png')
+const extensionIconsDir = join(root, '..', 'bear-password-extension', 'public', 'icons')
 
-const pngBuffer = await sharp(svgPath).resize(1024, 1024).png().toBuffer()
+const sourcePngBuffer = await sharp(logoPngPath).resize(1024, 1024).png().toBuffer()
+const roundedMask = Buffer.from(
+  '<svg width="1024" height="1024"><rect x="0" y="0" width="1024" height="1024" rx="220" fill="white"/></svg>'
+)
+const pngBuffer = await sharp(sourcePngBuffer)
+  .composite([{ input: roundedMask, blend: 'dest-in' }])
+  .png()
+  .toBuffer()
 
+await sharp(pngBuffer).resize(512, 512).png().toFile(desktopLogoPath)
+await sharp(pngBuffer).resize(512, 512).png().toFile(join(extensionIconsDir, 'logo.png'))
 await sharp(pngBuffer).resize(512, 512).png().toFile(join(resourcesDir, 'icon.png'))
 await sharp(pngBuffer).resize(256, 256).png().toFile(join(publicDir, 'favicon.png'))
 await sharp(traySvgPath).resize(22, 22).png().toFile(join(resourcesDir, 'tray-icon.png'))
@@ -27,6 +37,10 @@ const icoBuffers = await Promise.all(
 )
 const icoBuffer = await pngToIco(icoBuffers)
 writeFileSync(join(resourcesDir, 'icon.ico'), icoBuffer)
+
+for (const size of [16, 32, 48, 128]) {
+  await sharp(pngBuffer).resize(size, size).png().toFile(join(extensionIconsDir, `icon-${size}.png`))
+}
 
 if (process.platform === 'darwin') {
   const iconsetDir = join(resourcesDir, 'icon.iconset')

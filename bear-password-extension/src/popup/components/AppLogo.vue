@@ -13,7 +13,7 @@ withDefaults(
 
 <template>
   <div class="app-logo" :class="`app-logo--${size}`">
-    <img src="/icons/logo.svg" alt="" class="app-logo__image" />
+    <img src="/icons/logo.png" alt="" class="app-logo__image" />
     <span v-if="showText" class="app-logo__text">BearPassword</span>
   </div>
 </template>

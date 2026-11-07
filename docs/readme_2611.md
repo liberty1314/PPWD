@@ -621,3 +621,27 @@
     - docs/project/test-report-m2.md
     - docs/开发计划.md
     - docs/readme_2611.md
+
+[2026-11-07 10:27] feat(branding): 统一项目图标并应用圆角
+  Body: 统一桌面端、浏览器扩展、favicon 与文档使用的 Logo，并从 docs/img/logo.png 生成带透明圆角的多尺寸图标资源。保留系统托盘专用单色图标以适配平台菜单栏显示。
+  Files:
+    - README.md
+    - bear-password-desktop/README.md
+    - bear-password-desktop/public/favicon.png
+    - bear-password-desktop/resources/icon.icns
+    - bear-password-desktop/resources/icon.ico
+    - bear-password-desktop/resources/icon.png
+    - bear-password-desktop/scripts/generate-icons.mjs
+    - bear-password-desktop/src/assets/logo.png
+    - bear-password-desktop/src/components/common/AppLogo.vue
+    - bear-password-extension/README.md
+    - bear-password-extension/public/icons/icon-128.png
+    - bear-password-extension/public/icons/icon-16.png
+    - bear-password-extension/public/icons/icon-32.png
+    - bear-password-extension/public/icons/icon-48.png
+    - bear-password-extension/public/icons/logo.png
+    - bear-password-extension/src/content/inlinePicker.ts
+    - bear-password-extension/src/content/passwordFieldIcon.ts
+    - bear-password-extension/src/popup/components/AppLogo.vue
+    - bear-password-extension/src/wake/main.ts
+    - docs/img/logo.png

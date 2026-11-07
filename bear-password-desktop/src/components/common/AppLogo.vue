@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import logoUrl from '@/assets/logo.svg'
+import logoUrl from '@/assets/logo.png'
 
 /**
  * AppLogo - 品牌 Logo 组件

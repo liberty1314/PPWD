@@ -31,7 +31,7 @@ function renderSteps(): void {
 
 function render(): void {
   const logo = document.getElementById('wake-logo') as HTMLImageElement | null
-  if (logo) logo.src = chrome.runtime.getURL('public/icons/logo.svg')
+  if (logo) logo.src = chrome.runtime.getURL('public/icons/logo.png')
 
   document.title = t('wake.pageTitle', locale)
   setText('wake-title', t('wake.title', locale))

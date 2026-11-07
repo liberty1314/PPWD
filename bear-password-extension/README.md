@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/icons/logo.svg" alt="BearPassword" width="80" height="80" />
+  <img src="public/icons/logo.png" alt="BearPassword" width="80" height="80" />
 </p>
 
 <h1 align="center">BearPassword 浏览器扩展</h1>

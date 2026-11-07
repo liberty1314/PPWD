@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/assets/logo.svg" alt="BearPassword" width="80" height="80" />
+  <img src="src/assets/logo.png" alt="BearPassword" width="80" height="80" />
 </p>
 
 <h1 align="center">BearPassword 桌面端</h1>

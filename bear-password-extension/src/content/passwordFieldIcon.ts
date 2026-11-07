@@ -105,7 +105,7 @@ function createIconHost(passwordInput: HTMLInputElement): HTMLElement {
   btn.className = ICON_BTN_CLASS
   btn.title = tContent('content.passwordIcon.title')
   btn.setAttribute('aria-label', tContent('content.passwordIcon.title'))
-  btn.innerHTML = `<img src="${chrome.runtime.getURL('public/icons/logo.svg')}" alt="" />`
+  btn.innerHTML = `<img src="${chrome.runtime.getURL('public/icons/logo.png')}" alt="" />`
 
   btn.addEventListener('mousedown', (e) => {
     e.preventDefault()
