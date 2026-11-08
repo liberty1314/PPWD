@@ -1,0 +1,115 @@
+.react-vault__header-actions, .react-vault__toolbar { display: flex; align-items: center; gap: 8px; }
+.react-vault__toolbar { position: sticky; z-index: 2; top: 32px; border-bottom: 1px solid var(--bp-border); padding: 12px 0; background: var(--bp-surface); }
+.react-vault__toolbar > .bp-field { width: 145px; }
+.react-vault__search { display: flex; min-width: 180px; height: 36px; flex: 1; align-items: center; gap: 8px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 0 10px; color: var(--bp-text-muted); background: var(--bp-surface-raised); }
+.react-vault__search:focus-within { border-color: var(--bp-accent); box-shadow: 0 0 0 2px var(--bp-accent-soft); }
+.react-vault__search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--bp-text); font: inherit; font-size: 12px; }
+.react-vault__search kbd { flex: none; border: 1px solid var(--bp-border); border-radius: 3px; padding: 2px 4px; color: var(--bp-text-muted); font-size: 9px; }
+.react-vault__workspace { display: grid; min-height: 430px; height: calc(100vh - 190px); grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); border-bottom: 1px solid var(--bp-border); }
+.react-vault__list { min-width: 0; overflow: hidden; border-right: 1px solid var(--bp-border); }
+.react-vault__list-scroll { height: 100%; overflow: auto; overscroll-behavior: contain; }
+.react-vault__item { display: flex; min-height: 62px; align-items: center; gap: 8px; border-bottom: 1px solid var(--bp-border); padding: 7px 8px; }
+.react-vault__item.is-active { background: var(--bp-accent-soft); }
+.react-vault__item-main { display: flex; min-width: 0; flex: 1; align-items: center; gap: 10px; border: 0; padding: 0; text-align: left; background: transparent; color: var(--bp-text); cursor: pointer; }
+.react-vault__icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 7px; background: color-mix(in srgb, var(--entry-color) 18%, var(--bp-surface)); color: var(--entry-color); }
+.react-vault__item-copy { display: grid; min-width: 0; flex: 1; gap: 4px; }
+.react-vault__item-copy strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.react-vault__item-copy small { overflow: hidden; color: var(--bp-text-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.react-vault__item-more { display: grid; width: 30px; height: 30px; flex: none; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--bp-text-muted); cursor: pointer; }
+.react-vault__item-more:hover { background: var(--bp-surface-secondary); color: var(--bp-text); }
+.react-vault__item .is-favorite { flex: none; color: var(--bp-warning); }
+.react-vault__detail { min-width: 0; overflow: auto; }
+.react-vault__detail-content { max-width: 720px; margin: 0 auto; padding: 23px clamp(16px, 3vw, 32px); }
+.react-vault__detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--bp-border); padding-bottom: 18px; }
+.react-vault__detail-head h2 { overflow-wrap: anywhere; margin: 5px 0 0; color: var(--bp-text); font-size: 20px; }
+.react-vault__detail-head > div { min-width: 0; flex: 1; }
+.react-vault__back { display: none; }
+.react-vault__fields { display: grid; padding: 8px 0; }
+.react-vault__field { display: grid; grid-template-columns: minmax(100px, .35fr) minmax(0, 1fr); align-items: center; gap: 14px; min-height: 48px; border-bottom: 1px solid var(--bp-border); }
+.react-vault__field > span, .react-vault__tags > span:first-child { color: var(--bp-text-muted); font-size: 11px; }
+.react-vault__field > div { display: flex; min-width: 0; align-items: center; gap: 5px; }
+.react-vault__field button { border: 0; padding: 5px; background: transparent; color: var(--bp-text-secondary); cursor: pointer; }
+.react-vault__field button:first-child { overflow: hidden; flex: 1; text-align: left; text-overflow: ellipsis; white-space: nowrap; color: var(--bp-text); font: inherit; font-size: 12px; }
+.react-vault__field button:first-child.is-masked { letter-spacing: 1px; }
+.react-vault__tags { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; padding: 14px 0; }
+.react-vault__tags > span:not(:first-child) { border: 1px solid var(--bp-border); border-radius: 4px; padding: 3px 7px; color: var(--bp-text-secondary); font-size: 10px; }
+.react-vault__remark { border-top: 1px solid var(--bp-border); padding: 14px 0; }
+.react-vault__remark h3 { margin: 0 0 7px; color: var(--bp-text-muted); font-size: 11px; }
+.react-vault__remark p { margin: 0; color: var(--bp-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.react-vault__detail-actions { display: flex; gap: 8px; margin-top: 16px; }
+.react-vault__otp { display: grid; grid-template-columns: 1fr 110px auto; align-items: center; gap: 12px; margin: 16px 0 8px; border: 1px solid var(--bp-border); border-radius: 7px; padding: 12px; background: var(--bp-sensitive-surface); }
+.react-vault__otp > span { color: var(--bp-text); font-size: 23px; font-variant-numeric: tabular-nums; font-weight: 650; }
+.react-vault__otp > div { display: flex; align-items: center; gap: 7px; }
+.react-vault__otp i { width: 55px; height: 4px; overflow: hidden; border-radius: 4px; background: linear-gradient(to right, var(--bp-accent) var(--otp-progress), var(--bp-border) var(--otp-progress)); }
+.react-vault__otp small { color: var(--bp-text-muted); font-size: 10px; }
+.react-vault__empty, .react-vault__skeleton { display: grid; min-height: 240px; place-content: center; justify-items: center; gap: 12px; color: var(--bp-text-muted); text-align: center; }
+.react-vault__empty strong { color: var(--bp-text-secondary); font-size: 13px; }
+.react-vault__skeleton { padding: 16px; }
+.react-vault__skeleton i { display: block; width: min(260px, 75vw); height: 34px; border-radius: 5px; background: var(--bp-surface-secondary); animation: bp-pulse 1.4s ease-in-out infinite alternate; }
+.react-vault__skeleton i:nth-child(2n) { width: min(220px, 65vw); }
+.react-vault__more-hint { display: grid; justify-items: center; gap: 5px; margin: 8px; color: var(--bp-text-muted); font-size: 10px; }
+.react-vault__error { display: flex; align-items: center; gap: 9px; padding: 10px 0; color: var(--bp-danger); font-size: 12px; }
+.react-vault__batch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border-bottom: 1px solid var(--bp-border); padding: 9px 0; }
+.react-vault__batch label { display: flex; align-items: center; gap: 6px; color: var(--bp-text-secondary); font-size: 11px; }
+.react-vault__batch > span { margin-right: auto; color: var(--bp-text-muted); font-size: 11px; }
+.react-type-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 10px; }
+.react-type-picker button { display: flex; min-height: 46px; align-items: center; gap: 10px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 0 11px; background: var(--bp-surface); color: var(--bp-text); text-align: left; cursor: pointer; }
+.react-type-picker button:hover { border-color: var(--bp-accent); background: var(--bp-accent-soft); }
+.react-entry-form { display: grid; max-height: min(72vh, 720px); gap: 12px; overflow: auto; padding: 8px 2px 2px; }
+.react-entry-form .bp-field textarea { min-height: 72px; resize: vertical; }
+.react-password-input { display: grid; grid-template-columns: minmax(0, 1fr) 38px; align-items: end; gap: 4px; }
+.react-password-input .bp-field { min-width: 0; }
+.react-password-input > .bp-button { height: 36px; padding: 0; }
+.react-extra-fields { display: grid; gap: 8px; border-top: 1px solid var(--bp-border); padding-top: 10px; }
+.react-extra-fields header { display: flex; align-items: center; justify-content: space-between; }
+.react-extra-fields h3 { margin: 0; color: var(--bp-text-secondary); font-size: 11px; }
+.react-extra-fields__row { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 8px; }
+.react-extra-fields__authenticator { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.react-import { display: grid; gap: 12px; padding-top: 12px; }
+.react-entry-actions { display: grid; gap: 8px; padding-top: 12px; }
+.react-security-center__summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 18px 0; }
+.react-security-center__summary > div { display: grid; gap: 8px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 13px; }
+.react-security-center__summary span { color: var(--bp-text-secondary); font-size: 11px; }
+.react-security-center__summary strong { color: var(--bp-text); font-size: 22px; }
+.react-security-center__risks { border-top: 1px solid var(--bp-border); padding-top: 16px; }
+.react-security-center__risks h2 { color: var(--bp-text); font-size: 14px; }
+.react-security-center__risks > button { display: flex; width: 100%; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--bp-border); padding: 11px 5px; background: transparent; color: var(--bp-warning); text-align: left; cursor: pointer; }
+.react-security-center__risks > button span { display: grid; gap: 3px; }
+.react-security-center__risks > button strong { color: var(--bp-text); font-size: 12px; }
+.react-security-center__risks > button small, .react-security-center__risks > p { color: var(--bp-text-muted); font-size: 11px; }
+.react-dashboard__stat { width: 100%; text-align: left; cursor: pointer; font: inherit; }
+.react-dashboard__recent li { display: block; }
+.react-dashboard__recent li > button { display: grid; width: 100%; min-height: 49px; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 9px; border: 0; border-top: 1px solid var(--bp-border); padding: 0; background: transparent; text-align: left; cursor: pointer; }
+.react-dashboard__recent li > button:hover .react-dashboard__entry-copy strong { color: var(--bp-accent); }
+.react-dashboard__stat:hover { border-color: var(--bp-accent); background: var(--bp-accent-soft); }
+.react-dashboard__quick-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+@keyframes bp-pulse { to { opacity: .48; } }
+
+@media (max-width: 900px) {
+  .react-vault__workspace { grid-template-columns: minmax(225px, .8fr) minmax(0, 1.2fr); }
+  .react-vault__toolbar > .bp-field { width: 125px; }
+}
+
+@media (max-width: 640px) {
+  .react-vault__header-actions .bp-button { padding-inline: 8px; }
+  .react-vault__toolbar { flex-wrap: wrap; }
+  .react-vault__search { flex-basis: 100%; }
+  .react-vault__toolbar > .bp-field { width: calc(50% - 4px); flex: 1; }
+  .react-vault__workspace { display: block; height: calc(100vh - 245px); min-height: 360px; }
+  .react-vault__list { height: 100%; border-right: 0; }
+  .react-vault__detail { display: none; height: 100%; }
+  .react-vault__detail.is-open { display: block; }
+  .react-vault__back { display: inline-grid; width: 34px; flex: none; padding: 0; }
+  .react-vault__workspace:has(.react-vault__detail.is-open) .react-vault__list { display: none; }
+  .react-vault__field { grid-template-columns: 88px minmax(0, 1fr); gap: 8px; }
+  .react-vault__otp { grid-template-columns: 1fr auto; }
+  .react-vault__otp > div { grid-column: 1; grid-row: 2; }
+  .react-vault__otp > button { grid-column: 2; grid-row: 1 / span 2; }
+  .react-security-center__summary { gap: 6px; }
+  .react-security-center__summary > div { padding: 9px; }
+  .react-security-center__summary span { font-size: 10px; }
+  .react-extra-fields__row { grid-template-columns: 1fr 1fr auto; }
+  .react-extra-fields__authenticator { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) { .react-vault__skeleton i { animation: none; } }

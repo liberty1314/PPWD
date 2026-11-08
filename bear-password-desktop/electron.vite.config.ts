@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-import vue from '@vitejs/plugin-vue'
+import react from '@vitejs/plugin-react'
 
 /**
  * electron-vite 统一配置文件
@@ -35,7 +35,7 @@ export default defineConfig(() => ({
         '@': resolve('src')
       }
     },
-    plugins: [vue()],
+    plugins: [react()],
     css: {
       preprocessorOptions: {
         scss: {

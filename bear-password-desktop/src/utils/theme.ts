@@ -1,8 +1,4 @@
 import { storage } from './storage'
-import { ref } from 'vue'
-
-/** 系统深浅色变化计数，供 computed 追踪（cache 本身非响应式） */
-export const systemThemeRevision = ref(0)
 
 /**
  * 主题工具
@@ -74,7 +70,6 @@ let systemThemeUnsubscribe: (() => void) | null = null
 function setSystemThemeCache(dark: boolean): void {
   if (systemThemeDarkCache === dark) return
   systemThemeDarkCache = dark
-  systemThemeRevision.value += 1
 }
 
 function notifySystemThemeChange(): void {

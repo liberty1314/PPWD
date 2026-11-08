@@ -1,11 +1,10 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 import type { TrayClickAction, TraySettings } from '@/types/tray'
 
 /**
  * 状态栏图标配置与快捷搜索唤起
  */
-export const useTrayStore = defineStore('tray', () => {
+export const useTrayStore = createStateStore(() => {
   const available = ref(false)
   const enabled = ref(true)
   const clickAction = ref<TrayClickAction>('vault')

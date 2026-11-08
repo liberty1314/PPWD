@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -20,6 +20,6 @@
     },
     "types": ["chrome"]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,4 +1,3 @@
-import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useTrayStore } from '@/stores/tray'
@@ -14,8 +13,8 @@ export async function openVaultQuickSearch(): Promise<void> {
     return
   }
 
-  await router.push({ name: 'Vault' })
   useTrayStore().requestQuickSearchFocus()
+  window.dispatchEvent(new CustomEvent('bear:navigate-vault', { detail: { focus: true } }))
 }
 
 /** 打开密码库并弹出新增项目选择器（已登录且未锁定时） */
@@ -29,8 +28,8 @@ export async function openVaultCreate(): Promise<void> {
     return
   }
 
-  await router.push({ name: 'Vault' })
   useTrayStore().requestOpenCreate()
+  window.dispatchEvent(new CustomEvent('bear:navigate-vault', { detail: { focus: false } }))
 }
 
 /** 打开密码库并弹出导入密码对话框（已登录且未锁定时） */
@@ -44,6 +43,6 @@ export async function openVaultImport(): Promise<void> {
     return
   }
 
-  await router.push({ name: 'Vault' })
   useTrayStore().requestOpenImport()
+  window.dispatchEvent(new CustomEvent('bear:navigate-vault', { detail: { focus: false } }))
 }

@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --bp-bg: #f6f7f8;
+  --bp-surface: #ffffff;
+  --bp-surface-secondary: #f0f2f3;
+  --bp-surface-raised: #ffffff;
+  --bp-sensitive-surface: #ffffff;
+  --bp-text: #202425;
+  --bp-text-secondary: #626a6c;
+  --bp-text-muted: #858d8f;
+  --bp-border: #dce1e2;
+  --bp-border-strong: #b7c0c2;
+  --bp-focus: #356fca;
+  --bp-accent: #356fca;
+  --bp-accent-soft: #e9f0fb;
+  --bp-success: #27784c;
+  --bp-warning: #9b6217;
+  --bp-danger: #b8423b;
+  --bp-shadow: 0 12px 34px rgb(24 32 34 / 12%);
+  --bp-radius-sm: 4px;
+  --bp-radius-md: 8px;
+  --bp-control-height: 36px;
+}
+
+:root[data-appearance='dark'] {
+  color-scheme: dark;
+  --bp-bg: #191d1f;
+  --bp-surface: #22282a;
+  --bp-surface-secondary: #2b3234;
+  --bp-surface-raised: #30383a;
+  --bp-sensitive-surface: #22282a;
+  --bp-text: #edf0ef;
+  --bp-text-secondary: #b8c0bf;
+  --bp-text-muted: #929c9a;
+  --bp-border: #3d4748;
+  --bp-border-strong: #596465;
+  --bp-accent-soft: #263a56;
+  --bp-success: #66bd8b;
+  --bp-warning: #e7ad58;
+  --bp-danger: #f07b71;
+  --bp-shadow: 0 14px 40px rgb(0 0 0 / 34%);
+}
+
+:root[data-theme-design='soft'] {
+  --bp-bg: #f2f5f2;
+  --bp-surface: #fbfcfa;
+  --bp-surface-secondary: #eaf0eb;
+  --bp-border: #d5dfd7;
+  --bp-radius-md: 10px;
+}
+
+:root[data-theme-design='soft'][data-appearance='dark'] {
+  --bp-bg: #1b211f;
+  --bp-surface: #252e2a;
+  --bp-surface-secondary: #303a35;
+  --bp-border: #46544b;
+}
+
+:root[data-theme-design='contrast'] {
+  --bp-bg: #ffffff;
+  --bp-surface: #ffffff;
+  --bp-surface-secondary: #f3f4f4;
+  --bp-text: #111516;
+  --bp-text-secondary: #454e50;
+  --bp-border: #959fa1;
+  --bp-border-strong: #4d585a;
+  --bp-focus: #123d78;
+}
+
+:root[data-theme-design='contrast'][data-appearance='dark'] {
+  --bp-bg: #101314;
+  --bp-surface: #171c1d;
+  --bp-surface-secondary: #222829;
+  --bp-text: #ffffff;
+  --bp-text-secondary: #e0e5e4;
+  --bp-border: #778283;
+  --bp-border-strong: #b2baba;
+  --bp-focus: #90bdff;
+}
+
+:root[data-theme-design='liquid'] {
+  --bp-shadow: 0 10px 30px rgb(24 32 34 / 9%);
+}
+
+:root[data-theme-design='liquid'][data-appearance='dark'] {
+  --bp-shadow: 0 12px 32px rgb(0 0 0 / 30%);
+}
+
+:root[data-accent='teal'] { --bp-accent: #268c8a; --bp-accent-soft: #e4f3f1; }
+:root[data-accent='green'] { --bp-accent: #47845a; --bp-accent-soft: #e9f3eb; }
+:root[data-accent='purple'] { --bp-accent: #7865b1; --bp-accent-soft: #efecf7; }
+:root[data-accent='coral'] { --bp-accent: #d16c65; --bp-accent-soft: #fbefed; }
+:root[data-accent='amber'] { --bp-accent: #b47a2b; --bp-accent-soft: #f7f0e4; }
+
+:root[data-appearance='dark'][data-accent='teal'] { --bp-accent-soft: #203a39; }
+:root[data-appearance='dark'][data-accent='green'] { --bp-accent-soft: #26392c; }
+:root[data-appearance='dark'][data-accent='purple'] { --bp-accent-soft: #342e46; }
+:root[data-appearance='dark'][data-accent='coral'] { --bp-accent-soft: #482e2d; }
+:root[data-appearance='dark'][data-accent='amber'] { --bp-accent-soft: #413522; }
+
+* { box-sizing: border-box; }
+
+html, body, #app { width: 100%; min-width: 0; min-height: 100%; margin: 0; }
+
+body {
+  color: var(--bp-text);
+  background: var(--bp-bg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+button, input, select, textarea { font: inherit; }
+button { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--bp-focus);
+  outline-offset: 2px;
+}
+
+.bp-sensitive { background: var(--bp-sensitive-surface); }
+
+.bp-glass {
+  background: var(--bp-surface);
+  border: 1px solid var(--bp-border);
+}
+
+@supports (backdrop-filter: blur(14px)) {
+  @media (prefers-reduced-transparency: no-preference) {
+  :root[data-theme-design='liquid'] .bp-glass {
+    background: rgb(255 255 255 / 82%);
+    backdrop-filter: blur(16px) saturate(1.12);
+  }
+
+  :root[data-theme-design='liquid'][data-appearance='dark'] .bp-glass {
+    background: rgb(34 40 42 / 84%);
+  }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-theme-design='liquid'] .bp-glass {
+    background: var(--bp-surface-raised);
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

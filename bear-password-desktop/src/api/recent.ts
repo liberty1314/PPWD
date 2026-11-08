@@ -2,6 +2,7 @@ import type { PageResult, PasswordRelationMetaItem } from '@/types'
 import type { PasswordEntry } from '@/types'
 import { decryptPasswordEntries } from '@/utils/vaultEntryTransform'
 import { filterVaultEntries } from '@/utils/vaultEntrySearch'
+import { getVaultUnlockContext } from '@/api/vaultUnlockContext'
 import {
   getOfflineRecentVisitMetaApi,
   recordOfflineRecentVisitApi,
@@ -17,10 +18,12 @@ export async function getRecentVisitListApi(params: {
   const [entries, meta] = await Promise.all([fetchOfflinePasswordEntriesRaw(), getOfflineRecentVisitMetaApi()])
   const entryMap = new Map(entries.map((entry) => [entry.id, entry]))
   const recentTimeById = new Map(meta.map((item) => [item.passwordId, item.time]))
-  const recent = await decryptPasswordEntries(meta
-    .map((item) => entryMap.get(item.passwordId))
-    .filter((entry): entry is PasswordEntry => !!entry)
-    .map((entry) => ({ ...entry, recentVisitTime: recentTimeById.get(entry.id) }))
+  const recent = await decryptPasswordEntries(
+    meta
+      .map((item) => entryMap.get(item.passwordId))
+      .filter((entry): entry is PasswordEntry => !!entry)
+      .map((entry) => ({ ...entry, recentVisitTime: recentTimeById.get(entry.id) })),
+    getVaultUnlockContext()
   )
   const filtered = filterVaultEntries(recent, { keyword: params.keyword })
   const page = Math.max(1, params.page ?? 1)

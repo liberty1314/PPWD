@@ -1,11 +1,10 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 import type { OfflineVaultSettings, OfflineVaultSnapshot } from '../../shared/offlineVault'
 import { mergeOfflineVaultSnapshots } from '../../shared/offlineVault'
 import { isLocalVaultApiAvailable } from '@/utils/localVault'
 import { useVaultStore } from '@/stores/vault'
 
-export const useOfflineVaultStore = defineStore('offlineVault', () => {
+export const useOfflineVaultStore = createStateStore(() => {
   const dataDir = ref('')
   const defaultDataDir = ref('')
   const initialized = ref(false)

@@ -1,7 +1,3 @@
-import type { Language } from 'element-plus/es/locale'
-import elementZhCn from 'element-plus/es/locale/lang/zh-cn'
-import elementEn from 'element-plus/es/locale/lang/en'
-import elementJa from 'element-plus/es/locale/lang/ja'
 import type { MessageDict, ResolvedLocale } from './types'
 import zhCN from './zh-CN'
 import en from './en'
@@ -13,16 +9,6 @@ const messages: Record<ResolvedLocale, MessageDict> = {
   'zh-CN': zhCN,
   en,
   ja
-}
-
-const elementLocales: Record<ResolvedLocale, Language> = {
-  'zh-CN': elementZhCn,
-  en: elementEn,
-  ja: elementJa
-}
-
-export function getElementPlusLocale(locale: ResolvedLocale): Language {
-  return elementLocales[locale] ?? elementZhCn
 }
 
 /** 翻译函数，支持 {name} 占位符 */

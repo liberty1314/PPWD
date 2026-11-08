@@ -13,12 +13,12 @@ const zipPath = path.join(releaseDir, zipName)
 try {
   await stat(path.join(distDir, 'manifest.json'))
 } catch {
-  throw new Error('dist/manifest.json 不存在，请先执行 npm run build')
+  throw new Error('dist/manifest.json 不存在，请先执行 pnpm run build')
 }
 
 await mkdir(releaseDir, { recursive: true })
 
-execSync(`cd "${distDir}" && zip -r -q "${zipPath}" . -x "*.DS_Store"`, {
+execSync(`cd "${distDir}" && zip -FS -r -q "${zipPath}" . -x "*.DS_Store"`, {
   stdio: 'inherit'
 })
 

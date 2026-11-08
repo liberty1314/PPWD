@@ -1,0 +1,63 @@
+.bp-button, .bp-icon-button {
+  display: inline-flex;
+  min-height: var(--bp-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--bp-radius-md);
+  padding: 0 12px;
+  background: transparent;
+  color: var(--bp-text);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.bp-button:disabled { opacity: .5; cursor: not-allowed; }
+.bp-button svg { flex: 0 0 auto; }
+.bp-button--primary { background: var(--bp-accent); color: white; }
+.bp-button--primary:hover:not(:disabled) { filter: brightness(.94); }
+.bp-button--neutral { background: var(--bp-surface); border-color: var(--bp-border); }
+.bp-button--neutral:hover:not(:disabled), .bp-icon-button:hover { background: var(--bp-surface-secondary); }
+.bp-button--quiet { color: var(--bp-text-secondary); }
+.bp-button--quiet:hover:not(:disabled) { background: var(--bp-surface-secondary); color: var(--bp-text); }
+.bp-button--danger { background: var(--bp-danger); color: white; }
+.bp-icon-button { width: 34px; min-width: 34px; padding: 0; border-color: var(--bp-border); background: var(--bp-surface); }
+
+.bp-field { display: grid; gap: 6px; min-width: 0; }
+.bp-field__label { color: var(--bp-text-secondary); font-size: 12px; font-weight: 600; }
+.bp-field__description { color: var(--bp-text-muted); font-size: 11px; }
+.bp-input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--bp-control-height);
+  border: 1px solid var(--bp-border);
+  border-radius: var(--bp-radius-md);
+  padding: 7px 10px;
+  background: var(--bp-sensitive-surface);
+  color: var(--bp-text);
+}
+.bp-input:hover { border-color: var(--bp-border-strong); }
+.bp-select-wrap { position: relative; display: block; }
+.bp-select { appearance: none; padding-right: 34px; cursor: pointer; }
+.bp-select-wrap > svg { position: absolute; top: 10px; right: 10px; pointer-events: none; color: var(--bp-text-muted); }
+
+.bp-dialog-overlay { position: fixed; inset: 0; z-index: 50; background: rgb(12 18 20 / 48%); }
+.bp-dialog { position: fixed; z-index: 51; top: 50%; left: 50%; width: min(440px, calc(100vw - 32px)); transform: translate(-50%, -50%); border: 1px solid var(--bp-border); border-radius: 8px; padding: 20px; background: var(--bp-surface-raised); box-shadow: var(--bp-shadow); }
+.bp-dialog__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.bp-dialog__title { margin: 0; font-size: 16px; line-height: 1.35; }
+.bp-dialog__description { margin: 5px 0 0; color: var(--bp-text-secondary); font-size: 12px; }
+.bp-menu { min-width: 168px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 4px; background: var(--bp-surface-raised); box-shadow: var(--bp-shadow); }
+.bp-menu [role='menuitem'] { display: flex; min-height: 34px; align-items: center; border-radius: 4px; padding: 0 9px; outline: none; cursor: pointer; }
+.bp-menu [role='menuitem']:focus, .bp-menu [role='menuitem']:hover { background: var(--bp-accent-soft); color: var(--bp-text); }
+.bp-toast-viewport { position: fixed; z-index: 70; right: 16px; bottom: 16px; display: grid; width: min(360px, calc(100vw - 32px)); gap: 8px; margin: 0; padding: 0; list-style: none; outline: none; }
+.bp-toast { display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 11px 12px; background: var(--bp-surface-raised); box-shadow: var(--bp-shadow); }
+.bp-toast__close { display: inline-flex; border: 0; background: transparent; color: var(--bp-text-secondary); cursor: pointer; }
+.bp-error-boundary { display: flex; min-height: 100vh; align-items: center; justify-content: center; gap: 14px; padding: 24px; color: var(--bp-danger); }
+.bp-error-boundary h1 { margin: 0 0 5px; color: var(--bp-text); font-size: 16px; }
+.bp-error-boundary p { margin: 0 0 12px; color: var(--bp-text-secondary); font-size: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-button { transition: none; }
+}

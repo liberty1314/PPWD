@@ -13,6 +13,7 @@ import {
   encryptPasswordEntryParams
 } from '@/utils/vaultEntryTransform'
 import { filterVaultEntries } from '@/utils/vaultEntrySearch'
+import { getVaultUnlockContext } from '@/api/vaultUnlockContext'
 
 /**
  * 密码库 API
@@ -30,7 +31,7 @@ export async function getPasswordListApi(
 /** 拉取本地保险库全部密码条目并解密 */
 export async function fetchAllPasswordEntries(): Promise<PasswordEntry[]> {
   const raw = await fetchOfflinePasswordEntriesRaw()
-  return decryptPasswordEntries(raw)
+  return decryptPasswordEntries(raw, getVaultUnlockContext())
 }
 
 /** 获取密码详情 */
@@ -41,14 +42,14 @@ export async function getPasswordDetailApi(id: VaultEntryId): Promise<PasswordEn
   if (!entry) {
     throw new Error('密码条目不存在')
   }
-  return decryptPasswordEntry(entry)
+  return decryptPasswordEntry(entry, getVaultUnlockContext())
 }
 
 /** 新增密码条目 */
 export async function createPasswordApi(data: PasswordEntryParams): Promise<PasswordEntry> {
-  const payload = await encryptPasswordEntryParams(data)
+  const payload = await encryptPasswordEntryParams(data, getVaultUnlockContext())
   const entry = await createOfflinePasswordEntryRaw(payload)
-  return decryptPasswordEntry(entry)
+  return decryptPasswordEntry(entry, getVaultUnlockContext())
 }
 
 /** 更新密码条目 */
@@ -57,9 +58,9 @@ export async function updatePasswordApi(
   data: PasswordEntryParams
 ): Promise<PasswordEntry> {
   const entryId = toVaultEntryId(id)
-  const payload = await encryptPasswordEntryParams(data)
+  const payload = await encryptPasswordEntryParams(data, getVaultUnlockContext())
   const entry = await updateOfflinePasswordEntryRaw(entryId, payload)
-  return decryptPasswordEntry(entry)
+  return decryptPasswordEntry(entry, getVaultUnlockContext())
 }
 
 /** 删除密码条目 */

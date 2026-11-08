@@ -3,6 +3,7 @@ import type { PasswordEntry } from '@/types'
 import { toVaultEntryId, type VaultEntryId } from '../../shared/vaultEntryId'
 import { decryptPasswordEntries } from '@/utils/vaultEntryTransform'
 import { filterVaultEntries } from '@/utils/vaultEntrySearch'
+import { getVaultUnlockContext } from '@/api/vaultUnlockContext'
 import {
   addOfflineFavoriteApi,
   fetchOfflinePasswordEntriesRaw,
@@ -23,13 +24,15 @@ export async function getFavoriteListApi(params: {
     getOfflineFavoriteMetaApi()
   ])
   const favoriteTimeById = new Map(meta.map((item) => [toVaultEntryId(item.passwordId), item.time]))
-  const favorites = await decryptPasswordEntries(entries
-    .filter((entry) => ids.includes(toVaultEntryId(entry.id)))
-    .map((entry) => ({
-      ...entry,
-      favorite: true,
-      favoriteTime: favoriteTimeById.get(toVaultEntryId(entry.id))
-    }))
+  const favorites = await decryptPasswordEntries(
+    entries
+      .filter((entry) => ids.includes(toVaultEntryId(entry.id)))
+      .map((entry) => ({
+        ...entry,
+        favorite: true,
+        favoriteTime: favoriteTimeById.get(toVaultEntryId(entry.id))
+      })),
+    getVaultUnlockContext()
   )
   const filtered = filterVaultEntries(favorites, { keyword: params.keyword })
   const page = Math.max(1, params.page ?? 1)

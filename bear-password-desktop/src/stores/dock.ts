@@ -1,10 +1,9 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 
 /**
  * macOS Dock 栏图标显示配置
  */
-export const useDockStore = defineStore('dock', () => {
+export const useDockStore = createStateStore(() => {
   const available = ref(false)
   const hidden = ref(false)
   const loading = ref(false)

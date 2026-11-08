@@ -1,5 +1,4 @@
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
+import { computed, createStateStore, ref } from '@/stores/reactiveStore'
 import { useSecurityStore } from '@/stores/security'
 import { storage } from '@/utils/storage'
 
@@ -15,7 +14,7 @@ interface LocalVaultAuthStatus {
 }
 
 /** 本地门禁状态；此 store 不持有账号、服务端 token 或凭据。 */
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = createStateStore(() => {
   const status = ref<LocalVaultAuthStatus | null>(null)
   const initialized = ref(false)
   const loading = ref(false)

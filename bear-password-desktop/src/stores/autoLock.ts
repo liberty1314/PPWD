@@ -1,5 +1,4 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 import {
   AUTO_LOCK_OPTIONS,
   DEFAULT_AUTO_LOCK_MINUTES,
@@ -10,6 +9,7 @@ import { useSecurityStore } from '@/stores/security'
 import { useVaultStore } from '@/stores/vault'
 import { storage } from '@/utils/storage'
 import { clearSensitiveClipboardOnLock } from '@/utils/sensitiveClipboard'
+import { desktopThemeAdapter } from '@/platform/desktopThemeAdapter'
 
 const STORAGE_KEY = 'auto_lock_minutes'
 const LOCK_STATE_KEY = 'app_locked'
@@ -34,7 +34,7 @@ function clearCheckInterval(): void {
 }
 
 function hideWindowAfterLock(): void {
-  window.windowApi?.hide()
+  desktopThemeAdapter.hide()
 }
 
 function isMigrationActive(): boolean {
@@ -51,7 +51,7 @@ function applySecureLockSideEffects(): void {
 /**
  * 自动锁定：无操作超时后锁定应用，需重新输入密码解锁
  */
-export const useAutoLockStore = defineStore('autoLock', () => {
+export const useAutoLockStore = createStateStore(() => {
   const lockMinutes = ref<AutoLockMinutes>(
     normalizeLockMinutes(storage.get<number>(STORAGE_KEY, DEFAULT_AUTO_LOCK_MINUTES))
   )

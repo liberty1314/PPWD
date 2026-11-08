@@ -1,8 +1,4 @@
-import { ref } from 'vue'
 import type { LocalePreference, ResolvedLocale } from '@/locales/types'
-
-/** 系统语言变化计数，供 computed 追踪 */
-export const systemLocaleRevision = ref(0)
 
 export interface LocaleOption {
   value: LocalePreference
@@ -46,7 +42,6 @@ export function normalizeLocalePreference(value: unknown): LocalePreference {
 
 /** 根据偏好解析最终语言 */
 export function resolveLocale(preference: LocalePreference): ResolvedLocale {
-  void systemLocaleRevision.value
   if (preference === 'system') {
     return getSystemLocale()
   }
@@ -55,7 +50,7 @@ export function resolveLocale(preference: LocalePreference): ResolvedLocale {
 
 /** 同步系统语言 */
 export function syncSystemLocale(): void {
-  systemLocaleRevision.value += 1
+  systemLocaleListeners.forEach((listener) => listener())
 }
 
 /** 将语言应用到 document */
@@ -75,6 +70,10 @@ export function subscribeSystemLocaleChange(listener: SystemLocaleListener): () 
   ensureSystemLocaleWatching()
   return () => {
     systemLocaleListeners = systemLocaleListeners.filter((item) => item !== listener)
+    if (systemLocaleListeners.length === 0) {
+      systemLocaleUnsubscribe?.()
+      systemLocaleUnsubscribe = null
+    }
   }
 }
 
@@ -82,7 +81,6 @@ function ensureSystemLocaleWatching(): void {
   if (systemLocaleUnsubscribe || typeof window === 'undefined') return
   const handler = (): void => {
     syncSystemLocale()
-    systemLocaleListeners.forEach((listener) => listener())
   }
   window.addEventListener('languagechange', handler)
   systemLocaleUnsubscribe = () => window.removeEventListener('languagechange', handler)

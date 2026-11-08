@@ -1,5 +1,4 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 import {
   CLIPBOARD_CLEAR_OPTIONS,
   DEFAULT_CLIPBOARD_CLEAR_SECONDS,
@@ -16,7 +15,7 @@ function normalizeClipboardClearSeconds(value: unknown): ClipboardClearSeconds {
     : DEFAULT_CLIPBOARD_CLEAR_SECONDS
 }
 
-export const useClipboardClearStore = defineStore('clipboardClear', () => {
+export const useClipboardClearStore = createStateStore(() => {
   const clearSeconds = ref<ClipboardClearSeconds>(
     normalizeClipboardClearSeconds(storage.get<number>(STORAGE_KEY, DEFAULT_CLIPBOARD_CLEAR_SECONDS))
   )

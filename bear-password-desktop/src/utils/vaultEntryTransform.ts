@@ -12,21 +12,18 @@ import {
   type PasswordEntryApiParams
 } from '@/utils/contentMetadata'
 import { SecurityKeyRequiredError } from '@/utils/securityKeyRequired'
-import { useSecurityStore } from '@/stores/security'
 
 export { SecurityKeyRequiredError }
-
-function getUnlockContext(): VaultUnlockContext | null {
-  return useSecurityStore().getUnlockContext()
-}
 
 export function isDecryptFailedContent(content: PasswordContent): boolean {
   return !!(content as Record<string, unknown>).__decryptFailed__
 }
 
-export async function decryptPasswordEntry(entry: PasswordEntry): Promise<PasswordEntry> {
+export async function decryptPasswordEntry(
+  entry: PasswordEntry,
+  unlock: VaultUnlockContext | null
+): Promise<PasswordEntry> {
   const normalized: PasswordEntry = { ...entry, id: toVaultEntryId(entry.id) }
-  const unlock = getUnlockContext()
   if (!unlock) {
     if (isEncryptedContent(normalized.content)) {
       return {
@@ -58,23 +55,27 @@ export async function decryptPasswordEntry(entry: PasswordEntry): Promise<Passwo
   }
 }
 
-export async function decryptPasswordEntries(entries: PasswordEntry[]): Promise<PasswordEntry[]> {
-  return Promise.all(entries.map((entry) => decryptPasswordEntry(entry)))
+export async function decryptPasswordEntries(
+  entries: PasswordEntry[],
+  unlock: VaultUnlockContext | null
+): Promise<PasswordEntry[]> {
+  return Promise.all(entries.map((entry) => decryptPasswordEntry(entry, unlock)))
 }
 
 export async function decryptPasswordPage(
-  result: PageResult<PasswordEntry>
+  result: PageResult<PasswordEntry>,
+  unlock: VaultUnlockContext | null
 ): Promise<PageResult<PasswordEntry>> {
   return {
     ...result,
-    list: await decryptPasswordEntries(result.list)
+    list: await decryptPasswordEntries(result.list, unlock)
   }
 }
 
 export async function encryptPasswordEntryParams(
-  params: PasswordEntryParams
+  params: PasswordEntryParams,
+  unlock: VaultUnlockContext | null
 ): Promise<PasswordEntryApiParams> {
-  const unlock = getUnlockContext()
   if (!unlock) {
     throw new SecurityKeyRequiredError()
   }

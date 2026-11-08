@@ -1,5 +1,4 @@
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
+import { computed, createStateStore, ref } from '@/stores/reactiveStore'
 import type { VaultUnlockContext } from '@/utils/contentCrypto'
 import type { SecurityKeyReencryptProgress } from '@/utils/securityKeyReencrypt'
 
@@ -10,7 +9,7 @@ const defaultMigrationProgress = (): SecurityKeyReencryptProgress => ({
 })
 
 /** 保留 VUK 仅在内存中的约束；恢复密钥始终由主进程持有。 */
-export const useSecurityStore = defineStore('security', () => {
+export const useSecurityStore = createStateStore(() => {
   const vuk = ref<Uint8Array | null>(null)
   const vaultSalt = ref<string | null>(null)
   const secretKeyFingerprint = ref<string | null>(null)

@@ -1,10 +1,9 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 
 /**
  * 开机自启（登录系统后自动启动应用）
  */
-export const useLaunchAtLoginStore = defineStore('launchAtLogin', () => {
+export const useLaunchAtLoginStore = createStateStore(() => {
   const available = ref(false)
   const enabled = ref(false)
   const loading = ref(false)

@@ -1,7 +1,6 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 
-export const useSettingsDialogStore = defineStore('settingsDialog', () => {
+export const useSettingsDialogStore = createStateStore(() => {
   const visible = ref(false)
 
   function open(): void {

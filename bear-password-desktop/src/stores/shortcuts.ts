@@ -1,5 +1,4 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
+import { createStateStore, ref } from '@/stores/reactiveStore'
 import {
   DEFAULT_SHORTCUT_SETTINGS,
   type ShortcutActionId,
@@ -38,7 +37,7 @@ function normalizeSettings(value: unknown): ShortcutSettings {
 /**
  * 全局快捷键配置
  */
-export const useShortcutsStore = defineStore('shortcuts', () => {
+export const useShortcutsStore = createStateStore(() => {
   const settings = ref<ShortcutSettings>(
     normalizeSettings(storage.get<ShortcutSettings>(STORAGE_KEY, DEFAULT_SHORTCUT_SETTINGS))
   )

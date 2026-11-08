@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, createStateStore, ref } from '@/stores/reactiveStore'
 import { storage } from '@/utils/storage'
 import {
   type ThemePreference,
@@ -10,7 +9,6 @@ import {
   normalizeThemePreference,
   subscribeSystemThemeChange,
   syncSystemThemeFromPlatform,
-  systemThemeRevision,
   DEFAULT_THEME_PREFERENCE
 } from '@/utils/theme'
 import {
@@ -26,7 +24,7 @@ import {
   initLocaleOnBoot,
   normalizeLocalePreference,
   syncSystemLocale,
-  systemLocaleRevision
+  subscribeSystemLocaleChange
 } from '@/utils/localePreference'
 import type { LocalePreference, ResolvedLocale } from '@/locales/types'
 import { syncTrayAppearanceToMain } from '@/utils/trayAppearanceSync'
@@ -35,7 +33,9 @@ import { syncTrayAppearanceToMain } from '@/utils/trayAppearanceSync'
  * 应用全局状态
  * 管理主题、语言等全局配置
  */
-export const useAppStore = defineStore('app', () => {
+export const useAppStore = createStateStore(() => {
+  const systemThemeRevision = ref(0)
+  const systemLocaleRevision = ref(0)
   const themePreference = ref<ThemePreference>(
     normalizeThemePreference(storage.get<ThemePreference>('theme', DEFAULT_THEME_PREFERENCE))
   )
@@ -148,9 +148,14 @@ export const useAppStore = defineStore('app', () => {
 
     unsubscribeSystemTheme?.()
     unsubscribeSystemTheme = subscribeSystemThemeChange(() => {
+      systemThemeRevision.value += 1
       if (themePreference.value === 'system') {
         applyTheme()
       }
+    })
+    subscribeSystemLocaleChange(() => {
+      systemLocaleRevision.value += 1
+      if (localePreference.value === 'system') applyLocale()
     })
   }
 

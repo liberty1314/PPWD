@@ -8,7 +8,7 @@ owner: project-maintainer
 reviewers: []
 version: 1.0
 created_at: 2026-11-07
-updated_at: 2026-11-07
+updated_at: 2026-11-08
 depends_on:
   - docs/design-proposal.md
   - docs/prototypes/all-pages.html
@@ -168,7 +168,7 @@ TASK-UIR-04 + TASK-UIR-05 + TASK-UIR-06 + TASK-UIR-07
 - 拆为 `VaultWorkspace`、toolbar/search/filter、virtualizable entry list、detail panel、entry forms、sensitive field、password generator、TOTP display、confirm dialog 等有清晰职责的组件。
 - 实现条目载入、空库、无搜索结果、错误、加载 skeleton、选中、批量选择、删除确认、详情缺失和窄窗口返回列表状态。
 - 保持用户名/密码遮蔽、按命令显示密码、复制反馈、自动清理剪贴板、危险操作确认和自动锁定行为。
-- 支持登录、信用卡、身份、安全笔记、验证器、数据库等类型，以及 TOTP、自定义字段、附件/备注入口；每种类型遵循现有数据 schema。
+- 支持登录、信用卡、身份、安全笔记、验证器、数据库等类型，以及 TOTP、自定义字段和备注；附件入口仅在基线确认已有 schema/API 后迁移。当前桌面密码库未发现附件 schema、API 或既有界面入口，不在本次新增持久化能力。
 - 迁移收藏、最近访问与安全中心，保证筛选、排序、导航和风险项操作对应真实业务。
 - 对 900px 窄窗口检查滚动容器、详情折叠/返回和表单单列行为。
 
@@ -285,25 +285,25 @@ TASK-UIR-04 + TASK-UIR-05 + TASK-UIR-06 + TASK-UIR-07
 
 | 阶段 | 状态 | 退出条件 |
 | --- | --- | --- |
-| 迁移契约 | 未开始 | 入口、接口、偏好和安全行为清单评审通过 |
-| Shared 去框架化 | 未开始 | shared 不依赖 UI framework 并通过既有应用验证 |
-| React 基础 | 未开始 | 两个 React UI 入口、主题 token 和 preload adapter 可运行 |
-| 桌面页面迁移 | 未开始 | 桌面原型场景与关键业务验收完成 |
-| 扩展 UI 迁移 | 未开始 | popup/wake 验收及网页自动填充回归完成 |
-| 依赖清理 | 未开始 | Vue 移除、pnpm 构建和发布产物通过 |
+| 迁移契约 | 已完成（代码基线） | [TASK-UIR-01 基线契约记录](task-ui-refactor-01-baseline-contract.md)；接口、消息、偏好、安全时序和构建基线已盘点。真实应用旅程与真人 UI 验收留在全量验收阶段 |
+| Shared 去框架化 | 已完成 | extension shared locale、desktop theme/locale utilities 与 vault transforms 不再依赖 Vue/Pinia；系统偏好用显式订阅，解锁上下文经 API adapter 显式传递；行为测试及两端 typecheck/build 通过 |
+| React 基础 | 已完成 | 桌面 renderer、扩展 popup/wake React 入口及错误边界可生产构建；共享语义 token 覆盖四主题、六强调色、明暗模式和 reduced-motion/transparency；preload 调用经 typed adapter；生产构建兼容性已验证，详见 [TASK-UIR-03 开发记录](task-ui-refactor-03-development-report.md) |
+| 桌面页面迁移 | TASK-UIR-04、05 开发完成；人工旅程待 TASK-UIR-09 | 认证、设置、外观、概览及密码库/关键工作流 React 页面已接入桌面默认入口；开发和自动验证记录见 [TASK-UIR-04 开发记录](task-ui-refactor-04-development-report.md) 与 [TASK-UIR-05 开发记录](task-ui-refactor-05-development-report.md) |
+| 扩展 UI 迁移 | TASK-UIR-06 页面开发完成；TASK-UIR-07 Chromium 基本集成回归完成，Edge/完整旅程待 TASK-UIR-09 | popup 默认 React、wake 页面 React 化；production package、content script 依赖边界与 zip 归档检查通过。ego lite Chromium 已安装扩展，真实桌面 bridge、临时凭据匹配/自动填充/删除和运行中桌面 focus 唤起通过；Edge、协议冷启动、TOTP、快速保存和重启 session 留待 TASK-UIR-09。详见 [TASK-UIR-07 开发记录](task-ui-refactor-07-development-report.md) |
+| 依赖清理 | TASK-UIR-08 代码、构建收口及 macOS arm64 app/DMG 资源验证完成；当前机器旧 Electron 缓存需刷新，Windows installer 待补验 | 两端 Vue/Pinia/Element Plus/Vue Router 运行时与旧页面已删除，pnpm lockfile/typecheck/build 通过；扩展 package 和根级 build entry 通过。macOS app/DMG 使用隔离新下载缓存经默认 `unpack-electron` 打包并检查；当前用户缓存 ZIP 有异常偏移，Windows installer 待 Windows 环境验证。详情见 [TASK-UIR-08 开发记录](task-ui-refactor-08-development-report.md) |
 | 全量验收 | 未开始 | 自动化和真人验收证据齐全、发布回滚有效 |
 
 ## 风险与未决问题
 
 | 风险/问题 | 影响 | 处理方式 | 进入条件 |
 | --- | --- | --- | --- |
-| 现有 design proposal 未给出正式 REQ/UX 编号 | 追溯依赖文档章节 | 在需求/技术设计评审时建立编号并回填任务表 | TASK-UIR-01 退出前 |
-| React 依赖与 electron-vite 2 / CRXJS beta 的兼容性需实际验证 | 可能影响入口插件和 HMR | 在 TASK-UIR-03 锁版本并建立生产构建 spike | 不兼容时先升级构建插件并独立评估 |
+| 现有 design proposal 未给出正式 REQ/UX 编号 | 追溯依赖文档章节 | TASK-UIR-01 已在基线契约记录建立 UIR-REQ/UX 迁移追溯编号；正式产品需求编号仍可在需求评审统一治理 | 已记录，后续按需回填 |
+| Sass legacy API 与扩展图标重复输出提示 | 构建链升级或产物维护时需处理 | TASK-UIR-03 的两端生产构建已通过；提示与验证结果见 [开发记录](task-ui-refactor-03-development-report.md) | 依赖清理和发布产物收口时 |
 | 桌面 Vault 页面规模大且有大量集成行为 | 迁移遗漏或安全回归 | 分组件迁移，保留 IPC/store adapter，按模块验收 | 进入 TASK-UIR-05 前 |
-| 主题模型改变旧 `theme` 配置语义 | 升级后用户外观变化 | 幂等迁移测试、保留原明暗感知、设置回退 | TASK-UIR-03 主题联调前 |
-| 扩展 popup 和网页内容脚本共享部分状态/locale 逻辑 | 误把 UI runtime 打入网页 | 去耦 shared 模块并检查 bundle 内容 | TASK-UIR-02 通过后进入 TASK-UIR-06 |
-| Element Plus 与 shadcn 同时存在可能造成视觉和可访问性漂移 | 页面体验不统一 | 迁移期间限制 Element Plus 到尚未迁移页面，按路由切换逐步移除；禁止长期混搭完成态 | React 页面切片验收时 |
-| 浏览器扩展在 Chrome 与 Edge 的弹窗和宿主页面行为有差异 | 自动填充或 popup 溢出 | 两浏览器分别打包安装与人工检查 | TASK-UIR-07 和 09 |
+| 主题模型改变旧 `theme` 配置语义 | 升级后用户外观变化 | TASK-UIR-03 已以幂等迁移测试确认保留原明暗感知；具体页面验收仍在各 UI 迁移任务进行 | 页面接入 React 主题时 |
+| 扩展 popup 和网页内容脚本共享部分状态/locale 逻辑 | 误把 UI runtime 打入网页 | TASK-UIR-02 已去耦；TASK-UIR-06 生产产物检查确认 React primitives 只由 popup/wake React 入口加载，content script 仅加载 locale、匹配、复制和协议工具 | TASK-UIR-07 在 Chrome/Edge 安装后复核宿主页行为 |
+| Element Plus 与 shadcn 同时存在可能造成视觉和可访问性漂移 | 页面体验不统一 | TASK-UIR-08 已移除 Element Plus 与 Vue 页面，桌面默认 renderer 仅构建 React UI | 已关闭；剩余 UI 体验按 TASK-UIR-09 验收 |
+| 浏览器扩展在 Chrome 与 Edge 的弹窗和宿主页面行为有差异 | 自动填充或 popup 溢出 | TASK-UIR-07 已在 ego lite Chromium 完成扩展安装、popup、bridge 与临时表单填充；Edge、协议冷启动和真人 UI 检查待 TASK-UIR-09 | TASK-UIR-09 |
 | EasyUI/21st.dev 单项组件的依赖、许可和源码质量不同 | 维护与安全风险 | 每个采纳组件记录来源、许可证、依赖、改造点；未审查不合入 | 每次引入组件前 |
 
 明确决定：桌面 renderer 和扩展 popup/wake 迁移 React；Electron main/preload、background/content scripts 保持原技术职责；扩展无需 React 注入网页。实现中需要重新确认的版本/插件兼容性属于工程验证项，不改变已确认迁移方向。
@@ -331,6 +331,6 @@ TASK-UIR-04 + TASK-UIR-05 + TASK-UIR-06 + TASK-UIR-07
 | --- | --- | --- |
 | 设计方案与原型输入已核对 | 通过 | `docs/design-proposal.md` 与 `docs/prototypes/all-pages.html` |
 | 桌面及扩展入口已核对 | 通过 | `electron.vite.config.ts`、扩展 `vite.config.ts` 和 `manifest.config.ts` |
-| 任务覆盖迁移、主题、安全与扩展回归 | 有条件通过 | 本计划已覆盖；需在 TASK-UIR-01 评审时补正式 REQ/UX 编号 |
-| React 插件版本兼容性 | 待验证 | TASK-UIR-03 执行实际 renderer/popup/wake build spike |
-| 开发入口门禁 | 未通过 | 本文件是 draft；需维护者评审批准并完成 TASK-UIR-01 基线后方可进入代码迁移 |
+| 任务覆盖迁移、主题、安全与扩展回归 | 通过（基线已补） | UIR-REQ/UX 迁移追溯编号与接口/安全/构建基线见 [TASK-UIR-01 契约记录](task-ui-refactor-01-baseline-contract.md)；正式产品需求编号可在后续需求治理中统一补充 |
+| React 插件版本兼容性 | 通过 | TASK-UIR-03 桌面 renderer 与扩展 popup/wake 生产构建均通过，版本记录及剩余构建提示见 [开发记录](task-ui-refactor-03-development-report.md) |
+| 开发入口门禁 | 历史状态待维护者评审 | TASK-UIR-01 基线已完成，记录见 [基线契约](task-ui-refactor-01-baseline-contract.md)；本计划原 draft 评审门禁需维护者治理确认，不影响已完成任务的代码记录 |

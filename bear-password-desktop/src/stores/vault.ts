@@ -1,5 +1,4 @@
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
+import { computed, createStateStore, ref } from '@/stores/reactiveStore'
 import { fetchAllPasswordEntries } from '@/api/vault'
 import { getFavoriteMetaApi } from '@/api/favorites'
 import { getRecentVisitMetaApi } from '@/api/recent'
@@ -28,7 +27,7 @@ interface RefreshOptions {
 /**
  * 密码库全量缓存：从本地库读取密文后解密，收藏/最近访问由缓存 + 元数据组装
  */
-export const useVaultStore = defineStore('vault', () => {
+export const useVaultStore = createStateStore(() => {
   const allEntries = ref<PasswordEntry[]>([])
   const favoriteMeta = ref<FavoriteMetaItem[]>([])
   const recentMeta = ref<RecentVisitMetaItem[]>([])
