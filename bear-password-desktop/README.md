@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src/assets/logo.png" alt="BearPassword" width="80" height="80" />
+  <img src="src/assets/logo.png" alt="PPWD" width="80" height="80" />
 </p>
 
-<h1 align="center">BearPassword 本地版桌面端</h1>
+<h1 align="center">PPWD 本地版桌面端</h1>
 
 <p align="center">在电脑上管理密码库、生成强密码、查看两步验证码的主应用</p>
 
@@ -35,7 +35,7 @@
 从项目发布页获取对应系统安装包：
 
 - **macOS**：`.dmg` 安装包（内含应用与安装说明）
-- **Windows**：`BearPassword-Setup.exe` 安装程序（安装后注册桌面协议，供浏览器扩展唤醒）
+- **Windows**：`PPWD-Setup.exe` 安装程序（安装后注册桌面协议，供浏览器扩展唤醒）
 
 首次启动时创建本地保险库并绑定手机验证器。请妥善保存首次创建时展示的恢复密钥；软件不会替你保存或找回该密钥。
 
@@ -46,8 +46,8 @@
 ## 与浏览器扩展配合
 
 1. 安装 [浏览器扩展](../bear-password-extension/)
-2. 保持 BearPassword 桌面端**已解锁**
-3. 打开需要登录的网站，点击输入框旁的 BearPassword 图标进行填充
+2. 保持 PPWD 桌面端**已解锁**
+3. 打开需要登录的网站，点击输入框旁的 PPWD 图标进行填充
 
 扩展通过本机安全通道读取数据，无需在浏览器里再次输入主密码。
 

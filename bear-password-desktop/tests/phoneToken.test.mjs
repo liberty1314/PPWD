@@ -19,8 +19,8 @@ const STEP_MS = PHONE_TOKEN_PERIOD_SECONDS * 1000
 
 function codeAt(secret, timestamp) {
   return new OTPAuth.TOTP({
-    issuer: 'BearPassword',
-    label: 'BearPassword',
+    issuer: 'PPWD',
+    label: 'PPWD',
     algorithm: 'SHA1',
     digits: 6,
     period: PHONE_TOKEN_PERIOD_SECONDS,
@@ -43,7 +43,7 @@ test('恢复密钥为 128 位 Base64URL 字符串', () => {
 test('生成通用验证器 URI 与二维码数据', () => {
   const uri = createPhoneTokenUri(SECRET)
   assert.match(uri, /^otpauth:\/\/totp\//)
-  assert.match(uri, /issuer=BearPassword/)
+  assert.match(uri, /issuer=PPWD/)
   assert.match(createPhoneTokenQrDataUrl(SECRET), /^data:image\/gif;base64,/)
 })
 

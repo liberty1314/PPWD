@@ -61,7 +61,7 @@ function LoginPage() {
   const hintKey = `login.hint${status === 'notLoggedIn' ? 'NotLoggedIn' : status[0].toUpperCase() + status.slice(1)}`
 
   return <main className="popup-login">
-    <header className="popup-login__top"><span className="popup-login__brand"><AppLogo />BearPassword</span><button type="button" className="popup-icon-button" title={t('login.settings')} aria-label={t('login.settings')} onClick={state.openSettings}><Settings2 size={17} /></button></header>
+    <header className="popup-login__top"><span className="popup-login__brand"><AppLogo />PPWD</span><button type="button" className="popup-icon-button" title={t('login.settings')} aria-label={t('login.settings')} onClick={state.openSettings}><Settings2 size={17} /></button></header>
     <section className="popup-login__panel">
       <AppLogo size="lg" />
       <p className="popup-login__subtitle">{t('login.subtitle')}</p>

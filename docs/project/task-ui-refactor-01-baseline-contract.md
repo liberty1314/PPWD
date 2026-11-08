@@ -71,7 +71,7 @@ Content 内部另有 `TRIGGER_DESKTOP_PROTOCOL`、`PERFORM_AUTOFILL`、`INSERT_T
 
 ### 本机桌面 bridge 与 protocol
 
-- Host/port：`127.0.0.1:6892`；认证头 `X-BearPassword-Bridge: BearPassword-Extension`。
+- Host/port：`127.0.0.1:6892`；认证头 `X-PPWD-Bridge: PPWD-Extension`。
 - Wake protocol：`bearpassword://focus`；扩展 wake 页面 URL 由 `chrome.runtime.getURL('src/wake/index.html')` 生成。
 - desktop bridge 状态携带 `ready`、`loggedIn`、`unlocked`、`locked`、`username`、`themePreference`、`localePreference`；敏感凭据不应被增加到 bridge 状态。
 - `extensionBridge` 请求/响应类型位于根级 `shared/extensionBridge`，桌面 preload 将请求转发 renderer，React 适配层须保留请求 id 和响应结果。
@@ -118,7 +118,7 @@ Desktop 的通用 storage 工具添加 `bear_` 前缀；已确认关键键有 `b
 | `cd bear-password-desktop && pnpm run build` | 通过 | main/preload/renderer 均产出；legacy Sass JS API 有重复弃用提示；renderer 主 JS 约 2708 kB，字体资源约 27.8 MB（构建报告值） |
 | `cd bear-password-extension && pnpm run typecheck` | 通过 | `vue-tsc --noEmit` |
 | `cd bear-password-extension && pnpm run build` | 通过 | CRXJS 报告 4 个 `public/icons/icon-*.png` 同名覆盖输出提示；popup JS 约 90.8 kB，gzip 约 34.7 kB |
-| `cd bear-password-extension && pnpm run package` | 通过 | 脚本内部仍使用 `npm run build`；生成 `release/BearPassword-Extension.zip`（约 0.53 MB） |
+| `cd bear-password-extension && pnpm run package` | 通过 | 脚本内部仍使用 `npm run build`；生成 `release/PPWD-Extension.zip`（约 0.53 MB） |
 | `pnpm run build:all -- --extension` | 通过 | 根脚本正确委派到扩展 package，生成同名发布包 |
 | `pnpm run build:all -- --help` | 通过 | 根脚本 help 入口可运行 |
 

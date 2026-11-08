@@ -1,7 +1,7 @@
 import type { MessageDict } from './types'
 
 const messages: MessageDict = {
-  'app.name': 'BearPassword',
+  'app.name': 'PPWD',
   'app.loading': '加载中…',
 
   'locale.system': '跟随系统',
@@ -44,14 +44,14 @@ const messages: MessageDict = {
   'common.confirm': '确定',
   'common.deleting': '删除中…',
 
-  'login.subtitle': '需配合 BearPassword 桌面端使用',
+  'login.subtitle': '需配合 PPWD 桌面端使用',
   'login.desktopBridge': '桌面端地址',
   'login.connectionStatus': '连接状态',
   'login.statusOffline': '未连接',
   'login.statusNotLoggedIn': '未登录',
   'login.statusLocked': '已锁定',
   'login.statusReady': '就绪',
-  'login.hintOffline': '请先启动 BearPassword 桌面应用，或点击下方按钮唤起。',
+  'login.hintOffline': '请先启动 PPWD 桌面应用，或点击下方按钮唤起。',
   'login.hintNotLoggedIn': '请在桌面端登录你的账户，可点击下方按钮打开桌面端。',
   'login.hintLocked': '请在桌面端解锁保险库，可点击下方按钮打开桌面端。',
   'login.hintReady': '连接正常，正在进入…',
@@ -59,7 +59,7 @@ const messages: MessageDict = {
   'login.refreshing': '检测中…',
   'login.openDesktop': '打开桌面端',
   'login.openingDesktop': '正在唤起…',
-  'login.protocolConfirm': '若浏览器弹出确认框，请点击「打开 BearPassword」，然后在桌面端登录并解锁保险库。',
+  'login.protocolConfirm': '若浏览器弹出确认框，请点击「打开 PPWD」，然后在桌面端登录并解锁保险库。',
   'login.settings': '扩展设置',
 
   'vault.searchPlaceholder': '搜索此网站的登录项…',
@@ -92,7 +92,7 @@ const messages: MessageDict = {
   'vault.toast.fillNoTab': '无法获取当前标签页',
   'vault.share.username': '用户名',
   'vault.share.password': '密码',
-  'vault.share.footer': '此内容复制于 BearPassword，零知识 · 简洁 · 专业的密码管理工具。官网：{url}',
+  'vault.share.footer': '此内容复制于 PPWD，零知识 · 简洁 · 专业的密码管理工具。官网：{url}',
 
   'credential.autofill': '自动填充',
   'credential.fill': '填充',
@@ -133,7 +133,7 @@ const messages: MessageDict = {
   'settings.desktopNotLoggedIn': '桌面端未登录',
   'settings.desktopLocked': '桌面端已锁定或未解锁',
   'settings.desktopReady': '已连接且保险库已解锁',
-  'settings.desktopNote': '扩展需配合 BearPassword 桌面端使用，请保持桌面应用运行并已登录解锁。',
+  'settings.desktopNote': '扩展需配合 PPWD 桌面端使用，请保持桌面应用运行并已登录解锁。',
   'settings.appearanceFromDesktop': '主题与语言跟随桌面端设置；桌面端未运行时跟随系统。',
   'settings.appearance': '外观',
   'settings.theme': '主题',
@@ -141,7 +141,7 @@ const messages: MessageDict = {
   'settings.selectLanguage': '选择语言',
   'settings.service': '服务',
   'settings.server': '服务器地址',
-  'settings.serverDesc': 'BearPassword 后端 API 地址（仅 origin，不含 /api）',
+  'settings.serverDesc': 'PPWD 后端 API 地址（仅 origin，不含 /api）',
   'settings.serverPlaceholder': 'http://127.0.0.1:8080',
   'settings.serverSave': '保存并检测连接',
   'settings.backend': '后端服务',
@@ -167,18 +167,18 @@ const messages: MessageDict = {
   'settings.about': '关于',
   'settings.version': '当前版本',
   'settings.officialWebsite': '官网',
-  'settings.officialWebsiteLink': 'BearPassword 官网',
+  'settings.officialWebsiteLink': 'PPWD 官网',
   'settings.updateAvailable': '发现新版本 {version}',
   'settings.updateDownload': '立即下载',
   'settings.author': '作者',
 
-  'session.desktopFailed': '无法连接 BearPassword 桌面端',
-  'session.wakeDesktopFailed': '无法唤起桌面端，请手动打开 BearPassword',
+  'session.desktopFailed': '无法连接 PPWD 桌面端',
+  'session.wakeDesktopFailed': '无法唤起桌面端，请手动打开 PPWD',
 
-  'content.passwordIcon.title': 'BearPassword 填充',
+  'content.passwordIcon.title': 'PPWD 填充',
   'content.picker.needsSecurityKey': '请在桌面端解锁保险库后重试',
   'content.picker.desktopNotReady': '桌面端未就绪或已锁定，点击此处唤醒并解锁。',
-  'content.picker.desktopProtocolConfirm': '若浏览器弹出确认框，请点击「打开 BearPassword」，启动并解锁后重试。',
+  'content.picker.desktopProtocolConfirm': '若浏览器弹出确认框，请点击「打开 PPWD」，启动并解锁后重试。',
   'content.picker.noEntries': '此网站暂无保存的登录项',
   'content.picker.noMatch': '没有匹配的登录项',
   'content.picker.emptyDefault': '暂无可用登录项',
@@ -188,26 +188,26 @@ const messages: MessageDict = {
   'content.picker.saving': '保存中…',
   'content.picker.saved': '保存成功',
   'content.picker.saveSuccess': '登录项已保存成功',
-  'content.picker.saveFailed': '保存失败，请确认已登录 BearPassword',
+  'content.picker.saveFailed': '保存失败，请确认已登录 PPWD',
   'content.picker.noUsername': '（无用户名）',
   'content.picker.totpCopy': '点击复制验证码',
   'content.picker.totpCopied': '验证码已复制',
   'content.picker.totpCopyFailed': '复制失败，请手动复制验证码',
 
-  'content.banner.title': '保存到 BearPassword？',
+  'content.banner.title': '保存到 PPWD？',
   'content.banner.desc': '检测到新的登录信息：{username}',
   'content.banner.unknownUser': '未知用户',
   'content.banner.save': '保存',
   'content.banner.dismiss': '暂不',
 
-  'wake.pageTitle': '唤起 BearPassword',
-  'wake.title': '正在唤起 BearPassword',
+  'wake.pageTitle': '唤起 PPWD',
+  'wake.title': '正在唤起 PPWD',
   'wake.lead': '浏览器可能会询问是否打开桌面应用，请按下面步骤操作。',
   'wake.step1': '留意浏览器顶部或页面中的确认提示',
-  'wake.step2': '点击「打开 BearPassword」允许启动应用',
+  'wake.step2': '点击「打开 PPWD」允许启动应用',
   'wake.step3': '在桌面端登录并解锁保险库后，返回网页重试',
   'wake.retry': '再次尝试唤起',
-  'wake.note': '若未看到确认提示，可点击上方按钮重试，或手动打开 BearPassword 桌面应用。'
+  'wake.note': '若未看到确认提示，可点击上方按钮重试，或手动打开 PPWD 桌面应用。'
 }
 
 export default messages

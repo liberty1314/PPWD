@@ -4,14 +4,14 @@ export function sanitizeFileNameSegment(value: string): string {
   return trimmed || 'user'
 }
 
-/** 安全密钥备份默认文件名：BearPassword{用户名}安全密钥.txt */
+/** 安全密钥备份默认文件名：PPWD{用户名}安全密钥.txt */
 export function buildSecurityKeyBackupFileName(username: string): string {
-  return `BearPassword${sanitizeFileNameSegment(username)}安全密钥.txt`
+  return `PPWD${sanitizeFileNameSegment(username)}安全密钥.txt`
 }
 
 export function buildSecurityKeyBackupFileContent(username: string, securityKey: string): string {
   return [
-    'BearPassword 安全密钥备份',
+    'PPWD 安全密钥备份',
     `用户名：${username.trim() || '—'}`,
     '',
     securityKey,

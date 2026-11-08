@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="../bear-password-desktop/src/assets/logo.svg" alt="BearPassword" width="80" height="80" />
+  <img src="../bear-password-desktop/src/assets/logo.svg" alt="PPWD" width="80" height="80" />
 </p>
 
-<h1 align="center">BearPassword 服务端</h1>
+<h1 align="center">PPWD 服务端</h1>
 
 <p align="center">为桌面端与扩展提供账号登录、保险库同步与版本更新</p>
 
@@ -16,7 +16,7 @@
 
 普通用户使用 [官网](https://bear-password.xuewei.fun) 提供的云服务即可，**无需自行部署服务端**。
 
-本模块面向希望**自建 BearPassword 后端**的用户或开发者，负责：
+本模块面向希望**自建 PPWD 后端**的用户或开发者，负责：
 
 - 用户注册、登录与账号安全（含二次验证登录保护）
 - 保险库条目的加密数据存储与同步

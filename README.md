@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="bear-password-desktop/src/assets/logo.png" alt="BearPassword" width="96" height="96" />
+  <img src="bear-password-desktop/src/assets/logo.png" alt="PPWD" width="96" height="96" />
 </p>
 
-<h1 align="center">BearPassword 本地版</h1>
+<h1 align="center">PPWD 本地版</h1>
 
 <p align="center">
   仅桌面端，无服务器、无账号。保险库数据保存在本机并加密。<br />

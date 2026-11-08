@@ -7,7 +7,7 @@
   </g>
   <g id="header">
     <text x="64" y="78" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#7A4B22">对普通用户开箱即用，对开发者可自建</text>
-    <text x="66" y="120" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#1F2937">BearPassword 同时提供端侧体验、浏览器集成和可自建服务端的完整工程实现。</text>
+    <text x="66" y="120" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#1F2937">PPWD 同时提供端侧体验、浏览器集成和可自建服务端的完整工程实现。</text>
   </g>
   <g id="tech-column-desktop">
     <path fill="#FFFFFF" stroke="#E8D9C5" stroke-width="2" d="M92,164 H392 A28,28 0 0 1 420,192 V422 A28,28 0 0 1 392,450 H92 A28,28 0 0 1 64,422 V192 A28,28 0 0 1 92,164 Z" />

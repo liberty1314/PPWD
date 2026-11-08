@@ -16,9 +16,10 @@ import { getLaunchAtLoginSettings, setLaunchAtLogin } from './launchAtLogin'
 import type { TraySettings } from '../../shared/traySettings'
 import type { TrayAppearanceSnapshot, TrayRendererCommand } from '../../shared/trayMenu'
 import { loadTraySettings, saveTraySettings } from './trayConfig'
-import { applyTraySettings, destroyTray, isTrayAvailable } from './tray'
+import { applyTraySettings, destroyTray, isTrayAvailable, isTrayReady } from './tray'
 import { saveTrayAppearanceSnapshot } from './trayAppearance'
 import { loadDockSettings, saveDockSettings } from './dockConfig'
+import { canHideDockIcon, resolveDockSettingsAtStartup } from './dockPolicy'
 import { applyDockIconVisibility, isDockIconAvailable, shouldShowDockOnFocus } from './dock'
 import {
   getBiometricAvailability,
@@ -49,25 +50,29 @@ import { registerPhoneTokenIpc } from './phoneTokenIpc'
 import { deriveVerifiedVaultUnlockKey, isPhoneTokenSessionVerified } from './phoneTokenStorage'
 import { saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
 
-/** dev 与生产环境统一 userData 目录（~/Library/Application Support/BearPassword） */
-app.setName('BearPassword')
+/**
+ * 保持旧版 userData 目录，改产品显示名时不能让已有用户看到一个空保险库。
+ * macOS: ~/Library/Application Support/BearPassword；Windows: %APPDATA%/BearPassword。
+ */
+app.setName('PPWD')
+app.setPath('userData', join(app.getPath('appData'), 'BearPassword'))
 
-const DESKTOP_WAKE_PROTOCOL = 'bearpassword'
+const DESKTOP_WAKE_PROTOCOLS = ['ppwd', 'bearpassword'] as const
 let pendingWakeUrl: string | null = null
 let releaseMainWindowTopTimer: ReturnType<typeof setTimeout> | null = null
 
 function registerDesktopWakeProtocol(): void {
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient(DESKTOP_WAKE_PROTOCOL, process.execPath, [join(process.argv[1])])
-      return
+  for (const protocol of DESKTOP_WAKE_PROTOCOLS) {
+    if (process.defaultApp && process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient(protocol, process.execPath, [join(process.argv[1])])
+      continue
     }
+    app.setAsDefaultProtocolClient(protocol)
   }
-  app.setAsDefaultProtocolClient(DESKTOP_WAKE_PROTOCOL)
 }
 
 function isDesktopWakeUrl(url: string): boolean {
-  return url.startsWith(`${DESKTOP_WAKE_PROTOCOL}://`)
+  return DESKTOP_WAKE_PROTOCOLS.some((protocol) => url.startsWith(`${protocol}://`))
 }
 
 function handleDesktopWakeRequest(): void {
@@ -148,7 +153,7 @@ let isQuitting = false
 /** 主窗口默认与最小尺寸 */
 const WINDOW_DEFAULT_WIDTH = 1024
 const WINDOW_DEFAULT_HEIGHT = 720
-const WINDOW_MIN_WIDTH = 1024
+const WINDOW_MIN_WIDTH = 900
 const WINDOW_MIN_HEIGHT = 640
 
 /** 判断是否为开发环境 */
@@ -506,8 +511,8 @@ function quitApp(): void {
   app.quit()
 }
 
-function syncTrayFromSettings(settings = loadTraySettings()): void {
-  applyTraySettings(
+function syncTrayFromSettings(settings = loadTraySettings()): boolean {
+  return applyTraySettings(
     settings,
     {
       onOpen: () => focusMainWindow(),
@@ -516,13 +521,12 @@ function syncTrayFromSettings(settings = loadTraySettings()): void {
       onRecent: () => sendTrayCommand({ action: 'recent' }),
       onLock: () => sendTrayCommand({ action: 'lock' }),
       onSettings: () => sendTrayCommand({ action: 'settings' }),
-      onSetTheme: (value) => sendTrayCommand({ action: 'set-theme', value }),
       onSetLocale: (value) => sendTrayCommand({ action: 'set-locale', value }),
       onSetFont: (value) => sendTrayCommand({ action: 'set-font', value }),
       onQuit: () => quitApp()
     },
     getIconBaseDir
-  )
+  ) !== null
 }
 
 /** 注册全局快捷键 IPC */
@@ -577,6 +581,12 @@ function registerTrayIpc(): void {
   ipcMain.handle('tray:set', (_event, partial: Partial<TraySettings>) => {
     try {
       const current = loadTraySettings()
+      if (partial.enabled === false && loadDockSettings().hidden) {
+        return {
+          ok: false as const,
+          error: 'settings.trayRequiredForDock'
+        }
+      }
       const next = saveTraySettings({
         enabled: partial.enabled ?? current.enabled,
         clickAction: partial.clickAction ?? current.clickAction
@@ -688,8 +698,8 @@ function registerFileIpc(): void {
   ipcMain.handle('file:pickEncryptedVaultBackup', async () => {
     const parent = mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined
     const result = await dialog.showOpenDialog(parent, {
-      title: '选择 BearPassword 加密备份',
-      filters: [{ name: 'BearPassword Backup', extensions: ['bpbackup'] }],
+      title: '选择 PPWD 加密备份',
+      filters: [{ name: 'PPWD Backup', extensions: ['bpbackup'] }],
       properties: ['openFile']
     })
     if (result.canceled || !result.filePaths.length) return null
@@ -700,9 +710,9 @@ function registerFileIpc(): void {
   ipcMain.handle('file:saveEncryptedVaultBackup', async (_event, payload: { content: string }) => {
     const parent = mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined
     const result = await dialog.showSaveDialog(parent, {
-      title: '保存 BearPassword 加密备份',
-      defaultPath: 'BearPassword-backup.bpbackup',
-      filters: [{ name: 'BearPassword Backup', extensions: ['bpbackup'] }]
+      title: '保存 PPWD 加密备份',
+      defaultPath: 'PPWD-backup.bpbackup',
+      filters: [{ name: 'PPWD Backup', extensions: ['bpbackup'] }]
     })
     if (result.canceled || !result.filePath) return { ok: false as const, canceled: true as const }
     await writeFile(result.filePath, payload.content, { encoding: 'utf-8', mode: 0o600 })
@@ -765,7 +775,15 @@ function registerDockIpc(): void {
 
   ipcMain.handle('dock:set', (_event, hidden: unknown) => {
     try {
-      const next = saveDockSettings({ hidden: hidden === true })
+      const wantsHidden = hidden === true
+      if (wantsHidden && !canHideDockIcon(isTrayReady())) {
+        if (app.dock) app.dock.show()
+        return {
+          ok: false as const,
+          error: 'settings.trayRequiredForDock'
+        }
+      }
+      const next = saveDockSettings({ hidden: wantsHidden })
       applyDockIconVisibility(next)
       return {
         ok: true as const,
@@ -852,9 +870,12 @@ function startApp(): void {
     const initialBindings = loadShortcutBindings()
     syncGlobalShortcuts(initialBindings, toggleMainWindowForShortcut)
 
-    applyDockIconVisibility(loadDockSettings())
+    const trayReady = syncTrayFromSettings()
+    const savedDockSettings = loadDockSettings()
+    const dockSettings = resolveDockSettingsAtStartup(savedDockSettings, trayReady)
+    if (dockSettings.hidden !== savedDockSettings.hidden) saveDockSettings(dockSettings)
+    applyDockIconVisibility(dockSettings)
     createWindow()
-    syncTrayFromSettings()
 
     if (pendingWakeUrl) {
       handleDesktopWakeUrl(pendingWakeUrl)

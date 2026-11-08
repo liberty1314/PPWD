@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/icons/logo.png" alt="BearPassword" width="80" height="80" />
+  <img src="public/icons/logo.png" alt="PPWD" width="80" height="80" />
 </p>
 
-<h1 align="center">BearPassword 浏览器扩展</h1>
+<h1 align="center">PPWD 浏览器扩展</h1>
 
 <p align="center">在网页上自动填充账号密码，并查看、复制两步验证码</p>
 
@@ -15,7 +15,7 @@
 
 ## 你可以用它做什么
 
-- **网站自动填充**：在登录页的账号/密码框旁显示 BearPassword 图标，点选即可填入
+- **网站自动填充**：在登录页的账号/密码框旁显示 PPWD 图标，点选即可填入
 - **按网站匹配**：自动列出与当前页面相关的登录项，工具栏徽章显示可用数量
 - **扩展弹窗管理**：搜索、填充、编辑、收藏、删除当前网站的条目
 - **两步验证更方便**：
@@ -36,7 +36,7 @@
 
 ## 使用前准备
 
-扩展需要配合 **BearPassword 桌面端** 使用：
+扩展需要配合 **PPWD 桌面端** 使用：
 
 1. 安装并登录 [桌面端](../bear-password-desktop/)
 2. 解锁保险库（若启用了安全密钥，需在本机完成配置）
@@ -73,7 +73,7 @@ pnpm run build      # 生成 dist/
 pnpm run package    # 构建并打包为 zip
 ```
 
-打包产物位于仓库根目录 `release/BearPassword-Extension.zip`。
+打包产物位于仓库根目录 `release/PPWD-Extension.zip`。
 
 ---
 

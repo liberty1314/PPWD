@@ -6,12 +6,12 @@ export interface EmergencyKitPayload {
 }
 
 export function buildEmergencyKitFileName(): string {
-  return 'BearPassword-Emergency-Kit.txt'
+  return 'PPWD-Emergency-Kit.txt'
 }
 
 export function buildEmergencyKitFileContent(payload: EmergencyKitPayload): string {
   return [
-    'BearPassword Emergency Kit',
+    'PPWD Emergency Kit',
     '================================',
     '',
     '请妥善保管此文件。恢复密钥与主密码共同保护您的保险库。',
@@ -24,6 +24,6 @@ export function buildEmergencyKitFileContent(payload: EmergencyKitPayload): stri
     payload.recoveryKey,
     '',
     '--------------------------------',
-    'BearPassword - 请勿与他人分享此文件'
+    'PPWD - 请勿与他人分享此文件'
   ].join('\n')
 }

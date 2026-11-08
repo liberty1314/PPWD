@@ -1,6 +1,6 @@
-export type AppearanceMode = 'system' | 'light' | 'dark'
-export type ThemeDesign = 'classic' | 'liquid' | 'soft' | 'contrast'
-export type AccentColor = 'blue' | 'teal' | 'green' | 'purple' | 'coral' | 'amber'
+export type AppearanceMode = 'system'
+export type ThemeDesign = 'liquid'
+export type AccentColor = 'blue'
 
 export interface ThemePreferences {
   appearanceMode: AppearanceMode
@@ -10,6 +10,6 @@ export interface ThemePreferences {
 
 export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
   appearanceMode: 'system',
-  themeDesign: 'classic',
+  themeDesign: 'liquid',
   accentColor: 'blue'
 }

@@ -1,7 +1,7 @@
 import type { MessageDict } from './types'
 
 const messages: MessageDict = {
-  'app.name': 'BearPassword',
+  'app.name': 'PPWD',
   'app.loading': '読み込み中…',
 
   'locale.system': 'システムに従う',
@@ -44,14 +44,14 @@ const messages: MessageDict = {
   'common.confirm': '確認',
   'common.deleting': '削除中…',
 
-  'login.subtitle': 'BearPassword デスクトップ版が必要です',
+  'login.subtitle': 'PPWD デスクトップ版が必要です',
   'login.desktopBridge': 'デスクトップ接続',
   'login.connectionStatus': '状態',
   'login.statusOffline': '未接続',
   'login.statusNotLoggedIn': '未ログイン',
   'login.statusLocked': 'ロック中',
   'login.statusReady': '準備完了',
-  'login.hintOffline': 'BearPassword デスクトップ版を起動するか、下のボタンで開いてください。',
+  'login.hintOffline': 'PPWD デスクトップ版を起動するか、下のボタンで開いてください。',
   'login.hintNotLoggedIn': 'デスクトップ版でサインインしてください。下のボタンで開けます。',
   'login.hintLocked': 'デスクトップ版で保管庫のロックを解除してください。下のボタンで開けます。',
   'login.hintReady': '接続済み。読み込み中…',
@@ -60,7 +60,7 @@ const messages: MessageDict = {
   'login.openDesktop': 'デスクトップ版を開く',
   'login.openingDesktop': '起動中…',
   'login.protocolConfirm':
-    'ブラウザで BearPassword を開くか確認されたら「開く」をクリックし、デスクトップ版でログインして保管庫のロックを解除してください。',
+    'ブラウザで PPWD を開くか確認されたら「開く」をクリックし、デスクトップ版でログインして保管庫のロックを解除してください。',
   'login.settings': '拡張機能の設定',
 
   'vault.searchPlaceholder': 'このサイトのログインを検索…',
@@ -93,7 +93,7 @@ const messages: MessageDict = {
   'vault.toast.fillNoTab': 'アクティブなタブを取得できません',
   'vault.share.username': 'ユーザー名',
   'vault.share.password': 'パスワード',
-  'vault.share.footer': 'BearPassword からコピーした内容です。ゼロ知識 · シンプル · プロフェッショナルなパスワード管理ツール。公式サイト：{url}',
+  'vault.share.footer': 'PPWD からコピーした内容です。ゼロ知識 · シンプル · プロフェッショナルなパスワード管理ツール。公式サイト：{url}',
 
   'credential.autofill': '自動入力',
   'credential.fill': '入力',
@@ -135,7 +135,7 @@ const messages: MessageDict = {
   'settings.desktopLocked': 'デスクトップ版がロック中、または未解除です',
   'settings.desktopReady': '接続済みで保管庫は解除されています',
   'settings.desktopNote':
-    '拡張機能は BearPassword デスクトップ版と連携します。デスクトップ版を起動し、ログインして保管庫のロックを解除してください。',
+    '拡張機能は PPWD デスクトップ版と連携します。デスクトップ版を起動し、ログインして保管庫のロックを解除してください。',
   'settings.appearanceFromDesktop':
     'テーマと言語はデスクトップ版の設定に従います。デスクトップ版が起動していない場合はシステム設定に従います。',
   'settings.appearance': '外観',
@@ -144,7 +144,7 @@ const messages: MessageDict = {
   'settings.selectLanguage': '言語を選択',
   'settings.service': 'サービス',
   'settings.server': 'サーバー URL',
-  'settings.serverDesc': 'BearPassword バックエンド API の origin（/api なし）',
+  'settings.serverDesc': 'PPWD バックエンド API の origin（/api なし）',
   'settings.serverPlaceholder': 'http://127.0.0.1:8080',
   'settings.serverSave': '保存して接続を確認',
   'settings.backend': 'バックエンドサービス',
@@ -171,19 +171,19 @@ const messages: MessageDict = {
   'settings.about': '情報',
   'settings.version': 'バージョン',
   'settings.officialWebsite': '公式サイト',
-  'settings.officialWebsiteLink': 'BearPassword 公式サイト',
+  'settings.officialWebsiteLink': 'PPWD 公式サイト',
   'settings.updateAvailable': '新しいバージョン {version} があります',
   'settings.updateDownload': '今すぐダウンロード',
   'settings.author': '作者',
 
-  'session.desktopFailed': 'BearPassword デスクトップ版に接続できません',
-  'session.wakeDesktopFailed': 'デスクトップ版を起動できません。手動で BearPassword を開いてください。',
+  'session.desktopFailed': 'PPWD デスクトップ版に接続できません',
+  'session.wakeDesktopFailed': 'デスクトップ版を起動できません。手動で PPWD を開いてください。',
 
-  'content.passwordIcon.title': 'BearPassword 自動入力',
+  'content.passwordIcon.title': 'PPWD 自動入力',
   'content.picker.needsSecurityKey': 'デスクトップ版で保管庫のロックを解除してから再試行してください',
   'content.picker.desktopNotReady': 'デスクトップ版が未起動またはロックされています。クリックして起動・ロック解除します。',
   'content.picker.desktopProtocolConfirm':
-    'ブラウザに確認ダイアログが表示されたら「BearPassword を開く」をクリックし、起動後にロックを解除して再試行してください。',
+    'ブラウザに確認ダイアログが表示されたら「PPWD を開く」をクリックし、起動後にロックを解除して再試行してください。',
   'content.picker.noEntries': 'このサイトに保存されたログインはありません',
   'content.picker.noMatch': '一致するログインがありません',
   'content.picker.emptyDefault': '利用可能なログインがありません',
@@ -193,26 +193,26 @@ const messages: MessageDict = {
   'content.picker.saving': '保存中…',
   'content.picker.saved': '保存しました',
   'content.picker.saveSuccess': 'ログインを保存しました',
-  'content.picker.saveFailed': '保存に失敗しました。BearPassword にサインインしているか確認してください',
+  'content.picker.saveFailed': '保存に失敗しました。PPWD にサインインしているか確認してください',
   'content.picker.noUsername': '（ユーザー名なし）',
   'content.picker.totpCopy': 'クリックでコードをコピー',
   'content.picker.totpCopied': '認証コードをコピーしました',
   'content.picker.totpCopyFailed': 'コピーに失敗しました。手動でコピーしてください。',
 
-  'content.banner.title': 'BearPassword に保存しますか？',
+  'content.banner.title': 'PPWD に保存しますか？',
   'content.banner.desc': '新しいログインを検出しました：{username}',
   'content.banner.unknownUser': '不明なユーザー',
   'content.banner.save': '保存',
   'content.banner.dismiss': '後で',
 
-  'wake.pageTitle': 'BearPassword を起動',
-  'wake.title': 'BearPassword を起動しています',
+  'wake.pageTitle': 'PPWD を起動',
+  'wake.title': 'PPWD を起動しています',
   'wake.lead': 'ブラウザがデスクトップアプリを開くか確認する場合があります。以下の手順に従ってください。',
   'wake.step1': 'ブラウザ上部またはページ内の確認ダイアログを確認してください',
-  'wake.step2': '「BearPassword を開く」をクリックして起動を許可してください',
+  'wake.step2': '「PPWD を開く」をクリックして起動を許可してください',
   'wake.step3': 'デスクトップ版でログインし保管庫のロックを解除してから、ウェブページに戻って再試行してください',
   'wake.retry': 'もう一度起動する',
-  'wake.note': '確認ダイアログが表示されない場合は、上のボタンを押すか、手動で BearPassword を開いてください。'
+  'wake.note': '確認ダイアログが表示されない場合は、上のボタンを押すか、手動で PPWD を開いてください。'
 }
 
 export default messages

@@ -16,7 +16,7 @@ depends_on:
 supersedes: []
 ---
 
-# BearPassword UI 重构开发计划
+# PPWD UI 重构开发计划
 
 ## 目的与范围
 
@@ -53,7 +53,7 @@ supersedes: []
 
 - 桌面和扩展 UI 使用 React、TypeScript；桌面继续使用 electron-vite，扩展继续使用 `@crxjs/vite-plugin`，分别配置 Vite React 插件。
 - 推荐 React Router、Zustand、Tailwind CSS、Radix UI/shadcn 和 `lucide-react`。React Hook Form/Zod 仅在与当前校验逻辑核对后用于复杂表单。依赖版本在任务启动时按仓库 Node/Electron 版本和插件兼容矩阵锁定。
-- EasyUI 的 React/shadcn registry 控件按需采纳；21st.dev 组件在逐项检查源码、依赖、许可、键盘和可访问性后才接入。社区示例不得直接决定 BearPassword 的视觉变量。
+- EasyUI 的 React/shadcn registry 控件按需采纳；21st.dev 组件在逐项检查源码、依赖、许可、键盘和可访问性后才接入。社区示例不得直接决定 PPWD 的视觉变量。
 - 产品专属的密码库列表/详情、敏感字段、密码生成器、TOTP、恢复密钥、自动填充确认和保险库操作由项目维护；不得依赖展示组件承载安全策略。
 - 保持现有 preload 暴露的 Electron API 和扩展消息契约。React UI 不直接导入 Electron 模块、不访问 Node API。
 - Zustand 用于应用/界面状态适配，不延长明文密码、恢复密钥或解密后的保险库内容的存活时间。

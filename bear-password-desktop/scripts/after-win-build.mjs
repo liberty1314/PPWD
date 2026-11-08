@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url'
 import { releaseDir } from '../../scripts/release-dir.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const setupPath = join(releaseDir, 'BearPassword-Setup.exe')
+const setupPath = join(releaseDir, 'PPWD-Setup.exe')
 
 const extraArtifacts = [
-  'BearPassword-win-x64.zip',
-  'BearPassword-Windows-安装包.zip',
-  'BearPassword-Setup.exe.blockmap',
+  'PPWD-win-x64.zip',
+  'PPWD-Windows-安装包.zip',
+  'PPWD-Setup.exe.blockmap',
   'latest.yml',
   '安装说明.txt',
   'win-unpacked',
@@ -38,9 +38,9 @@ function renameArtifact(oldName, newName) {
 }
 
 for (const name of readdirSync(releaseDir)) {
-  const nsisMatch = name.match(/^BearPassword(?: Setup)?(?:\s[\d.]+)?\.exe$/i)
+  const nsisMatch = name.match(/^PPWD(?: Setup)?(?:\s[\d.]+)?\.exe$/i)
   if (nsisMatch) {
-    renameArtifact(name, 'BearPassword-Setup.exe')
+    renameArtifact(name, 'PPWD-Setup.exe')
   }
 }
 
@@ -51,5 +51,5 @@ for (const name of extraArtifacts) {
 if (existsSync(setupPath)) {
   console.log(`[after-win-build] Windows 产物：${setupPath}`)
 } else {
-  console.warn('[after-win-build] 未生成 BearPassword-Setup.exe')
+  console.warn('[after-win-build] 未生成 PPWD-Setup.exe')
 }

@@ -1,12 +1,12 @@
-BearPassword macOS 安装说明
+PPWD macOS 安装说明
 ==========================
 
-1. 将 BearPassword.app 拖到「应用程序」
+1. 将 PPWD.app 拖到「应用程序」
 2. 打开「终端」，粘贴并回车：
 
-   xattr -cr /Applications/BearPassword.app
+   xattr -cr /Applications/PPWD.app
 
-3. 从启动台或应用程序文件夹打开 BearPassword
+3. 从启动台或应用程序文件夹打开 PPWD
 
 若提示「已损坏，无法打开」，执行第 2 步即可解除 macOS 拦截。
 

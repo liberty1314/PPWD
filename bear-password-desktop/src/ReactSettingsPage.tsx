@@ -17,7 +17,7 @@ import { useTrayStore } from './stores/tray'
 import { desktopAuthAdapter } from './platform/desktopAuthAdapter'
 import { desktopSettingsAdapter } from './platform/desktopSettingsAdapter'
 import { useDesktopLocale } from './ui/useDesktopLocale'
-import { Button, Dialog, DialogClose, DialogContent, NativeSelect, TextField, useToast } from './ui/primitives'
+import { Button, Dialog, DialogClose, DialogContent, SelectField, TextField, useToast } from './ui/primitives'
 import { AUTO_LOCK_OPTIONS, type AutoLockMinutes } from './types/autoLock'
 import { CLIPBOARD_CLEAR_OPTIONS, type ClipboardClearSeconds } from './types/clipboardClear'
 import { SHORTCUT_ACTION_OPTIONS, type ShortcutActionId } from './types/shortcut'
@@ -27,10 +27,7 @@ import { FONT_OPTIONS } from './utils/font'
 import { formatAccelerator, keyboardEventToAccelerator } from './utils/shortcut'
 import { normalizeAcceleratorString } from '../shared/acceleratorMatch'
 import { persistVaultPassword } from './utils/vaultPasswordStorage'
-import { APP_VERSION, AUTHOR_GITHUB_URL, AUTHOR_NAME, OFFICIAL_WEBSITE_URL } from './constants/app'
-import { ReactAppearancePage } from './ReactAppearancePage'
-
-const SETTINGS_SECTIONS = ['general', 'security', 'appearance', 'shortcuts', 'backup', 'about'] as const
+const SETTINGS_SECTIONS = ['general', 'security', 'shortcuts', 'backup'] as const
 type SettingsSection = typeof SETTINGS_SECTIONS[number]
 
 function useStoreUpdates(stores: StoreGeneric[], onMount?: () => void): void {
@@ -143,11 +140,36 @@ export function SettingsPage() {
   const settingTabs: Array<{ id: SettingsSection; label: string }> = [
     { id: 'general', label: translate('settings.general') },
     { id: 'security', label: translate('settings.security') },
-    { id: 'appearance', label: translate('settings.appearance') },
     { id: 'shortcuts', label: translate('settings.shortcuts') },
-    { id: 'backup', label: translate('backup.title') },
-    { id: 'about', label: translate('settings.about') }
+    { id: 'backup', label: translate('backup.title') }
   ]
+
+  async function updateTrayEnabled(enabled: boolean): Promise<void> {
+    if (!enabled && dock.hidden) {
+      toast(translate('settings.trayRequiredForDock'))
+      return
+    }
+    const result = await tray.updateSettings({ enabled })
+    if (result.ok) toast(translate(enabled ? 'msg.trayOn' : 'msg.trayOff'))
+    else toast(result.error === 'settings.trayRequiredForDock' ? translate(result.error) : result.error ?? translate('common.settingsFailed'))
+  }
+
+  async function updateDockHidden(hidden: boolean): Promise<void> {
+    let enabledTrayForReopen = false
+    if (hidden && !tray.enabled) {
+      const trayResult = await tray.updateSettings({ enabled: true })
+      if (!trayResult.ok) {
+        toast(trayResult.error === 'settings.trayRequiredForDock' ? translate(trayResult.error) : trayResult.error ?? translate('common.settingsFailed'))
+        return
+      }
+      enabledTrayForReopen = true
+    }
+
+    const result = await dock.setHidden(hidden)
+    if (result.ok) return
+    if (enabledTrayForReopen) await tray.updateSettings({ enabled: false })
+    toast(result.error === 'settings.trayRequiredForDock' ? translate(result.error) : result.error ?? translate('common.settingsFailed'))
+  }
 
   async function enableBiometric(): Promise<void> {
     if (biometricBusy) return
@@ -302,17 +324,17 @@ export function SettingsPage() {
 
     {section === 'general' && <section className="react-settings" aria-label={translate('settings.general')}>
       <ToggleRow title={translate('settings.launchAtLogin')} description={translate('settings.launchAtLoginDesc')} checked={launchAtLogin.enabled} disabled={!launchAtLogin.available || launchAtLogin.loading} onChange={async (enabled) => { const result = await launchAtLogin.setEnabled(enabled); if (result.ok) toast(translate(enabled ? 'msg.launchAtLoginOn' : 'msg.launchAtLoginOff')); else toast(result.error ?? translate('common.settingsFailed')) }} />
-      <ToggleRow title={translate('settings.tray')} description={translate('settings.trayDesc')} checked={tray.enabled} disabled={!tray.available || tray.loading} onChange={async (enabled) => { const result = await tray.updateSettings({ enabled }); if (result.ok) toast(translate(enabled ? 'msg.trayOn' : 'msg.trayOff')); else toast(result.error ?? translate('common.settingsFailed')) }} />
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.trayClickAction')}</h2><p>{translate('settings.trayClickActionDesc')}</p></div><NativeSelect label={translate('settings.trayClickAction')} id="tray-click-action" value={tray.clickAction} onChange={(event) => void tray.updateSettings({ clickAction: event.target.value as TrayClickAction })}><option value="vault">{translate('nav.vault')}</option><option value="favorites">{translate('nav.favorites')}</option><option value="recent">{translate('nav.recent')}</option><option value="settings">{translate('nav.settings')}</option></NativeSelect></div>
-      <ToggleRow title={translate('settings.dockHidden')} description={translate('settings.dockHiddenDesc')} checked={dock.hidden} disabled={!dock.available || dock.loading} onChange={async (hidden) => { const result = await dock.setHidden(hidden); if (!result.ok) toast(result.error ?? translate('common.settingsFailed')) }} />
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.font')}</h2><p>{translate(app.fontPreference === 'system' ? 'font.systemDesc' : 'font.cangerDesc')}</p></div><NativeSelect label={translate('settings.font')} id="font-preference" value={app.fontPreference} onChange={(event) => app.setFontPreference(event.target.value)}>{FONT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(`font.${option.value}`)}</option>)}</NativeSelect></div>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.subtitle')}</p></div><NativeSelect label={translate('settings.language')} id="locale-preference" value={app.localePreference} onChange={(event) => app.setLocalePreference(event.target.value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</NativeSelect></div>
+      <ToggleRow title={translate('settings.tray')} description={translate('settings.trayDesc')} checked={tray.enabled} disabled={!tray.available || tray.loading} onChange={updateTrayEnabled} />
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.trayClickAction')}</h2><p>{translate('settings.trayClickActionDesc')}</p></div><SelectField label={translate('settings.trayClickAction')} id="tray-click-action" value={tray.clickAction} onValueChange={(value) => void tray.updateSettings({ clickAction: value as TrayClickAction })}><option value="vault">{translate('nav.vault')}</option><option value="favorites">{translate('nav.favorites')}</option><option value="recent">{translate('nav.recent')}</option><option value="settings">{translate('nav.settings')}</option></SelectField></div>
+      <ToggleRow title={translate('settings.dockHidden')} description={translate('settings.dockHiddenDesc')} checked={dock.hidden} disabled={!dock.available || dock.loading} onChange={updateDockHidden} />
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.font')}</h2><p>{translate(app.fontPreference === 'system' ? 'font.systemDesc' : 'font.cangerDesc')}</p></div><SelectField label={translate('settings.font')} id="font-preference" value={app.fontPreference} onValueChange={(value) => app.setFontPreference(value)}>{FONT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(`font.${option.value}`)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.subtitle')}</p></div><SelectField label={translate('settings.language')} id="locale-preference" value={app.localePreference} onValueChange={(value) => app.setLocalePreference(value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</SelectField></div>
       <div className="react-setting-row react-setting-row--directory"><div className="react-setting-row__copy"><h2>{translate('settings.offlineDataDir')}</h2><p>{offline.dataDir || offline.defaultDataDir || translate('settings.offlineDataDirUnset')}</p></div><Button icon={<FolderOpen size={15} />} onClick={requestDirectoryChange} disabled={offline.saving}>{translate('settings.offlineDataDirChoose')}</Button></div>
     </section>}
 
     {section === 'security' && <section className="react-settings" aria-label={translate('settings.security')}>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.autoLock')}</h2><p>{translate('settings.autoLockDesc')}</p></div><NativeSelect label={translate('settings.autoLock')} id="auto-lock-minutes" value={String(autoLock.lockMinutes)} disabled={security.isMigrating} onChange={(event) => autoLock.setLockMinutes(Number(event.target.value) as AutoLockMinutes)}>{AUTO_LOCK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.value === 0 ? 'autoLock.never' : `autoLock.${option.value}`)}</option>)}</NativeSelect></div>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.clipboardClear')}</h2><p>{translate('settings.clipboardClearDesc')}</p></div><NativeSelect label={translate('settings.clipboardClear')} id="clipboard-clear-seconds" value={String(clipboard.clearSeconds)} disabled={security.isMigrating} onChange={(event) => clipboard.setClearSeconds(Number(event.target.value) as ClipboardClearSeconds)}>{CLIPBOARD_CLEAR_OPTIONS.map((seconds) => <option key={seconds} value={seconds}>{translate(seconds === 0 ? 'clipboardClear.never' : `clipboardClear.${seconds}`)}</option>)}</NativeSelect></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.autoLock')}</h2><p>{translate('settings.autoLockDesc')}</p></div><SelectField label={translate('settings.autoLock')} id="auto-lock-minutes" value={String(autoLock.lockMinutes)} disabled={security.isMigrating} onValueChange={(value) => autoLock.setLockMinutes(Number(value) as AutoLockMinutes)}>{AUTO_LOCK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.value === 0 ? 'autoLock.never' : `autoLock.${option.value}`)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.clipboardClear')}</h2><p>{translate('settings.clipboardClearDesc')}</p></div><SelectField label={translate('settings.clipboardClear')} id="clipboard-clear-seconds" value={String(clipboard.clearSeconds)} disabled={security.isMigrating} onValueChange={(value) => clipboard.setClearSeconds(Number(value) as ClipboardClearSeconds)}>{CLIPBOARD_CLEAR_OPTIONS.map((seconds) => <option key={seconds} value={seconds}>{translate(seconds === 0 ? 'clipboardClear.never' : `clipboardClear.${seconds}`)}</option>)}</SelectField></div>
       <ToggleRow title={translate('settings.preferBiometricUnlock')} description={translate(biometricSupported ? 'settings.preferBiometricUnlockDesc' : 'settings.preferBiometricUnlockDesc')} checked={biometric.preferBiometricUnlock} disabled={!biometricSupported || security.isMigrating} onChange={(enabled) => { if (!enabled) biometric.setPreferBiometricUnlock(false); else { setSecurityError(''); setBiometricPromptOpen(true) } }} />
       {security.isMigrating && <p className="react-form__warning" role="status">{security.migrationProgress.message}</p>}
       <section className="react-subsection"><h2>{translate('phoneToken.title')}</h2><p>{translate(auth.hasPhoneTokenBinding ? 'phoneToken.bound' : 'phoneToken.unbound')}{auth.status?.fingerprint ? ` · ${translate('phoneToken.fingerprint', { fingerprint: auth.status.fingerprint })}` : ''}</p>
@@ -322,8 +344,6 @@ export function SettingsPage() {
       </section>
     </section>}
 
-    {section === 'appearance' && <ReactAppearancePage />}
-
     {section === 'shortcuts' && <section className="react-settings" aria-label={translate('settings.shortcuts')}>
       <p className="react-page__description">{translate('settings.shortcuts.globalOnlyDesktop')}</p>
       {SHORTCUT_ACTION_OPTIONS.map((item) => <div className="react-setting-row" key={item.id}><div className="react-setting-row__copy"><h2>{translate(`shortcut.${item.id}`)}</h2><p>{translate(`shortcut.${item.id}Desc`)}</p></div><ShortcutRecorder action={item.id} value={shortcuts.settings[item.id]} disabled={shortcutBusy === item.id} onSave={(value) => saveShortcut(item.id, value)} /></div>)}
@@ -331,14 +351,12 @@ export function SettingsPage() {
       <Button icon={<RotateCcw size={15} />} onClick={async () => { const result = await shortcuts.resetDefaults(); setShortcutWarning(result.ok ? '' : translate('settings.shortcuts.openFailed')); if (result.ok) toast(translate('msg.shortcutReset')) }}>{translate('settings.shortcuts.reset')}</Button>
     </section>}
 
-    {section === 'backup' && <section className="react-settings react-settings--stack" aria-label={translate('backup.title')}>
+    {section === 'backup' && <section className="react-settings react-settings--stack react-backup-settings" aria-label={translate('backup.title')}>
       <div className="react-setting-row react-setting-row--stack"><div className="react-setting-row__copy"><h2>{translate('backup.title')}</h2><p>{translate('backup.description')}</p></div><TextField label={translate('backup.password')} type="password" autoComplete="new-password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></div>
-      <p className="react-page__description">{translate('backup.hint')}</p>
-      <div className="react-preview-actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></div>
+      <p className="react-backup-settings__hint">{translate('backup.hint')}</p>
+      <div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></div>
       {backupError && <p className="react-form__error" role="alert">{localizedMessage(backupError, translate)}</p>}
     </section>}
-
-    {section === 'about' && <section className="react-settings"><div className="react-setting-row"><h2>{translate('settings.version')}</h2><span>{APP_VERSION}</span></div><div className="react-setting-row"><h2>{translate('settings.author')}</h2><a href={AUTHOR_GITHUB_URL} target="_blank" rel="noreferrer">{AUTHOR_NAME}</a></div><div className="react-setting-row"><h2>{translate('settings.officialWebsite')}</h2><a href={OFFICIAL_WEBSITE_URL} target="_blank" rel="noreferrer">{translate('settings.officialWebsiteLink')}</a></div></section>}
 
     <Dialog open={biometricPromptOpen} onOpenChange={(open) => { setBiometricPromptOpen(open); if (!open) setBiometricPassword('') }}><DialogContent title={translate('settings.biometricEnableTitle')} description={translate('settings.biometricEnablePasswordPrompt')}><div className="react-dialog-body"><TextField label={translate('settings.biometricEnablePasswordPlaceholder')} type="password" autoComplete="current-password" value={biometricPassword} onChange={(event) => setBiometricPassword(event.target.value)} />{securityError && <p className="react-form__error" role="alert">{securityError}</p>}<div className="react-dialog-actions"><DialogClose asChild><Button tone="quiet">{translate('common.cancel')}</Button></DialogClose><Button tone="primary" icon={<FingerprintIcon />} onClick={() => void enableBiometric()} disabled={biometricBusy || !biometricPassword}>{translate('settings.biometricEnableConfirm')}</Button></div></div></DialogContent></Dialog>
 

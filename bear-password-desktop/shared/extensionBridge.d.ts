@@ -5,7 +5,7 @@ export declare const EXTENSION_BRIDGE_ORIGIN = "http://127.0.0.1:6892";
 export declare const EXTENSION_BRIDGE_AUTH_HEADER = "X-BearPassword-Bridge";
 export declare const EXTENSION_BRIDGE_AUTH_VALUE = "BearPassword-Extension";
 /** 扩展唤起桌面端（未连接时由系统打开应用） */
-export declare const DESKTOP_WAKE_PROTOCOL_URL = "bearpassword://focus";
+export declare const DESKTOP_WAKE_PROTOCOL_URL = "ppwd://focus";
 export interface ExtensionBridgeHealth {
     ready: boolean;
     loggedIn: boolean;

@@ -2,7 +2,7 @@ import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'BearPassword',
+  name: 'PPWD',
   description: '简洁、安全、专业的密码管理浏览器扩展',
   version: '26.9.9',
   icons: {
@@ -12,7 +12,7 @@ export default defineManifest({
     128: 'public/icons/icon-128.png'
   },
   action: {
-    default_title: 'BearPassword',
+    default_title: 'PPWD',
     default_popup: 'src/popup/index.html',
     default_icon: {
       16: 'public/icons/icon-16.png',

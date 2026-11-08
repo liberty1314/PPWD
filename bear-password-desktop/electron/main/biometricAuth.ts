@@ -126,7 +126,7 @@ function isBiometricPromptCanceled(message: string): boolean {
 }
 
 export async function promptBiometricUnlock(reason: string): Promise<BiometricPromptResult> {
-  const message = reason.trim() || 'Unlock BearPassword'
+  const message = reason.trim() || 'Unlock PPWD'
 
   if (process.platform === 'darwin') {
     if (!systemPreferences.canPromptTouchID()) {

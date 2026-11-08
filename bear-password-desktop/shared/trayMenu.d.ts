@@ -1,6 +1,3 @@
-/** 托盘右键菜单可切换的主题值 */
-export declare const TRAY_THEME_VALUES: readonly ["light", "ocean", "warm", "bloom", "rose", "mint", "lagoon", "forest", "violet", "earth", "dark", "midnight", "noir", "system"];
-export type TrayThemeValue = (typeof TRAY_THEME_VALUES)[number];
 /** 托盘右键菜单可切换的语言值 */
 export declare const TRAY_LOCALE_VALUES: readonly ["system", "zh-CN", "en", "ja"];
 export type TrayLocaleValue = (typeof TRAY_LOCALE_VALUES)[number];
@@ -11,16 +8,13 @@ export interface TrayMenuLabels {
     open: string;
     lock: string;
     settings: string;
-    theme: string;
     language: string;
     font: string;
     quit: string;
-    themes: Partial<Record<TrayThemeValue, string>>;
     locales: Partial<Record<TrayLocaleValue, string>>;
     fonts: Partial<Record<TrayFontValue, string>>;
 }
 export interface TrayAppearanceSnapshot {
-    theme: string;
     locale: string;
     font: string;
     labels: TrayMenuLabels;
@@ -39,9 +33,6 @@ export type TrayRendererCommand = {
     action: 'favorites';
 } | {
     action: 'recent';
-} | {
-    action: 'set-theme';
-    value: TrayThemeValue;
 } | {
     action: 'set-locale';
     value: TrayLocaleValue;

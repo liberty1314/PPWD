@@ -98,7 +98,7 @@ export const useReactPopupStore = create<ReactPopupState>((set, get) => ({
       const desktopState = await sendMessage<DesktopConnectionState>({ type: 'GET_DESKTOP_STATE' })
       if (sequence !== desktopRequestSequence) return
       set({ desktopState })
-      usePopupThemeStore.getState().syncFromDesktop(desktopState.themePreference)
+      usePopupThemeStore.getState().syncFromDesktop(desktopState.themePreference, desktopState.themePreferences)
       usePopupLocaleStore.getState().syncFromDesktop(desktopState)
       if (!desktopState.unlocked) {
         vaultRequestSequence++

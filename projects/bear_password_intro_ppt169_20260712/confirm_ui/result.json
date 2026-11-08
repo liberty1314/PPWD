@@ -2,7 +2,7 @@
   "stage": "final",
   "status": "confirmed",
   "canvas": "ppt169",
-  "audience": "面向潜在用户、产品评审者、开源项目关注者与希望了解 BearPassword 的个人/开发者；重点解释产品价值、使用闭环与安全可信度。",
+  "audience": "面向潜在用户、产品评审者、开源项目关注者与希望了解 PPWD 的个人/开发者；重点解释产品价值、使用闭环与安全可信度。",
   "content_divergence": "基于仓库 README 与产品截图重组为产品介绍叙事；保留事实与功能边界，不虚构商业指标。",
   "mode": "problem-solution",
   "visual_style": "soft-rounded",

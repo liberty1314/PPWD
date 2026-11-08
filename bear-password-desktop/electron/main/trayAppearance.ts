@@ -15,7 +15,6 @@ function mergeLabels(labels?: Partial<TrayMenuLabels>): TrayMenuLabels {
   return {
     ...DEFAULT_TRAY_MENU_LABELS,
     ...labels,
-    themes: { ...DEFAULT_TRAY_MENU_LABELS.themes, ...labels?.themes },
     locales: { ...DEFAULT_TRAY_MENU_LABELS.locales, ...labels?.locales },
     fonts: { ...DEFAULT_TRAY_MENU_LABELS.fonts, ...labels?.fonts }
   }
@@ -23,7 +22,6 @@ function mergeLabels(labels?: Partial<TrayMenuLabels>): TrayMenuLabels {
 
 export function saveTrayAppearanceSnapshot(snapshot: TrayAppearanceSnapshot): TrayAppearanceSnapshot {
   const normalized: TrayAppearanceSnapshot = {
-    theme: snapshot.theme,
     locale: snapshot.locale,
     font: snapshot.font,
     labels: mergeLabels(snapshot.labels)
@@ -36,7 +34,6 @@ export function loadTrayAppearanceSnapshot(): TrayAppearanceSnapshot {
   const filePath = getSnapshotPath()
   if (!existsSync(filePath)) {
     return {
-      theme: 'system',
       locale: 'zh-CN',
       font: 'system',
       labels: DEFAULT_TRAY_MENU_LABELS
@@ -46,14 +43,12 @@ export function loadTrayAppearanceSnapshot(): TrayAppearanceSnapshot {
   try {
     const raw = JSON.parse(readFileSync(filePath, 'utf-8')) as Partial<TrayAppearanceSnapshot>
     return {
-      theme: typeof raw.theme === 'string' ? raw.theme : 'system',
       locale: typeof raw.locale === 'string' ? raw.locale : 'zh-CN',
       font: typeof raw.font === 'string' ? raw.font : 'system',
       labels: mergeLabels(raw.labels)
     }
   } catch {
     return {
-      theme: 'system',
       locale: 'zh-CN',
       font: 'system',
       labels: DEFAULT_TRAY_MENU_LABELS

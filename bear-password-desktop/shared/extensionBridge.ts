@@ -1,12 +1,15 @@
+import type { ThemePreferences } from '../../shared/ui/themeTypes'
+
 /** 浏览器扩展 ↔ 桌面端本地桥接（固定端口） */
 export const EXTENSION_BRIDGE_HOST = '127.0.0.1'
 export const EXTENSION_BRIDGE_PORT = 6892
 export const EXTENSION_BRIDGE_ORIGIN = `http://${EXTENSION_BRIDGE_HOST}:${EXTENSION_BRIDGE_PORT}`
+// Keep bridge auth identifiers stable for already-installed extensions.
 export const EXTENSION_BRIDGE_AUTH_HEADER = 'X-BearPassword-Bridge'
 export const EXTENSION_BRIDGE_AUTH_VALUE = 'BearPassword-Extension'
 
 /** 扩展唤起桌面端（未连接时由系统打开应用） */
-export const DESKTOP_WAKE_PROTOCOL_URL = 'bearpassword://focus'
+export const DESKTOP_WAKE_PROTOCOL_URL = 'ppwd://focus'
 
 export interface ExtensionBridgeHealth {
   ready: boolean
@@ -16,6 +19,8 @@ export interface ExtensionBridgeHealth {
   username: string | null
   /** 桌面端主题偏好；桥接不可用时为 null */
   themePreference: string | null
+  /** 桌面端设计主题与强调色偏好 */
+  themePreferences?: ThemePreferences
   /** 桌面端语言偏好；桥接不可用时为 null */
   localePreference: string | null
 }

@@ -14,7 +14,7 @@
   --bp-sensitive-surface: #ffffff;
   --bp-text: #202425;
   --bp-text-secondary: #626a6c;
-  --bp-text-muted: #858d8f;
+  --bp-text-muted: #667174;
   --bp-border: #dce1e2;
   --bp-border-strong: #b7c0c2;
   --bp-focus: #356fca;
@@ -27,6 +27,47 @@
   --bp-radius-sm: 4px;
   --bp-radius-md: 8px;
   --bp-control-height: 36px;
+  --bp-accent-text: var(--bp-accent);
+  --bp-accent-on: #ffffff;
+  --bp-danger-on: #ffffff;
+  --bp-card-bg: var(--bp-surface);
+  --bp-card-border: var(--bp-border);
+  --bp-card-hover-bg: var(--bp-surface-secondary);
+  --bp-card-shadow: none;
+  --bp-card-backdrop: none;
+  --bp-row-hover-bg: var(--bp-surface-secondary);
+  --bp-row-active-bg: var(--bp-accent-soft);
+  --bp-control-bg: var(--bp-surface-raised);
+  --bp-control-border: var(--bp-border);
+  --bp-control-hover-bg: var(--bp-surface-secondary);
+  --bp-control-hover-border: var(--bp-border-strong);
+  --bp-control-shadow: none;
+  --bp-control-backdrop: none;
+  --bp-button-neutral-bg: var(--bp-control-bg);
+  --bp-button-neutral-border: var(--bp-control-border);
+  --bp-button-hover-bg: var(--bp-control-hover-bg);
+  --bp-button-primary-shadow: none;
+  --bp-nav-hover-bg: var(--bp-surface-secondary);
+  --bp-nav-active-bg: var(--bp-accent-soft);
+  --bp-nav-active-text: var(--bp-accent-text);
+  --bp-segment-bg: var(--bp-surface-secondary);
+  --bp-segment-active-bg: var(--bp-surface-raised);
+  --bp-menu-bg: var(--bp-surface-raised);
+  --bp-menu-border: var(--bp-border);
+  --bp-menu-item-hover-bg: var(--bp-accent-soft);
+  --bp-menu-shadow: var(--bp-shadow);
+  --bp-menu-backdrop: none;
+  --bp-chrome-bg: var(--bp-surface);
+  --bp-chrome-border: var(--bp-border);
+  --bp-chrome-shadow: none;
+  --bp-chrome-backdrop: none;
+  --bp-glass-control-bg: var(--bp-control-bg);
+  --bp-glass-control-border: var(--bp-control-border);
+  --bp-glass-control-hover-bg: var(--bp-control-hover-bg);
+  --bp-glass-control-hover-border: var(--bp-control-hover-border);
+  --bp-glass-control-shadow: none;
+  --bp-glass-control-backdrop: none;
+  --bp-segment-backdrop: none;
 }
 
 :root[data-appearance='dark'] {
@@ -38,78 +79,69 @@
   --bp-sensitive-surface: #22282a;
   --bp-text: #edf0ef;
   --bp-text-secondary: #b8c0bf;
-  --bp-text-muted: #929c9a;
+  --bp-text-muted: #aab3b1;
   --bp-border: #3d4748;
   --bp-border-strong: #596465;
   --bp-accent-soft: #263a56;
   --bp-success: #66bd8b;
   --bp-warning: #e7ad58;
   --bp-danger: #f07b71;
+  --bp-danger-on: #202425;
+  --bp-accent-text: #8eb7ff;
   --bp-shadow: 0 14px 40px rgb(0 0 0 / 34%);
 }
 
-:root[data-theme-design='soft'] {
-  --bp-bg: #f2f5f2;
-  --bp-surface: #fbfcfa;
-  --bp-surface-secondary: #eaf0eb;
-  --bp-border: #d5dfd7;
-  --bp-radius-md: 10px;
-}
-
-:root[data-theme-design='soft'][data-appearance='dark'] {
-  --bp-bg: #1b211f;
-  --bp-surface: #252e2a;
-  --bp-surface-secondary: #303a35;
-  --bp-border: #46544b;
-}
-
-:root[data-theme-design='contrast'] {
-  --bp-bg: #ffffff;
-  --bp-surface: #ffffff;
-  --bp-surface-secondary: #f3f4f4;
-  --bp-text: #111516;
-  --bp-text-secondary: #454e50;
-  --bp-border: #959fa1;
-  --bp-border-strong: #4d585a;
-  --bp-focus: #123d78;
-}
-
-:root[data-theme-design='contrast'][data-appearance='dark'] {
-  --bp-bg: #101314;
-  --bp-surface: #171c1d;
-  --bp-surface-secondary: #222829;
-  --bp-text: #ffffff;
-  --bp-text-secondary: #e0e5e4;
-  --bp-border: #778283;
-  --bp-border-strong: #b2baba;
-  --bp-focus: #90bdff;
-}
-
 :root[data-theme-design='liquid'] {
-  --bp-shadow: 0 10px 30px rgb(24 32 34 / 9%);
-  --bp-glass-surface: #eef2f5;
-  --bp-glass-border: rgb(255 255 255 / 88%);
-  --bp-glass-highlight: inset 0 1px 0 rgb(255 255 255 / 82%);
+  --bp-shadow: 0 12px 32px rgb(24 32 34 / 12%);
+  --bp-chrome-bg: rgb(248 251 255 / 68%);
+  --bp-chrome-border: rgb(255 255 255 / 82%);
+  --bp-chrome-shadow: inset 0 1px 0 rgb(255 255 255 / 92%), 0 8px 24px rgb(32 48 64 / 10%);
+  --bp-chrome-backdrop: blur(24px) saturate(1.45);
+  --bp-glass-control-bg: rgb(255 255 255 / 48%);
+  --bp-glass-control-border: rgb(255 255 255 / 72%);
+  --bp-glass-control-hover-bg: rgb(255 255 255 / 68%);
+  --bp-glass-control-hover-border: rgb(255 255 255 / 88%);
+  --bp-glass-control-shadow: inset 0 1px 0 rgb(255 255 255 / 86%), 0 2px 7px rgb(32 48 64 / 7%);
+  --bp-glass-control-backdrop: blur(18px) saturate(1.35);
+  --bp-menu-bg: rgb(249 251 253 / 88%);
+  --bp-menu-border: rgb(255 255 255 / 88%);
+  --bp-menu-shadow: 0 16px 40px rgb(24 32 40 / 18%), inset 0 1px 0 rgb(255 255 255 / 90%);
+  --bp-menu-backdrop: blur(24px) saturate(1.42);
+  --bp-segment-bg: rgb(231 237 244 / 66%);
+  --bp-segment-active-bg: rgb(255 255 255 / 86%);
+  --bp-segment-backdrop: blur(18px) saturate(1.35);
+  --bp-nav-hover-bg: color-mix(in srgb, var(--bp-accent) 8%, transparent);
+  --bp-nav-active-bg: color-mix(in srgb, var(--bp-accent) 16%, transparent);
+  --bp-nav-active-text: var(--bp-accent);
+  --bp-menu-item-hover-bg: color-mix(in srgb, var(--bp-accent) 14%, transparent);
 }
 
 :root[data-theme-design='liquid'][data-appearance='dark'] {
-  --bp-shadow: 0 12px 32px rgb(0 0 0 / 30%);
-  --bp-glass-surface: #293033;
-  --bp-glass-border: rgb(255 255 255 / 12%);
-  --bp-glass-highlight: inset 0 1px 0 rgb(255 255 255 / 10%);
+  --bp-chrome-bg: rgb(31 37 40 / 76%);
+  --bp-chrome-border: rgb(255 255 255 / 18%);
+  --bp-chrome-shadow: inset 0 1px 0 rgb(255 255 255 / 16%), 0 8px 26px rgb(0 0 0 / 30%);
+  --bp-chrome-backdrop: blur(24px) saturate(1.35);
+  --bp-glass-control-bg: rgb(47 55 59 / 64%);
+  --bp-glass-control-border: rgb(255 255 255 / 20%);
+  --bp-glass-control-hover-bg: rgb(65 75 80 / 82%);
+  --bp-glass-control-hover-border: rgb(255 255 255 / 30%);
+  --bp-glass-control-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), 0 2px 8px rgb(0 0 0 / 20%);
+  --bp-glass-control-backdrop: blur(18px) saturate(1.3);
+  --bp-menu-bg: rgb(39 46 49 / 92%);
+  --bp-menu-border: rgb(255 255 255 / 20%);
+  --bp-menu-shadow: 0 18px 44px rgb(0 0 0 / 42%), inset 0 1px 0 rgb(255 255 255 / 12%);
+  --bp-menu-backdrop: blur(24px) saturate(1.35);
+  --bp-segment-bg: rgb(20 25 27 / 62%);
+  --bp-segment-active-bg: rgb(72 82 86 / 88%);
+  --bp-segment-backdrop: blur(18px) saturate(1.3);
+  --bp-nav-hover-bg: rgb(255 255 255 / 7%);
+  --bp-nav-active-bg: color-mix(in srgb, var(--bp-accent) 24%, transparent);
+  --bp-menu-item-hover-bg: color-mix(in srgb, var(--bp-accent) 22%, transparent);
 }
 
-:root[data-accent='teal'] { --bp-accent: #268c8a; --bp-accent-soft: #e4f3f1; }
-:root[data-accent='green'] { --bp-accent: #47845a; --bp-accent-soft: #e9f3eb; }
-:root[data-accent='purple'] { --bp-accent: #7865b1; --bp-accent-soft: #efecf7; }
-:root[data-accent='coral'] { --bp-accent: #d16c65; --bp-accent-soft: #fbefed; }
-:root[data-accent='amber'] { --bp-accent: #b47a2b; --bp-accent-soft: #f7f0e4; }
+:root[data-appearance='dark'][data-accent='blue'] { --bp-accent-text: #8eb7ff; }
 
-:root[data-appearance='dark'][data-accent='teal'] { --bp-accent-soft: #203a39; }
-:root[data-appearance='dark'][data-accent='green'] { --bp-accent-soft: #26392c; }
-:root[data-appearance='dark'][data-accent='purple'] { --bp-accent-soft: #342e46; }
-:root[data-appearance='dark'][data-accent='coral'] { --bp-accent-soft: #482e2d; }
-:root[data-appearance='dark'][data-accent='amber'] { --bp-accent-soft: #413522; }
+:root:not([data-appearance='dark'])[data-accent='blue'] { --bp-accent-text: #2b5ea8; }
 
 * { box-sizing: border-box; }
 
@@ -133,30 +165,56 @@ button { color: inherit; }
 .bp-sensitive { background: var(--bp-sensitive-surface); }
 
 .bp-glass {
-  background: var(--bp-glass-surface, var(--bp-surface));
-  border: 1px solid var(--bp-glass-border, var(--bp-border));
-  box-shadow: var(--bp-glass-highlight, none);
+  background: var(--bp-chrome-bg);
+  border: 1px solid var(--bp-chrome-border);
+  box-shadow: var(--bp-chrome-shadow);
+  -webkit-backdrop-filter: var(--bp-chrome-backdrop);
+  backdrop-filter: var(--bp-chrome-backdrop);
 }
 
-@supports (backdrop-filter: blur(14px)) {
-  :root[data-theme-design='liquid'] .bp-glass {
-    background: rgb(255 255 255 / 82%);
-    -webkit-backdrop-filter: blur(16px) saturate(1.12);
-    backdrop-filter: blur(16px) saturate(1.12);
-  }
+.bp-glass--control {
+  background: var(--bp-glass-control-bg);
+  border-color: var(--bp-glass-control-border);
+  box-shadow: var(--bp-glass-control-shadow);
+  -webkit-backdrop-filter: var(--bp-glass-control-backdrop);
+  backdrop-filter: var(--bp-glass-control-backdrop);
+}
 
-  :root[data-theme-design='liquid'][data-appearance='dark'] .bp-glass {
-    background: rgb(34 40 42 / 84%);
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root[data-theme-design='liquid'] {
+    --bp-chrome-bg: var(--bp-surface);
+    --bp-chrome-border: var(--bp-border);
+    --bp-chrome-shadow: none;
+    --bp-chrome-backdrop: none;
+    --bp-glass-control-bg: var(--bp-control-bg);
+    --bp-glass-control-border: var(--bp-control-border);
+    --bp-glass-control-hover-bg: var(--bp-control-hover-bg);
+    --bp-glass-control-hover-border: var(--bp-control-hover-border);
+    --bp-glass-control-shadow: none;
+    --bp-glass-control-backdrop: none;
+    --bp-segment-bg: var(--bp-surface-secondary);
+    --bp-segment-active-bg: var(--bp-surface-raised);
+    --bp-segment-backdrop: none;
+    --bp-menu-bg: var(--bp-surface-raised);
+    --bp-menu-border: var(--bp-border);
+    --bp-menu-shadow: var(--bp-shadow);
+    --bp-menu-backdrop: none;
   }
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  :root[data-theme-design='liquid'] .bp-glass {
-    background: var(--bp-glass-surface);
-    border-color: var(--bp-glass-border);
-    box-shadow: var(--bp-glass-highlight);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+@supports not (backdrop-filter: blur(1px)) {
+  :root[data-theme-design='liquid'] {
+    --bp-chrome-bg: var(--bp-surface);
+    --bp-chrome-border: var(--bp-border);
+    --bp-chrome-shadow: none;
+    --bp-glass-control-bg: var(--bp-control-bg);
+    --bp-glass-control-border: var(--bp-control-border);
+    --bp-glass-control-hover-bg: var(--bp-control-hover-bg);
+    --bp-glass-control-hover-border: var(--bp-control-hover-border);
+    --bp-glass-control-shadow: none;
+    --bp-menu-bg: var(--bp-surface-raised);
+    --bp-menu-border: var(--bp-border);
+    --bp-menu-shadow: var(--bp-shadow);
   }
 }
 

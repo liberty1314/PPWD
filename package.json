@@ -1,7 +1,7 @@
 {
-  "name": "bear-password",
+  "name": "ppwd",
   "private": true,
-  "description": "BearPassword monorepo",
+  "description": "PPWD monorepo",
   "scripts": {
     "build:all": "node scripts/build-all.mjs",
     "build:mac": "node scripts/build-all.mjs --mac",

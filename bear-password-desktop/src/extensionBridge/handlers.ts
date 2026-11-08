@@ -10,6 +10,8 @@ import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoLockStore } from '@/stores/autoLock'
 import { useVaultStore } from '@/stores/vault'
+import { storage } from '@/utils/storage'
+import { migrateThemePreferences } from '@/utils/themePreferenceMigration'
 import type { ExtensionBridgeHealth } from '../../shared/extensionBridge'
 import {
   applyFavoriteState,
@@ -38,6 +40,12 @@ export function extensionBridgeHealth(): ExtensionBridgeHealth {
   const authStore = useAuthStore()
   const autoLockStore = useAutoLockStore()
   const appStore = useAppStore()
+  const themePreferences = migrateThemePreferences({
+    theme: storage.get<unknown>('theme'),
+    appearanceMode: storage.get<unknown>('appearanceMode'),
+    themeDesign: storage.get<unknown>('themeDesign'),
+    accentColor: storage.get<unknown>('accentColor')
+  })
 
   return {
     ready: true,
@@ -45,7 +53,8 @@ export function extensionBridgeHealth(): ExtensionBridgeHealth {
     locked: autoLockStore.isLocked,
     unlocked: authStore.isUnlocked && !autoLockStore.isLocked,
     username: authStore.hasLocalVault ? 'local' : null,
-    themePreference: appStore.themePreference,
+    themePreference: 'system',
+    themePreferences,
     localePreference: appStore.localePreference
   }
 }

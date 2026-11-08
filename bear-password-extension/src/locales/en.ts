@@ -1,7 +1,7 @@
 import type { MessageDict } from './types'
 
 const messages: MessageDict = {
-  'app.name': 'BearPassword',
+  'app.name': 'PPWD',
   'app.loading': 'Loading…',
 
   'locale.system': 'Follow System',
@@ -44,14 +44,14 @@ const messages: MessageDict = {
   'common.confirm': 'Confirm',
   'common.deleting': 'Deleting…',
 
-  'login.subtitle': 'Requires the BearPassword desktop app',
+  'login.subtitle': 'Requires the PPWD desktop app',
   'login.desktopBridge': 'Desktop bridge',
   'login.connectionStatus': 'Status',
   'login.statusOffline': 'Offline',
   'login.statusNotLoggedIn': 'Not signed in',
   'login.statusLocked': 'Locked',
   'login.statusReady': 'Ready',
-  'login.hintOffline': 'Start BearPassword on your computer, or tap the button below to open it.',
+  'login.hintOffline': 'Start PPWD on your computer, or tap the button below to open it.',
   'login.hintNotLoggedIn': 'Sign in from the desktop app. Tap the button below to open it.',
   'login.hintLocked': 'Unlock the vault in the desktop app. Tap the button below to open it.',
   'login.hintReady': 'Connected. Loading…',
@@ -60,7 +60,7 @@ const messages: MessageDict = {
   'login.openDesktop': 'Open desktop app',
   'login.openingDesktop': 'Opening…',
   'login.protocolConfirm':
-    'If your browser asks to open BearPassword, click Open. Then sign in and unlock the vault in the desktop app.',
+    'If your browser asks to open PPWD, click Open. Then sign in and unlock the vault in the desktop app.',
   'login.settings': 'Extension settings',
 
   'vault.searchPlaceholder': 'Search logins for this site…',
@@ -93,7 +93,7 @@ const messages: MessageDict = {
   'vault.toast.fillNoTab': 'Cannot access the active tab',
   'vault.share.username': 'Username',
   'vault.share.password': 'Password',
-  'vault.share.footer': 'Copied from BearPassword — zero-knowledge, simple, professional password management. Website: {url}',
+  'vault.share.footer': 'Copied from PPWD — zero-knowledge, simple, professional password management. Website: {url}',
 
   'credential.autofill': 'Autofill',
   'credential.fill': 'Fill',
@@ -135,7 +135,7 @@ const messages: MessageDict = {
   'settings.desktopLocked': 'Desktop vault locked or not unlocked',
   'settings.desktopReady': 'Connected and vault unlocked',
   'settings.desktopNote':
-    'The extension works with the BearPassword desktop app. Keep it running, signed in, and unlocked.',
+    'The extension works with the PPWD desktop app. Keep it running, signed in, and unlocked.',
   'settings.appearanceFromDesktop':
     'Theme and language follow the desktop app; when it is not running, the extension follows the system.',
   'settings.appearance': 'Appearance',
@@ -144,7 +144,7 @@ const messages: MessageDict = {
   'settings.selectLanguage': 'Select language',
   'settings.service': 'Service',
   'settings.server': 'Server URL',
-  'settings.serverDesc': 'BearPassword backend API origin (no /api suffix)',
+  'settings.serverDesc': 'PPWD backend API origin (no /api suffix)',
   'settings.serverPlaceholder': 'http://127.0.0.1:8080',
   'settings.serverSave': 'Save and test connection',
   'settings.backend': 'Backend service',
@@ -171,19 +171,19 @@ const messages: MessageDict = {
   'settings.about': 'About',
   'settings.version': 'Version',
   'settings.officialWebsite': 'Website',
-  'settings.officialWebsiteLink': 'BearPassword Website',
+  'settings.officialWebsiteLink': 'PPWD Website',
   'settings.updateAvailable': 'New version {version} available',
   'settings.updateDownload': 'Download now',
   'settings.author': 'Author',
 
-  'session.desktopFailed': 'Cannot connect to BearPassword desktop app',
-  'session.wakeDesktopFailed': 'Could not open the desktop app. Please launch BearPassword manually.',
+  'session.desktopFailed': 'Cannot connect to PPWD desktop app',
+  'session.wakeDesktopFailed': 'Could not open the desktop app. Please launch PPWD manually.',
 
-  'content.passwordIcon.title': 'BearPassword autofill',
+  'content.passwordIcon.title': 'PPWD autofill',
   'content.picker.needsSecurityKey': 'Unlock the vault in the desktop app and try again',
-  'content.picker.desktopNotReady': 'BearPassword desktop is locked or not running. Click here to open and unlock.',
+  'content.picker.desktopNotReady': 'PPWD desktop is locked or not running. Click here to open and unlock.',
   'content.picker.desktopProtocolConfirm':
-    'If your browser shows a confirmation, click Open BearPassword, then sign in and unlock the vault.',
+    'If your browser shows a confirmation, click Open PPWD, then sign in and unlock the vault.',
   'content.picker.noEntries': 'No saved logins for this site',
   'content.picker.noMatch': 'No matching logins',
   'content.picker.emptyDefault': 'No logins available',
@@ -193,26 +193,26 @@ const messages: MessageDict = {
   'content.picker.saving': 'Saving…',
   'content.picker.saved': 'Saved',
   'content.picker.saveSuccess': 'Login saved successfully',
-  'content.picker.saveFailed': 'Save failed. Make sure you are signed in to BearPassword',
+  'content.picker.saveFailed': 'Save failed. Make sure you are signed in to PPWD',
   'content.picker.noUsername': '(no username)',
   'content.picker.totpCopy': 'Click to copy code',
   'content.picker.totpCopied': 'Verification code copied',
   'content.picker.totpCopyFailed': 'Copy failed. Please copy the code manually.',
 
-  'content.banner.title': 'Save to BearPassword?',
+  'content.banner.title': 'Save to PPWD?',
   'content.banner.desc': 'New login detected: {username}',
   'content.banner.unknownUser': 'Unknown user',
   'content.banner.save': 'Save',
   'content.banner.dismiss': 'Not now',
 
-  'wake.pageTitle': 'Open BearPassword',
-  'wake.title': 'Opening BearPassword',
+  'wake.pageTitle': 'Open PPWD',
+  'wake.title': 'Opening PPWD',
   'wake.lead': 'Your browser may ask whether to open the desktop app. Follow the steps below.',
   'wake.step1': 'Look for a confirmation prompt at the top of the browser or on this page',
-  'wake.step2': 'Click Open BearPassword to allow the app to launch',
+  'wake.step2': 'Click Open PPWD to allow the app to launch',
   'wake.step3': 'Sign in and unlock the vault in the desktop app, then return to the website',
   'wake.retry': 'Try again',
-  'wake.note': 'If you do not see a prompt, click the button above or open BearPassword manually.'
+  'wake.note': 'If you do not see a prompt, click the button above or open PPWD manually.'
 }
 
 export default messages

@@ -1,7 +1,7 @@
-BearPassword Windows 安装说明
+PPWD Windows 安装说明
 ============================
 
-1. 双击运行 BearPassword-Setup.exe
+1. 双击运行 PPWD-Setup.exe
 2. 按向导选择安装目录（可修改）
 3. 安装完成后可从开始菜单或桌面快捷方式启动
 
@@ -9,4 +9,4 @@ BearPassword Windows 安装说明
 
 说明：适用于 64 位 Windows 10 / 11（x64）；首次使用前请确保后端已启动（默认 http://127.0.0.1:8080）。
 
-卸载：设置 → 应用 → 已安装的应用 → BearPassword → 卸载。
+卸载：设置 → 应用 → 已安装的应用 → PPWD → 卸载。

@@ -27,8 +27,8 @@ if (platform === 'mac') {
   for (const name of readdirSync(releaseDir)) {
     if (
       name === 'latest-mac.yml' ||
-      name === 'BearPassword.zip' ||
-      name === 'BearPassword.zip.blockmap'
+      name === 'PPWD.zip' ||
+      name === 'PPWD.zip.blockmap'
     ) {
       copyIfExists(name)
       copied.push(name)
@@ -38,8 +38,8 @@ if (platform === 'mac') {
   for (const name of readdirSync(releaseDir)) {
     if (
       name === 'latest.yml' ||
-      name === 'BearPassword-Setup.exe' ||
-      name === 'BearPassword-Setup.exe.blockmap'
+      name === 'PPWD-Setup.exe' ||
+      name === 'PPWD-Setup.exe.blockmap'
     ) {
       copyIfExists(name)
       copied.push(name)

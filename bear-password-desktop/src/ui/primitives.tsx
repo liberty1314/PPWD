@@ -1,7 +1,8 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as SelectPrimitive from '@radix-ui/react-select'
 import * as ToastPrimitive from '@radix-ui/react-toast'
-import { createContext, useContext, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { Children, createContext, isValidElement, useContext, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import { Check, ChevronDown, X } from 'lucide-react'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { tone?: 'primary' | 'neutral' | 'quiet' | 'danger'; icon?: ReactNode }
@@ -15,8 +16,39 @@ export function TextField({ label, description, ...props }: InputHTMLAttributes<
   return <label className="bp-field" htmlFor={id}><span className="bp-field__label">{label}</span><input className="bp-input" id={id} {...props} />{description && <span className="bp-field__description">{description}</span>}</label>
 }
 
-export function NativeSelect({ label, children, ...props }: { label: string; id: string; value: string; disabled?: boolean; onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void; children: ReactNode }) {
-  return <label className="bp-field" htmlFor={props.id}><span className="bp-field__label">{label}</span><span className="bp-select-wrap"><select className="bp-input bp-select" {...props}>{children}</select><ChevronDown size={15} aria-hidden="true" /></span></label>
+type SelectOptionProps = { value?: string; disabled?: boolean; children?: ReactNode }
+const EMPTY_SELECT_VALUE = '__bear_password_empty_select_value__'
+
+export function SelectField({ label, children, id, value, disabled, onValueChange }: { label: string; id: string; value: string; disabled?: boolean; onValueChange: (value: string) => void; children: ReactNode }) {
+  const options = Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<SelectOptionProps>(child) || child.type !== 'option') return []
+    return [child]
+  })
+  const selectedValue = value === '' ? EMPTY_SELECT_VALUE : value
+
+  return <div className="bp-field">
+    <span id={`${id}-label`} className="bp-field__label">{label}</span>
+    <SelectPrimitive.Root value={selectedValue} disabled={disabled} onValueChange={(next) => onValueChange(next === EMPTY_SELECT_VALUE ? '' : next)}>
+      <SelectPrimitive.Trigger id={id} className="bp-select-trigger" aria-labelledby={`${id}-label`}>
+        <SelectPrimitive.Value />
+        <SelectPrimitive.Icon asChild><ChevronDown size={15} aria-hidden="true" /></SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+      <SelectPrimitive.Portal>
+        <SelectPrimitive.Content className="bp-select-content" position="popper" sideOffset={4}>
+          <SelectPrimitive.Viewport>
+            {options.map((option, index) => {
+              const optionValue = String(option.props.value ?? option.props.children ?? '')
+              const itemValue = optionValue === '' ? EMPTY_SELECT_VALUE : optionValue
+              return <SelectPrimitive.Item key={option.key ?? `${itemValue}-${index}`} className="bp-select-item" value={itemValue} disabled={option.props.disabled}>
+                <SelectPrimitive.ItemText>{option.props.children}</SelectPrimitive.ItemText>
+                <SelectPrimitive.ItemIndicator className="bp-select-item__indicator"><Check size={14} aria-hidden="true" /></SelectPrimitive.ItemIndicator>
+              </SelectPrimitive.Item>
+            })}
+          </SelectPrimitive.Viewport>
+        </SelectPrimitive.Content>
+      </SelectPrimitive.Portal>
+    </SelectPrimitive.Root>
+  </div>
 }
 
 export const Dialog = DialogPrimitive.Root

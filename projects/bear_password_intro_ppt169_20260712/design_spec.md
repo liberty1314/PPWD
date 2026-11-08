@@ -1,12 +1,12 @@
-# BearPassword Product Intro - Design Spec
+# PPWD Product Intro - Design Spec
 
 ## I. Project Information
 
-- **Project name**: BearPassword 产品介绍
+- **Project name**: PPWD 产品介绍
 - **Project path**: `/Users/xuew/WorkSpace/IdeaProject/BearProject/bear-password/projects/bear_password_intro_ppt169_20260712`
 - **Source material**: 仓库根 README、桌面端 README、浏览器扩展 README、服务端 README、官网产品截图
-- **Audience**: 潜在用户、产品评审者、开源项目关注者，以及希望了解 BearPassword 的个人/开发者
-- **Communication goal**: 在 8 页内说明 BearPassword 是什么、解决什么问题、如何通过桌面端与浏览器扩展形成安全便捷的密码管理闭环
+- **Audience**: 潜在用户、产品评审者、开源项目关注者，以及希望了解 PPWD 的个人/开发者
+- **Communication goal**: 在 8 页内说明 PPWD 是什么、解决什么问题、如何通过桌面端与浏览器扩展形成安全便捷的密码管理闭环
 - **Content divergence**: 基于源材料重组叙事；保留功能与安全事实，不虚构商业指标
 - **Confirmed mode**: problem-solution
 - **Confirmed visual style**: soft-rounded
@@ -88,7 +88,7 @@ Use only subtle background glows, not heavy gradients:
 ### Layout Pattern Library (combine or break as content demands)
 
 1. **Hero screenshot + floating value statement**: large product screenshot framed like an app window, with 1–2 headline chips.
-2. **Problem cards → product answer**: left-side pain points, right-side BearPassword response.
+2. **Problem cards → product answer**: left-side pain points, right-side PPWD response.
 3. **System loop diagram**: desktop, extension, encrypted sync, service as connected nodes.
 4. **Screenshot side-by-side**: text column plus large UI screenshot.
 5. **Security layered stack**: local encryption, master password, local extension bridge, encrypted server sync.
@@ -156,26 +156,26 @@ All screenshots are 2056 × 1498, ratio 1.37, suitable for 16:9 side-by-side pla
 
 - **Cover impact**: “密码、账号、二次验证码，需要一个安心的家” — use a warm product screenshot as the trusted vault metaphor rather than a generic title slide.
 - **Layout**: Warm gradient background, large rounded screenshot frame on the right, title and value chips on the left.
-- **Title**: BearPassword
+- **Title**: PPWD
 - **Subtitle**: 简洁、安全、专业的密码管理工具
 - **Info**: 桌面端 + 浏览器扩展 · 本地加密后同步
 
 #### Slide 02 - Why It Matters
 
-- **Layout**: Three pain cards on the left, one BearPassword response card on the right.
+- **Layout**: Three pain cards on the left, one PPWD response card on the right.
 - **Title**: 账号越多，真正难的是“安心管理”
-- **Core message**: BearPassword 聚焦的不只是保存密码，而是把登录、验证码和敏感信息管理变成可控流程。
+- **Core message**: PPWD 聚焦的不只是保存密码，而是把登录、验证码和敏感信息管理变成可控流程。
 - **Content**:
   - 多网站、多账号：登录凭据分散，复制粘贴容易出错。
   - 二次验证码：TOTP 需要实时查看、复制，和登录流程割裂。
   - 敏感信息：银行卡、证件、服务器、数据库等不适合散落在普通笔记里。
-  - BearPassword 的答案：桌面端集中管理，浏览器扩展在需要时安全取用。
+  - PPWD 的答案：桌面端集中管理，浏览器扩展在需要时安全取用。
 
 #### Slide 03 - Product Loop
 
 - **Layout**: Four-node rounded architecture loop with a product screenshot panel.
 - **Title**: 桌面端 + 扩展，组成完整使用闭环
-- **Core message**: BearPassword 把“集中管理”和“网页即用”拆给最适合的端来完成。
+- **Core message**: PPWD 把“集中管理”和“网页即用”拆给最适合的端来完成。
 - **Visualization**: Architecture loop diagram
 - **Content**:
   - 桌面端：创建、查看、编辑和解锁保险库。
@@ -187,7 +187,7 @@ All screenshots are 2056 × 1498, ratio 1.37, suitable for 16:9 side-by-side pla
 
 - **Layout**: Large vault screenshot plus capability cards; add-password screenshot as inset.
 - **Title**: 桌面端：把敏感信息放进一个可搜索的保险库
-- **Core message**: 桌面端是 BearPassword 的管理中枢，覆盖密码、身份、银行卡、服务器和 TOTP 等多种条目。
+- **Core message**: 桌面端是 PPWD 的管理中枢，覆盖密码、身份、银行卡、服务器和 TOTP 等多种条目。
 - **Content**:
   - 多种条目类型：登录信息、安全备注、身份、银行卡、服务器、数据库、两步验证、自定义。
   - 登录扩展字段：URL、邮箱、地址、电话、备用密码、两步验证。
@@ -208,7 +208,7 @@ All screenshots are 2056 × 1498, ratio 1.37, suitable for 16:9 side-by-side pla
 
 - **Layout**: Four-layer security stack with settings screenshots on the right.
 - **Title**: 安全设计：主密码不明文上传，服务器只存密文
-- **Core message**: BearPassword 的安全边界建立在客户端加密、本机通信和自动锁定等机制上。
+- **Core message**: PPWD 的安全边界建立在客户端加密、本机通信和自动锁定等机制上。
 - **Visualization**: Security layered stack
 - **Content**:
   - 设备侧加密：保险库内容在本地加密后才上传或同步。
@@ -220,7 +220,7 @@ All screenshots are 2056 × 1498, ratio 1.37, suitable for 16:9 side-by-side pla
 
 - **Layout**: Three-column technology matrix with deployment note.
 - **Title**: 对普通用户开箱即用，对开发者可自建
-- **Core message**: BearPassword 同时提供端侧体验、浏览器集成和可自建服务端的完整工程实现。
+- **Core message**: PPWD 同时提供端侧体验、浏览器集成和可自建服务端的完整工程实现。
 - **Visualization**: Tech/deployment matrix
 - **Content**:
   - 桌面端：Electron · Vue 3 · TypeScript · Pinia · Element Plus · Vite。
@@ -231,7 +231,7 @@ All screenshots are 2056 × 1498, ratio 1.37, suitable for 16:9 side-by-side pla
 #### Slide 08 - Closing
 
 - **Layout**: Centered value lockup, three proof pillars, website CTA.
-- **Title**: BearPassword：安心保存，顺手填充
+- **Title**: PPWD：安心保存，顺手填充
 - **Core message**: 它把密码管理、TOTP 和敏感信息收拢到一个可信工作流中。
 - **Content**:
   - 简洁：桌面端管理，网页端一键填充。

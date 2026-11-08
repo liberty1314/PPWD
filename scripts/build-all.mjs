@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * BearPassword 桌面端与浏览器扩展一键打包
+ * PPWD 桌面端与浏览器扩展一键打包
  *
  * 用法:
  *   node scripts/build-all.mjs                 # Mac + Win + 浏览器扩展
@@ -26,9 +26,9 @@ const desktopDir = join(root, 'bear-password-desktop')
 const extensionDir = join(root, 'bear-password-extension')
 
 const RELEASE_ARTIFACTS = [
-  'BearPassword.dmg',
-  'BearPassword-Setup.exe',
-  'BearPassword-Extension.zip'
+  'PPWD.dmg',
+  'PPWD-Setup.exe',
+  'PPWD-Extension.zip'
 ]
 
 function formatDuration(ms) {
@@ -41,7 +41,7 @@ function parseArgs() {
   const args = process.argv.slice(2)
 
   if (args.includes('--help') || args.includes('-h')) {
-    console.log(`BearPassword 本地版打包
+    console.log(`PPWD 本地版打包
 
 用法:
   node scripts/build-all.mjs                 Mac + Win + 浏览器扩展
@@ -103,9 +103,9 @@ function printSummary({ mac, win, extension }) {
   let found = false
   for (const name of RELEASE_ARTIFACTS) {
     const shouldShow =
-      (name === 'BearPassword.dmg' && mac) ||
-      (name === 'BearPassword-Setup.exe' && win) ||
-      (name === 'BearPassword-Extension.zip' && extension)
+      (name === 'PPWD.dmg' && mac) ||
+      (name === 'PPWD-Setup.exe' && win) ||
+      (name === 'PPWD-Extension.zip' && extension)
 
     if (!shouldShow) continue
 
@@ -135,7 +135,7 @@ function main() {
   }
 
   const totalStartedAt = Date.now()
-  console.log('[build-all] BearPassword 本地版打包开始')
+  console.log('[build-all] PPWD 本地版打包开始')
   console.log(`[build-all] 目标: ${selected.join(' + ')}`)
 
   if (options.mac || options.win) {

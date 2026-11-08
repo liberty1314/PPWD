@@ -5,11 +5,9 @@ import type { TrayClickAction, TraySettings } from '../../shared/traySettings'
 import {
   TRAY_FONT_VALUES,
   TRAY_LOCALE_VALUES,
-  TRAY_THEME_VALUES,
   type TrayAppearanceSnapshot,
   type TrayFontValue,
-  type TrayLocaleValue,
-  type TrayThemeValue
+  type TrayLocaleValue
 } from '../../shared/trayMenu'
 import { loadTrayAppearanceSnapshot } from './trayAppearance'
 
@@ -24,7 +22,6 @@ export interface TrayActionHandlers {
   onRecent: () => void
   onLock: () => void
   onSettings: () => void
-  onSetTheme: (value: TrayThemeValue) => void
   onSetLocale: (value: TrayLocaleValue) => void
   onSetFont: (value: TrayFontValue) => void
   onQuit: () => void
@@ -97,15 +94,6 @@ function buildTrayContextMenu(
     { label: labels.settings, click: handlers.onSettings },
     { type: 'separator' },
     {
-      label: labels.theme,
-      submenu: TRAY_THEME_VALUES.map((value) => ({
-        type: 'radio' as const,
-        label: labels.themes[value] ?? value,
-        checked: snapshot.theme === value,
-        click: () => handlers.onSetTheme(value)
-      }))
-    },
-    {
       label: labels.language,
       submenu: TRAY_LOCALE_VALUES.map((value) => ({
         type: 'radio' as const,
@@ -144,7 +132,7 @@ export function applyTraySettings(
   if (!image) return null
 
   tray = new Tray(image)
-  tray.setToolTip('BearPassword')
+  tray.setToolTip('PPWD')
 
   tray.on('click', () => {
     handleTrayClick(settings.clickAction, handlers)
@@ -163,6 +151,10 @@ export function destroyTray(): void {
   if (!tray) return
   tray.destroy()
   tray = null
+}
+
+export function isTrayReady(): boolean {
+  return tray !== null
 }
 
 export function isTrayAvailable(): boolean {

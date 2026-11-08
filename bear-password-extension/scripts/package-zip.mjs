@@ -7,7 +7,7 @@ import { releaseDir } from '../../scripts/release-dir.mjs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '..')
 const distDir = path.join(rootDir, 'dist')
-const zipName = 'BearPassword-Extension.zip'
+const zipName = 'PPWD-Extension.zip'
 const zipPath = path.join(releaseDir, zipName)
 
 try {

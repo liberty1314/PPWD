@@ -1,5 +1,5 @@
 import { getThemeTokens, THEME_PRESETS, type ThemePresetId } from '@/shared/theme/presets'
-import { loadThemePreference, saveThemePreference } from '@/shared/storage/theme'
+import { loadThemePreference } from '@/shared/storage/theme'
 
 export type { ThemePresetId }
 export type ThemePreference = ThemePresetId | 'system'
@@ -118,12 +118,6 @@ export async function initThemeOnBoot(): Promise<ThemePreference> {
   const preference = await loadThemePreference()
   applyResolvedTheme(resolveTheme(preference))
   return preference
-}
-
-export async function setThemePreference(preference: ThemePreference): Promise<void> {
-  const normalized = normalizeThemePreference(preference)
-  await saveThemePreference(normalized)
-  applyResolvedTheme(resolveTheme(normalized))
 }
 
 export function isValidThemePreset(theme: string): theme is ThemePresetId {

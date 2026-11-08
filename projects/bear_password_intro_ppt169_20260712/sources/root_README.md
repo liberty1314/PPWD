@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="bear-password-desktop/src/assets/logo.svg" alt="BearPassword" width="96" height="96" />
+  <img src="bear-password-desktop/src/assets/logo.svg" alt="PPWD" width="96" height="96" />
 </p>
 
-<h1 align="center">BearPassword</h1>
+<h1 align="center">PPWD</h1>
 
 <p align="center">
   简洁、安全、专业的密码管理工具<br />
@@ -15,9 +15,9 @@
 
 ---
 
-## BearPassword 能做什么？
+## PPWD 能做什么？
 
-BearPassword 是一套完整的密码管理方案，由**桌面应用**和**浏览器扩展**配合使用：
+PPWD 是一套完整的密码管理方案，由**桌面应用**和**浏览器扩展**配合使用：
 
 - 在桌面端集中管理各类敏感信息（登录账号、银行卡、证件、服务器、数据库、安全备注等）
 - 在网页登录时一键填充用户名和密码
@@ -25,7 +25,7 @@ BearPassword 是一套完整的密码管理方案，由**桌面应用**和**浏�
 - 数据在本地加密后再同步，主密码不会明文上传到服务器
 
 <p align="center">
-  <img src="bear-password-index/assets/screenshots/4首页.png" alt="BearPassword 首页" width="720" />
+  <img src="bear-password-index/assets/screenshots/4首页.png" alt="PPWD 首页" width="720" />
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@ BearPassword 是一套完整的密码管理方案，由**桌面应用**和**浏�
 
 ## 推荐使用方式
 
-1. 从 [官网](https://bear-password.xuewei.fun) 下载并安装 **BearPassword 桌面端**（支持 macOS、Windows）
+1. 从 [官网](https://bear-password.xuewei.fun) 下载并安装 **PPWD 桌面端**（支持 macOS、Windows）
 2. 注册账号，设置主密码，解锁保险库（建议同时配置安全密钥）
 3. 安装 **浏览器扩展**（Chrome / Edge）
 4. 日常使用：保持桌面端在后台运行并已解锁，即可在网页中自动填充
@@ -78,7 +78,7 @@ BearPassword 是一套完整的密码管理方案，由**桌面应用**和**浏�
 
 ## 项目组成
 
-本仓库包含 BearPassword 的完整产品代码：
+本仓库包含 PPWD 的完整产品代码：
 
 | 目录 | 面向谁 | 说明 |
 |------|--------|------|

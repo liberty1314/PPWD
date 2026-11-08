@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Copy, Eye, EyeOff, FileUp, Filter, KeyRound, MoreHorizontal, Pencil, Plus, RefreshCw, Search, ShieldAlert, Star, Trash2 } from 'lucide-react'
+import { ArrowLeft, Copy, CreditCard, Database, Eye, EyeOff, FileText, FileUp, Fingerprint, KeyRound, ListChecks, MoreHorizontal, Pencil, Plus, RefreshCw, Search, Server, ShieldAlert, ShieldCheck, Star, Trash2, X } from 'lucide-react'
 import { addFavoriteApi, getFavoriteIdsApi, getFavoriteListApi, removeFavoriteApi } from './api/favorites'
 import { fetchAllPasswordEntries, createPasswordApi, deletePasswordApi, updatePasswordApi } from './api/vault'
 import { getRecentVisitListApi, recordRecentVisitApi } from './api/recent'
 import { useSecurityStore } from './stores/security'
 import { useStoreSnapshot } from './stores/reactiveStore'
 import { useDesktopLocale } from './ui/useDesktopLocale'
-import { Button, Dialog, DialogContent, NativeSelect, TextField, useToast } from './ui/primitives'
+import { Button, Dialog, DialogContent, SelectField, TextField, useToast } from './ui/primitives'
 import type { AuthenticatorContent, PasswordContent, PasswordEntry, PasswordEntryParams, PasswordType, LoginExtraField } from './types'
 import { PASSWORD_PICKER_ITEMS } from './types/vault'
 import { resolveEntryTitle } from './utils/passwordTitle'
 import { resolveEntryType, getEntryTypeColor } from './utils/vaultEntryDisplay'
 import { getPasswordTypeFilterOptions } from './utils/passwordTypeI18n'
 import { filterVaultEntries } from './utils/vaultEntrySearch'
-import { loadVaultSort, saveVaultSort, sortEntries, type VaultSortState, type VaultSortField } from './utils/vaultSort'
+import { getVaultSortOrderOptions, loadVaultSort, saveVaultSort, sortEntries, type VaultSortState, type VaultSortField } from './utils/vaultSort'
 import { createEmptyLoginContent, createServerPresetContent } from './utils/loginContent'
 import { createEmptyBankCardContent } from './utils/bankCardContent'
 import { createEmptyIdentityContent } from './utils/identityContent'
@@ -29,6 +29,7 @@ import { SecurityKeyRequiredError } from './utils/securityKeyRequired'
 import { parsePasswordImportCsv, buildLoginImportParams } from './utils/passwordImport'
 import { buildChromePasswordCsv } from './utils/passwordExport'
 import { resolveEntryWebsites, formatWebsitesDisplay } from './utils/passwordWebsites'
+import { getEditorWebsiteText, getEditorWebsites } from './utils/editorWebsiteValues'
 import { EXTRA_FIELD_TYPE_OPTIONS } from './constants/extraFieldTypes'
 import { applyParsedOtpAuthToExtraField, createAuthenticatorExtraField, extraFieldToAuthenticatorContent } from './utils/extraField'
 import { auditVaultPasswords } from './utils/vaultSecurityAudit'
@@ -126,6 +127,7 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selection, setSelection] = useState<string[]>([])
+  const [selectionMode, setSelectionMode] = useState(false)
   const [visibleLimit, setVisibleLimit] = useState(100)
   const [batchBusy, setBatchBusy] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -167,6 +169,8 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
 
   useEffect(() => {
     void load()
+    setSelectionMode(false)
+    setSelection([])
     return () => { loadSequence.current++ }
   }, [mode])
 
@@ -206,6 +210,9 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
   const selected = filtered.find((entry) => entry.id === selectedId) ?? null
   const title = translate(mode === 'favorites' ? 'nav.favorites' : mode === 'recent' ? 'nav.recent' : 'nav.vault')
   const typeOptions = getPasswordTypeFilterOptions(locale)
+  const sortOrderOptions = getVaultSortOrderOptions(sort.field)
+  const searchShortcut = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘ F' : 'Ctrl F'
+  const hasActiveFilters = Boolean(keyword.trim() || type)
 
   function openNew(): void {
     if (!security.hasVaultAccess) { toast(translate('msg.securityKeyRequiredWrite')); return }
@@ -302,6 +309,7 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
       } catch { /* keep processing remaining selected entries */ }
     }
     setSelection([])
+    setSelectionMode(false)
     setConfirmBatchDelete(false)
     await load()
     setBatchBusy(false)
@@ -310,9 +318,15 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
   }
 
   function setSortField(field: VaultSortField): void {
-    const next = { ...sort, field }
+    const next = { field, order: field === 'title' ? 'asc' : 'desc' } satisfies VaultSortState
     setSort(next)
     saveVaultSort(next)
+  }
+
+  function clearFilters(): void {
+    setKeyword('')
+    setType('')
+    searchRef.current?.focus()
   }
 
   async function importCsv(file: File | undefined): Promise<void> {
@@ -347,7 +361,7 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
       const entries = await fetchAllPasswordEntries()
       const result = buildChromePasswordCsv(entries)
       if (!result.rowCount) { toast(translate('dashboard.exportEmpty')); return }
-      const saved = await window.fileApi?.savePasswordCsv({ defaultFileName: `BearPassword-passwords-${new Date().toISOString().slice(0, 10)}.csv`, content: result.content })
+      const saved = await window.fileApi?.savePasswordCsv({ defaultFileName: `PPWD-passwords-${new Date().toISOString().slice(0, 10)}.csv`, content: result.content })
       if (saved?.ok) toast(translate('dashboard.exportSuccess', { count: result.rowCount }))
     } catch (cause) { toast(cause instanceof Error ? cause.message : translate('dashboard.exportFailed')) }
   }
@@ -357,26 +371,27 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
 
   return <main className="react-page react-vault" aria-busy={loading}>
     <header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.dashboard')}</p><h1>{title}</h1><p className="react-page__description">{translate(mode === 'favorites' ? 'vault.favoriteSubtitle' : mode === 'recent' ? 'vault.recentSubtitle' : 'vault.subtitle')}</p></div><div className="react-vault__header-actions">{mode === 'vault' && <Button onClick={exportCsv} icon={<FileUp size={15} />}>{translate('dashboard.actionExportPassword')}</Button>}<Button tone="primary" onClick={openNew} icon={<Plus size={16} />}>{translate('vault.newItem')}</Button></div></header>
-    <div className="react-vault__toolbar bp-glass">
-      <label className="react-vault__search"><Search size={16} /><input ref={searchRef} value={keyword} onChange={(event) => setKeyword(event.target.value)} placeholder={translate('vault.searchPlaceholder')} aria-label={translate('vault.searchPlaceholder')} /><kbd>⌘/Ctrl F</kbd></label>
-      <NativeSelect label={translate('vault.allCategories')} id="vault-type-filter" value={type} onChange={(event) => setType(event.target.value)}><option value="">{translate('vault.allCategories')}</option>{typeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</NativeSelect>
-      <NativeSelect label={translate('vault.sortAriaLabel')} id="vault-sort" value={sort.field} onChange={(event) => setSortField(event.target.value as VaultSortField)}>{(['title', 'createTime', 'updateTime', 'recent'] as VaultSortField[]).map((field) => <option key={field} value={field}>{translate(`vault.sort.field.${field}`)}</option>)}</NativeSelect>
-      <NativeSelect label={translate('vault.sort.orderLabel')} id="vault-sort-order" value={sort.order} onChange={(event) => { const next = { ...sort, order: event.target.value as VaultSortState['order'] }; setSort(next); saveVaultSort(next) }}><option value="desc">{translate('vault.sort.order.desc')}</option><option value="asc">{translate('vault.sort.order.asc')}</option></NativeSelect>
-      <Button aria-label={translate('vault.batch.select')} title={translate('vault.batch.select')} icon={<Filter size={16} />} onClick={() => setSelection((current) => current.length ? [] : selected ? [selected.id] : [])} />
+    <div className="react-vault__toolbar">
+      <div className="react-vault__search" role="search"><Search size={16} /><input ref={searchRef} value={keyword} onChange={(event) => setKeyword(event.target.value)} placeholder={translate('vault.searchPlaceholder')} aria-label={translate('vault.searchPlaceholder')} />{keyword && <button type="button" className="react-vault__search-clear" aria-label={translate('vault.clearSearch')} title={translate('vault.clearSearch')} onClick={() => setKeyword('')}><X size={15} /></button>}<kbd>{searchShortcut}</kbd></div>
+      <SelectField label={translate('vault.allCategories')} id="vault-type-filter" value={type} onValueChange={setType}><option value="">{translate('vault.allCategories')}</option>{typeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</SelectField>
+      <SelectField label={translate('vault.sortAriaLabel')} id="vault-sort" value={sort.field} onValueChange={(value) => setSortField(value as VaultSortField)}>{(['title', 'createTime', 'updateTime', 'recent'] as VaultSortField[]).map((field) => <option key={field} value={field}>{translate(`vault.sort.field.${field}`)}</option>)}</SelectField>
+      <SelectField label={translate('vault.sort.orderLabel')} id="vault-sort-order" value={sort.order} onValueChange={(value) => { const next = { ...sort, order: value as VaultSortState['order'] }; setSort(next); saveVaultSort(next) }}>{sortOrderOptions.map(({ value }) => <option key={value} value={value}>{translate(`vault.sort.order.${sort.field}.${value}`)}</option>)}</SelectField>
+      <Button aria-label={translate('vault.batch.select')} title={translate('vault.batch.select')} aria-pressed={selectionMode} className={selectionMode ? 'is-active' : ''} icon={<ListChecks size={16} />} onClick={() => { if (selectionMode) { setSelectionMode(false); setSelection([]) } else setSelectionMode(true) }} />
     </div>
-    {selection.length > 0 && <div className="react-vault__batch"><label><input type="checkbox" checked={shownEntries.length > 0 && shownEntries.every((entry) => selection.includes(entry.id))} onChange={(event) => setSelection(event.target.checked ? Array.from(new Set([...selection, ...shownEntries.map((entry) => entry.id)])) : selection.filter((id) => !shownEntries.some((entry) => entry.id === id)))} />{translate('vault.batch.selectAll')}</label><span>{translate('vault.batch.selected', { count: selection.length })}</span>{mode === 'favorites' ? <Button disabled={batchBusy} onClick={() => void runBatch('unfavorite')}>{translate('vault.batch.removeFavorite')}</Button> : <Button disabled={batchBusy} onClick={() => void runBatch('favorite')}>{translate('vault.batch.addFavorite')}</Button>}<Button tone="danger" disabled={batchBusy} onClick={() => setConfirmBatchDelete(true)}>{translate('vault.batch.delete')}</Button><Button tone="quiet" onClick={() => setSelection([])}>{translate('vault.batch.cancel')}</Button></div>}
+    <div className="react-vault__filter-status" aria-live="polite"><span>{translate('vault.resultCount', { count: filtered.length })}</span>{hasActiveFilters && <Button tone="quiet" icon={<X size={14} />} onClick={clearFilters}>{translate('vault.clearFilters')}</Button>}</div>
+    {selectionMode && <div className="react-vault__batch"><label><input type="checkbox" disabled={!filtered.length} checked={filtered.length > 0 && filtered.every((entry) => selection.includes(entry.id))} onChange={(event) => setSelection(event.target.checked ? Array.from(new Set([...selection, ...filtered.map((entry) => entry.id)])) : selection.filter((id) => !filtered.some((entry) => entry.id === id)))} />{translate('vault.batch.selectAll')}</label><span>{translate('vault.batch.selected', { count: selection.length })}</span>{mode === 'favorites' ? <Button disabled={batchBusy || !selection.length} onClick={() => void runBatch('unfavorite')}>{translate('vault.batch.removeFavorite')}</Button> : <Button disabled={batchBusy || !selection.length} onClick={() => void runBatch('favorite')}>{translate('vault.batch.addFavorite')}</Button>}<Button tone="danger" disabled={batchBusy || !selection.length} onClick={() => setConfirmBatchDelete(true)}>{translate('vault.batch.delete')}</Button><Button tone="quiet" onClick={() => { setSelection([]); setSelectionMode(false) }}>{translate('vault.batch.cancel')}</Button></div>}
     {error && <div className="react-vault__error" role="alert"><ShieldAlert size={16} />{error}<Button onClick={() => void load()}>{translate('common.retry')}</Button></div>}
     <section className="react-vault__workspace">
       <aside className={`react-vault__list ${selected ? 'has-selection' : ''}`} aria-label={title}>
         {loading ? <div className="react-vault__skeleton" aria-label={translate('common.loading')}>{Array.from({ length: 7 }, (_, index) => <i key={index} />)}</div> : shownEntries.length ? <div className="react-vault__list-scroll">{shownEntries.map((entry) => <article key={entry.id} className={`react-vault__item ${entry.id === selectedId ? 'is-active' : ''}`}>
-          {selection.length > 0 && <input type="checkbox" aria-label={resolveEntryTitle(entry)} checked={selection.includes(entry.id)} onChange={(event) => setSelection((current) => event.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))} />}
-          <button type="button" className="react-vault__item-main" onClick={() => { setSelectedId(entry.id); void recordRecentVisitApi(entry.id) }}><span className="react-vault__icon" style={{ '--entry-color': getEntryTypeColor(entry) } as React.CSSProperties}><KeyRound size={16} /></span><span className="react-vault__item-copy"><strong>{resolveEntryTitle(entry)}</strong><small>{subtitle(entry, translate)}</small></span>{favoriteIds.includes(entry.id) && <Star size={14} className="is-favorite" aria-label={translate('vault.detail.favorite')} />}</button>
+          {selectionMode && <input type="checkbox" aria-label={resolveEntryTitle(entry)} checked={selection.includes(entry.id)} onChange={(event) => setSelection((current) => event.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))} />}
+          <button type="button" className="react-vault__item-main" aria-pressed={selectionMode ? selection.includes(entry.id) : undefined} onClick={() => { if (selectionMode) setSelection((current) => current.includes(entry.id) ? current.filter((id) => id !== entry.id) : [...current, entry.id]); else { setSelectedId(entry.id); void recordRecentVisitApi(entry.id) } }}><span className="react-vault__icon" style={{ '--entry-color': getEntryTypeColor(entry) } as React.CSSProperties}>{entryTypeIcon(entry)}</span><span className="react-vault__item-copy"><strong title={resolveEntryTitle(entry)}>{resolveEntryTitle(entry)}</strong><small>{subtitle(entry, translate)}</small></span>{favoriteIds.includes(entry.id) && <Star size={14} className="is-favorite" aria-label={translate('vault.detail.favorite')} />}</button>
           <button type="button" className="react-vault__item-more" aria-label={translate('vault.detail.moreActions')} title={translate('vault.detail.moreActions')} onClick={() => { setSelectedId(entry.id); setActionEntry(entry) }}><MoreHorizontal size={17} /></button>
         </article>)}</div> : <div className="react-vault__empty"><KeyRound size={26} /><strong>{translate(keyword || type ? 'vault.empty.search' : mode === 'favorites' ? 'vault.empty.favorites' : mode === 'recent' ? 'vault.empty.recent' : 'vault.empty.default')}</strong>{mode === 'vault' && !keyword && !type && <Button tone="primary" onClick={openNew} icon={<Plus size={15} />}>{translate('vault.newItem')}</Button>}</div>}
         {hasMore && <div className="react-vault__more-hint"><span>{translate('vault.listLimit', { count: shownEntries.length })}</span><Button onClick={() => setVisibleLimit((count) => count + 100)}>{translate('vault.loadMore')}</Button></div>}
       </aside>
       <div className={`react-vault__detail ${selected ? 'is-open' : ''}`}>
-        {selected ? <EntryDetail entry={selected} favorite={favoriteIds.includes(selected.id)} onBack={() => setSelectedId('')} onFavorite={() => void toggleFavorite(selected)} onEdit={() => beginEdit(selected)} onDelete={() => setConfirmDelete(selected)} onCopy={copyValue} translate={translate} /> : <div className="react-vault__empty"><KeyRound size={28} /><strong>{translate('vault.empty.selectItem')}</strong></div>}
+        {selected ? <EntryDetail entry={selected} favorite={favoriteIds.includes(selected.id)} onBack={() => setSelectedId('')} onFavorite={() => void toggleFavorite(selected)} onEdit={() => beginEdit(selected)} onMore={() => setActionEntry(selected)} onCopy={copyValue} translate={translate} /> : <div className="react-vault__empty"><KeyRound size={28} /><strong>{translate('vault.empty.selectItem')}</strong></div>}
       </div>
     </section>
     <EntryTypePicker open={pickerOpen} onClose={() => setPickerOpen(false)} onImport={() => { setPickerOpen(false); setImportOpen(true) }} onSelect={(type) => { setEditing({ id: '', passwordType: type, content: emptyContent(type) } as PasswordEntry); setEditorOpen(true); setPickerOpen(false) }} translate={translate} />
@@ -398,7 +413,18 @@ function subtitle(entry: PasswordEntry, translate: (key: string) => string): str
   return translate(`vault.type.${type === '安全备注' ? 'secureNote' : type === '自定义' ? 'custom' : type === '两步验证（2FA）' ? 'authenticator' : 'login'}`)
 }
 
-function EntryDetail({ entry, favorite, onBack, onFavorite, onEdit, onDelete, onCopy, translate }: { entry: PasswordEntry; favorite: boolean; onBack: () => void; onFavorite: () => void; onEdit: () => void; onDelete: () => void; onCopy: (field: DetailField) => void; translate: (key: string, params?: Record<string, string | number>) => string }) {
+function entryTypeIcon(entry: PasswordEntry): React.ReactNode {
+  const type = resolveEntryType(entry)
+  if (type === '银行卡') return <CreditCard size={16} />
+  if (type === '身份信息') return <Fingerprint size={16} />
+  if (type === '数据库') return <Database size={16} />
+  if (type === '服务器') return <Server size={16} />
+  if (type === '安全备注') return <FileText size={16} />
+  if (type === '两步验证（2FA）') return <ShieldCheck size={16} />
+  return <KeyRound size={16} />
+}
+
+function EntryDetail({ entry, favorite, onBack, onFavorite, onEdit, onMore, onCopy, translate }: { entry: PasswordEntry; favorite: boolean; onBack: () => void; onFavorite: () => void; onEdit: () => void; onMore: () => void; onCopy: (field: DetailField) => void; translate: (key: string, params?: Record<string, string | number>) => string }) {
   const [visible, setVisible] = useState<string[]>([])
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
   const fields = detailsFor(entry).filter((field) => field.value || field.authenticator)
@@ -420,7 +446,7 @@ function EntryDetail({ entry, favorite, onBack, onFavorite, onEdit, onDelete, on
     {auth && <OtpCode content={auth} onCopy={(code) => onCopy({ label: 'entry.form.authenticator.secret', value: code, secret: true })} translate={translate} />}
     <div className="react-vault__fields">{fields.map((field, index) => { if (field.authenticator) return <div key={`${field.label}-${index}`} className="react-vault__field"><span>{translate(field.label)}</span><OtpCode content={field.authenticator} onCopy={(code) => onCopy({ label: field.label, value: code, secret: true })} translate={translate} /></div>; const show = !field.secret || visible.includes(field.label); return <div key={`${field.label}-${index}`} className="react-vault__field"><span>{translate(field.label)}</span><div><button type="button" className={field.secret && !show ? 'is-masked' : ''} onClick={() => field.secret ? reveal(field) : field.link ? void onCopy(field) : undefined} onDoubleClick={() => void onCopy(field)}>{show ? field.value : '••••••••••••'}</button>{field.secret && <button type="button" aria-label={translate(show ? 'vault.detail.hide' : 'vault.detail.show')} title={translate(show ? 'vault.detail.hide' : 'vault.detail.show')} onClick={() => reveal(field)}>{show ? <EyeOff size={15} /> : <Eye size={15} />}</button>}<button type="button" aria-label={translate('vault.detail.share')} title={translate('vault.detail.share')} onClick={() => void onCopy(field)}><Copy size={14} /></button></div></div> })}</div>
     {entry.passwordLabels?.length ? <div className="react-vault__tags"><span>{translate('vault.detail.tags')}</span>{entry.passwordLabels.map((label) => <span key={label}>{label}</span>)}</div> : null}{entry.remark && <section className="react-vault__remark"><h3>{translate('vault.detail.remark')}</h3><p>{entry.remark}</p></section>}
-    <footer className="react-vault__detail-actions"><Button onClick={onEdit} icon={<Pencil size={15} />}>{translate('vault.detail.edit')}</Button><Button tone="quiet" onClick={onDelete} icon={<Trash2 size={15} />}>{translate('vault.detail.delete')}</Button></footer>
+    <footer className="react-vault__detail-actions"><Button onClick={onEdit} icon={<Pencil size={15} />}>{translate('vault.detail.edit')}</Button><Button tone="quiet" aria-label={translate('vault.detail.moreActions')} title={translate('vault.detail.moreActions')} onClick={onMore} icon={<MoreHorizontal size={16} />}>{translate('vault.detail.moreActions')}</Button></footer>
   </article>
 }
 
@@ -446,33 +472,47 @@ function EntryEditor({ open, entry, busy, onClose, onSave, translate }: { open: 
   const [remark, setRemark] = useState(entry?.remark ?? '')
   const [otpUri, setOtpUri] = useState('')
   const [error, setError] = useState('')
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const toast = useToast()
   const record = content as Record<string, unknown>
   function set(key: string, value: unknown): void { setContent((current) => ({ ...current, [key]: value }) as PasswordContent) }
   function generatePassword(): void { set('password', createStrongPassword()) }
+  async function copyEditorPassword(): Promise<void> {
+    const copied = await copySensitiveText(String(record.password ?? ''))
+    toast(copied ? appendClipboardClearHint(translate('entry.form.passwordCopied'), translate) : translate('entry.msg.copyFailed'))
+  }
+  function passwordField(labelKey: string): React.ReactNode {
+    return <div className="react-password-input react-password-input--editor">
+      {field('password', labelKey, passwordVisible ? 'text' : 'password')}
+      <Button type="button" aria-label={translate(passwordVisible ? 'entry.form.hidePassword' : 'entry.form.showPassword')} title={translate(passwordVisible ? 'entry.form.hidePassword' : 'entry.form.showPassword')} icon={passwordVisible ? <EyeOff size={15} /> : <Eye size={15} />} onClick={() => setPasswordVisible((visible) => !visible)} />
+      <Button type="button" aria-label={translate('entry.form.copyPassword')} title={translate('entry.form.copyPassword')} icon={<Copy size={15} />} onClick={() => void copyEditorPassword()} disabled={!record.password} />
+      <Button type="button" aria-label={translate('entry.form.generatePassword')} title={translate('entry.form.generatePassword')} icon={<RefreshCw size={15} />} onClick={generatePassword} />
+    </div>
+  }
   function field(key: string, labelKey: string, typeName = 'text'): React.ReactNode { return <TextField key={key} label={translate(labelKey)} type={typeName} value={String(record[key] ?? '')} onChange={(event) => set(key, event.target.value)} autoComplete="off" /> }
   function submit(event: FormEvent): void {
     event.preventDefault()
     const title = String(record.title ?? '').trim()
     if (!title) { setError(translate('entry.form.titleRequired')); return }
     if (type === '两步验证（2FA）' && !isValidAuthenticatorSecret(String(record.secret ?? ''))) { setError(translate('entry.form.authenticator.secretInvalid')); return }
-    const websites = type === '登录信息' ? (record.websites as string[]).filter(Boolean) : []
+    const websites = type === '登录信息' ? getEditorWebsites(record.websites).filter(Boolean) : []
     onSave({ passwordType: type, passwordLabels: labels.split(',').map((label) => label.trim()).filter(Boolean), passwordTitle: title, content, websites, remark })
   }
   let specific: React.ReactNode = null
-  if (type === '登录信息') specific = <>{field('username', 'entry.form.login.username')}<div className="react-password-input">{field('password', 'entry.form.login.password', 'password')}<Button type="button" aria-label={translate('entry.form.generatePassword')} title={translate('entry.form.generatePassword')} icon={<RefreshCw size={15} />} onClick={generatePassword} /></div><TextField label={translate('entry.form.login.website')} value={(record.websites as string[]).join(', ')} onChange={(event) => set('websites', event.target.value.split(',').map((value) => value.trim()))} description={translate('entry.form.websitesHint')} /><ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => set('extraFields', value)} translate={translate} /></>
-  else if (type === '服务器') specific = <>{field('host', 'entry.form.login.host')}{field('username', 'entry.form.login.username')}<div className="react-password-input">{field('password', 'entry.form.login.password', 'password')}<Button type="button" aria-label={translate('entry.form.generatePassword')} title={translate('entry.form.generatePassword')} icon={<RefreshCw size={15} />} onClick={generatePassword} /></div><ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
+  if (type === '登录信息') specific = <>{field('username', 'entry.form.login.username')}{passwordField('entry.form.login.password')}<TextField label={translate('entry.form.login.website')} value={getEditorWebsiteText(record.websites)} onChange={(event) => set('websites', event.target.value.split(',').map((value) => value.trim()))} description={translate('entry.form.websitesHint')} /><ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => set('extraFields', value)} translate={translate} /></>
+  else if (type === '服务器') specific = <>{field('host', 'entry.form.login.host')}{field('username', 'entry.form.login.username')}{passwordField('entry.form.login.password')}<ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
   else if (type === '银行卡') specific = <>{field('bankName', 'entry.form.bankCard.bankName')}{field('cardHolder', 'entry.form.bankCard.cardHolder')}{field('cardNumber', 'entry.form.bankCard.cardNumber', 'password')}{field('expiry', 'entry.form.bankCard.expiry')}{field('cvv', 'entry.form.bankCard.cvv', 'password')}<ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
   else if (type === '身份信息') specific = <>{field('name', 'entry.form.identity.name')}{field('idNumber', 'entry.form.identity.idNumber', 'password')}{field('birthDate', 'entry.form.identity.birthDate')}{field('lunarBirthday', 'entry.form.identity.lunarBirthday')}{field('phone', 'entry.form.identity.phone')}{field('address', 'entry.form.identity.address')}<ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
-  else if (type === '数据库') specific = <>{field('dbType', 'entry.form.database.dbType')}{field('host', 'entry.form.database.host')}{field('port', 'entry.form.database.port')}{field('databaseName', 'entry.form.database.databaseName')}{field('username', 'entry.form.database.username')}<div className="react-password-input">{field('password', 'entry.form.database.password', 'password')}<Button type="button" aria-label={translate('entry.form.generatePassword')} title={translate('entry.form.generatePassword')} icon={<RefreshCw size={15} />} onClick={generatePassword} /></div><ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
+  else if (type === '数据库') specific = <>{field('dbType', 'entry.form.database.dbType')}{field('host', 'entry.form.database.host')}{field('port', 'entry.form.database.port')}{field('databaseName', 'entry.form.database.databaseName')}{field('username', 'entry.form.database.username')}{passwordField('entry.form.database.password')}<ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
   else if (type === '安全备注') specific = <><label className="bp-field"><span className="bp-field__label">{translate('entry.form.fieldContent')}</span><textarea className="bp-input" rows={6} value={String(record.body ?? '')} onChange={(event) => set('body', event.target.value)} /></label><ExtraFields value={record.extraFields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, extraFields: value }) as PasswordContent)} translate={translate} /></>
-  else if (type === '两步验证（2FA）') specific = <><TextField label={translate('entry.form.authenticator.importUri')} value={otpUri} onChange={(event) => setOtpUri(event.target.value)} placeholder={translate('entry.form.authenticator.importUriPlaceholder')} /><Button type="button" onClick={() => { const parsed = parseOtpAuthUri(otpUri); if (!parsed) setError(translate('entry.form.authenticator.importFailed')); else { const next = { ...(content as AuthenticatorContent) }; applyParsedOtpAuthImport(next, parsed); setContent(next); setError('') } }}>{translate('entry.form.authenticator.import')}</Button>{field('issuer', 'entry.form.authenticator.issuer')}{field('account', 'entry.form.authenticator.accountNamePlaceholder')}{field('secret', 'entry.form.authenticator.secret')}<NativeSelect label={translate('entry.form.authenticator.algorithm')} id="otp-algorithm" value={String(record.algorithm)} onChange={(event) => set('algorithm', event.target.value)}><option>SHA1</option><option>SHA256</option><option>SHA512</option></NativeSelect><NativeSelect label={translate('entry.form.authenticator.digits')} id="otp-digits" value={String(record.digits)} onChange={(event) => set('digits', event.target.value)}><option value="6">6</option><option value="8">8</option></NativeSelect><NativeSelect label={translate('entry.form.authenticator.period')} id="otp-period" value={String(record.period)} onChange={(event) => set('period', event.target.value)}>{[15, 30, 45, 60].map((value) => <option key={value} value={value}>{translate('entry.form.authenticator.periodOption', { n: value })}</option>)}</NativeSelect></>
+  else if (type === '两步验证（2FA）') specific = <><TextField label={translate('entry.form.authenticator.importUri')} value={otpUri} onChange={(event) => setOtpUri(event.target.value)} placeholder={translate('entry.form.authenticator.importUriPlaceholder')} /><Button type="button" onClick={() => { const parsed = parseOtpAuthUri(otpUri); if (!parsed) setError(translate('entry.form.authenticator.importFailed')); else { const next = { ...(content as AuthenticatorContent) }; applyParsedOtpAuthImport(next, parsed); setContent(next); setError('') } }}>{translate('entry.form.authenticator.import')}</Button>{field('issuer', 'entry.form.authenticator.issuer')}{field('account', 'entry.form.authenticator.accountNamePlaceholder')}{field('secret', 'entry.form.authenticator.secret')}<SelectField label={translate('entry.form.authenticator.algorithm')} id="otp-algorithm" value={String(record.algorithm)} onValueChange={(value) => set('algorithm', value)}><option>SHA1</option><option>SHA256</option><option>SHA512</option></SelectField><SelectField label={translate('entry.form.authenticator.digits')} id="otp-digits" value={String(record.digits)} onValueChange={(value) => set('digits', value)}><option value="6">6</option><option value="8">8</option></SelectField><SelectField label={translate('entry.form.authenticator.period')} id="otp-period" value={String(record.period)} onValueChange={(value) => set('period', value)}>{[15, 30, 45, 60].map((value) => <option key={value} value={value}>{translate('entry.form.authenticator.periodOption', { n: value })}</option>)}</SelectField></>
   else specific = <CustomFields fields={record.fields as LoginExtraField[]} onChange={(value) => setContent((current) => ({ ...current, fields: value }) as PasswordContent)} translate={translate} />
   return <Dialog open={open} onOpenChange={(value) => { if (!value) onClose() }}><DialogContent title={translate(entry?.id ? 'vault.detail.edit' : 'entry.dialog.save')}><form className="react-entry-form" onSubmit={submit}>{field('title', 'entry.form.titlePlaceholder')}{specific}<label className="bp-field"><span className="bp-field__label">{translate('entry.form.tags')}</span><input className="bp-input" value={labels} onChange={(event) => setLabels(event.target.value)} placeholder={translate('entry.dialog.addTagsPlaceholder')} /></label><label className="bp-field"><span className="bp-field__label">{translate('entry.form.remark')}</span><textarea className="bp-input" rows={2} value={remark} onChange={(event) => setRemark(event.target.value)} /></label>{error && <p role="alert" className="react-form__error">{error}</p>}<div className="react-dialog-actions"><Button type="button" onClick={onClose}>{translate('msg.cancel')}</Button><Button type="submit" tone="primary" disabled={busy}>{translate('entry.dialog.save')}</Button></div></form></DialogContent></Dialog>
 }
 
 function ExtraFields({ value = [], onChange, translate }: { value?: LoginExtraField[]; onChange: (value: LoginExtraField[]) => void; translate: (key: string) => string }) {
   function update(index: number, next: LoginExtraField): void { onChange(value.map((item, i) => i === index ? next : item)) }
-  return <section className="react-extra-fields"><header><h3>{translate('entry.form.addMore')}</h3><Button type="button" icon={<Plus size={14} />} onClick={() => onChange([...value, { label: '', value: '', type: 'custom' }])}>{translate('entry.form.addMore')}</Button></header>{value.map((field, index) => <div className="react-extra-fields__row" key={index}><NativeSelect label={translate('entry.form.extraFieldType.custom')} id={`extra-type-${index}`} value={field.type ?? 'custom'} onChange={(event) => { const nextType = event.target.value as LoginExtraField['type']; update(index, nextType === 'authenticator' ? createAuthenticatorExtraField() : { ...field, type: nextType }) }}>{EXTRA_FIELD_TYPE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{translate(option.labelKey)}</option>)}</NativeSelect>{field.type === 'authenticator' ? <AuthenticatorExtraFieldEditor field={field} onChange={(next) => update(index, next)} translate={translate} /> : <><TextField label={translate('entry.form.fieldTitle')} value={field.label} onChange={(event) => update(index, { ...field, label: event.target.value })} /><TextField label={translate('entry.form.fieldContent')} type={field.type === 'password' ? 'password' : 'text'} value={field.value} onChange={(event) => update(index, { ...field, value: event.target.value })} /></>}<Button type="button" aria-label={translate('entry.form.removeField')} title={translate('entry.form.removeField')} icon={<Trash2 size={14} />} onClick={() => onChange(value.filter((_, i) => i !== index))} /></div>)}</section>
+  return <section className="react-extra-fields"><header><h3>{translate('entry.form.additionalFields')}</h3><Button type="button" icon={<Plus size={14} />} onClick={() => onChange([...value, { label: '', value: '', type: 'custom' }])}>{translate('entry.form.addMore')}</Button></header>{value.map((field, index) => <div className="react-extra-fields__row" key={index}><SelectField label={translate('entry.form.extraFieldType.custom')} id={`extra-type-${index}`} value={field.type ?? 'custom'} onValueChange={(nextType) => { update(index, nextType === 'authenticator' ? createAuthenticatorExtraField() : { ...field, type: nextType as LoginExtraField['type'] }) }}>{EXTRA_FIELD_TYPE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{translate(option.labelKey)}</option>)}</SelectField>{field.type === 'authenticator' ? <AuthenticatorExtraFieldEditor field={field} onChange={(next) => update(index, next)} translate={translate} /> : <><TextField label={translate('entry.form.fieldTitle')} value={field.label} onChange={(event) => update(index, { ...field, label: event.target.value })} /><TextField label={translate('entry.form.fieldContent')} type={field.type === 'password' ? 'password' : 'text'} value={field.value} onChange={(event) => update(index, { ...field, value: event.target.value })} /></>}<Button type="button" aria-label={translate('entry.form.removeField')} title={translate('entry.form.removeField')} icon={<Trash2 size={14} />} onClick={() => onChange(value.filter((_, i) => i !== index))} /></div>)}</section>
 }
 
 function AuthenticatorExtraFieldEditor({ field, onChange, translate }: { field: LoginExtraField; onChange: (field: LoginExtraField) => void; translate: (key: string, params?: Record<string, string | number>) => string }) {
@@ -485,12 +525,12 @@ function AuthenticatorExtraFieldEditor({ field, onChange, translate }: { field: 
     applyParsedOtpAuthToExtraField(next, parsed)
     onChange(next)
   }
-  return <div className="react-extra-fields__authenticator"><TextField label={translate('entry.form.authenticator.importUri')} value={uri} onChange={(event) => setUri(event.target.value)} placeholder={translate('entry.form.authenticator.importUriPlaceholder')} /><Button type="button" onClick={importUri}>{translate('entry.form.authenticator.import')}</Button><TextField label={translate('entry.form.authenticator.issuer')} value={field.issuer ?? ''} onChange={(event) => set('issuer', event.target.value)} /><TextField label={translate('entry.form.authenticator.accountNamePlaceholder')} value={field.account ?? ''} onChange={(event) => set('account', event.target.value)} /><TextField label={translate('entry.form.authenticator.secret')} type="password" value={field.secret ?? field.value} onChange={(event) => set('secret', event.target.value)} /><NativeSelect label={translate('entry.form.authenticator.algorithm')} id="extra-otp-algorithm" value={field.algorithm ?? 'SHA1'} onChange={(event) => set('algorithm', event.target.value)}><option>SHA1</option><option>SHA256</option><option>SHA512</option></NativeSelect><NativeSelect label={translate('entry.form.authenticator.digits')} id="extra-otp-digits" value={String(field.digits ?? 6)} onChange={(event) => set('digits', Number(event.target.value))}><option value="6">6</option><option value="8">8</option></NativeSelect><NativeSelect label={translate('entry.form.authenticator.period')} id="extra-otp-period" value={String(field.period ?? 30)} onChange={(event) => set('period', Number(event.target.value))}>{[15, 30, 45, 60].map((value) => <option key={value} value={value}>{translate('entry.form.authenticator.periodOption', { n: value })}</option>)}</NativeSelect></div>
+  return <div className="react-extra-fields__authenticator"><TextField label={translate('entry.form.authenticator.importUri')} value={uri} onChange={(event) => setUri(event.target.value)} placeholder={translate('entry.form.authenticator.importUriPlaceholder')} /><Button type="button" onClick={importUri}>{translate('entry.form.authenticator.import')}</Button><TextField label={translate('entry.form.authenticator.issuer')} value={field.issuer ?? ''} onChange={(event) => set('issuer', event.target.value)} /><TextField label={translate('entry.form.authenticator.accountNamePlaceholder')} value={field.account ?? ''} onChange={(event) => set('account', event.target.value)} /><TextField label={translate('entry.form.authenticator.secret')} type="password" value={field.secret ?? field.value} onChange={(event) => set('secret', event.target.value)} /><SelectField label={translate('entry.form.authenticator.algorithm')} id="extra-otp-algorithm" value={field.algorithm ?? 'SHA1'} onValueChange={(value) => set('algorithm', value)}><option>SHA1</option><option>SHA256</option><option>SHA512</option></SelectField><SelectField label={translate('entry.form.authenticator.digits')} id="extra-otp-digits" value={String(field.digits ?? 6)} onValueChange={(value) => set('digits', Number(value))}><option value="6">6</option><option value="8">8</option></SelectField><SelectField label={translate('entry.form.authenticator.period')} id="extra-otp-period" value={String(field.period ?? 30)} onValueChange={(value) => set('period', Number(value))}>{[15, 30, 45, 60].map((value) => <option key={value} value={value}>{translate('entry.form.authenticator.periodOption', { n: value })}</option>)}</SelectField></div>
 }
 
 function CustomFields({ fields = [], onChange, translate }: { fields?: LoginExtraField[]; onChange: (fields: LoginExtraField[]) => void; translate: (key: string) => string }) {
   function update(index: number, next: LoginExtraField): void { onChange(fields.map((item, i) => i === index ? next : item)) }
-  return <section className="react-extra-fields"><header><h3>{translate('entry.form.addMore')}</h3><Button type="button" icon={<Plus size={14} />} onClick={() => onChange([...fields, { label: '', value: '', type: 'custom' }])}>{translate('entry.form.addMore')}</Button></header>{fields.map((field, index) => <div className="react-extra-fields__row" key={index}><NativeSelect label={translate('entry.form.extraFieldType.custom')} id={`custom-type-${index}`} value={field.type ?? 'custom'} onChange={(event) => { const nextType = event.target.value as LoginExtraField['type']; update(index, nextType === 'authenticator' ? createAuthenticatorExtraField() : { ...field, type: nextType }) }}>{EXTRA_FIELD_TYPE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{translate(option.labelKey)}</option>)}</NativeSelect>{field.type === 'authenticator' ? <AuthenticatorExtraFieldEditor field={field} onChange={(next) => update(index, next)} translate={translate} /> : <><TextField label={translate('entry.form.fieldTitle')} value={field.label} onChange={(event) => update(index, { ...field, label: event.target.value })} /><TextField label={translate('entry.form.fieldContent')} type={field.type === 'password' ? 'password' : 'text'} value={field.value} onChange={(event) => update(index, { ...field, value: event.target.value })} /></>}<Button type="button" aria-label={translate('entry.form.removeField')} icon={<Trash2 size={14} />} onClick={() => onChange(fields.filter((_, i) => i !== index))} /></div>)}</section>
+  return <section className="react-extra-fields"><header><h3>{translate('entry.form.additionalFields')}</h3><Button type="button" icon={<Plus size={14} />} onClick={() => onChange([...fields, { label: '', value: '', type: 'custom' }])}>{translate('entry.form.addMore')}</Button></header>{fields.map((field, index) => <div className="react-extra-fields__row" key={index}><SelectField label={translate('entry.form.extraFieldType.custom')} id={`custom-type-${index}`} value={field.type ?? 'custom'} onValueChange={(nextType) => { update(index, nextType === 'authenticator' ? createAuthenticatorExtraField() : { ...field, type: nextType as LoginExtraField['type'] }) }}>{EXTRA_FIELD_TYPE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{translate(option.labelKey)}</option>)}</SelectField>{field.type === 'authenticator' ? <AuthenticatorExtraFieldEditor field={field} onChange={(next) => update(index, next)} translate={translate} /> : <><TextField label={translate('entry.form.fieldTitle')} value={field.label} onChange={(event) => update(index, { ...field, label: event.target.value })} /><TextField label={translate('entry.form.fieldContent')} type={field.type === 'password' ? 'password' : 'text'} value={field.value} onChange={(event) => update(index, { ...field, value: event.target.value })} /></>}<Button type="button" aria-label={translate('entry.form.removeField')} icon={<Trash2 size={14} />} onClick={() => onChange(fields.filter((_, i) => i !== index))} /></div>)}</section>
 }
 
 function createStrongPassword(): string {

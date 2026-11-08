@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
-  <title>Why BearPassword Matters</title>
+  <title>Why PPWD Matters</title>
   <g id="background">
     <rect x="0" y="0" width="1280" height="720" fill="#FFF8ED" />
     <circle cx="1135" cy="92" r="180" fill="#FEF3C7" opacity="0.55" />
@@ -7,7 +7,7 @@
   </g>
   <g id="header">
     <text x="64" y="78" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#7A4B22">账号越多，真正难的是“安心管理”</text>
-    <text x="66" y="120" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#1F2937">BearPassword 聚焦的不只是保存密码，而是把登录、验证码和敏感信息管理变成可控流程。</text>
+    <text x="66" y="120" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#1F2937">PPWD 聚焦的不只是保存密码，而是把登录、验证码和敏感信息管理变成可控流程。</text>
   </g>
   <g id="pain-card-1">
     <path fill="#FFFFFF" stroke="#E8D9C5" stroke-width="1.8" d="M90,178 H368 A26,26 0 0 1 394,204 V314 A26,26 0 0 1 368,340 H90 A26,26 0 0 1 64,314 V204 A26,26 0 0 1 90,178 Z" />
@@ -38,7 +38,7 @@
   <g id="answer-card">
     <path fill="#7A4B22" d="M832,178 H1184 A32,32 0 0 1 1216,210 V494 A32,32 0 0 1 1184,526 H832 A32,32 0 0 1 800,494 V210 A32,32 0 0 1 832,178 Z" />
     <circle cx="1122" cy="266" r="118" fill="#F59E0B" opacity="0.18" />
-    <text x="844" y="240" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="32" font-weight="800" fill="#FFFFFF">BearPassword 的答案</text>
+    <text x="844" y="240" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="32" font-weight="800" fill="#FFFFFF">PPWD 的答案</text>
     <text x="844" y="302" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="28" font-weight="700" fill="#FEF3C7">一个保险库，两个使用场景</text>
     <text x="844" y="364" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#FFFFFF">桌面端集中管理各类敏感信息，</text>
     <text x="844" y="402" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="24" fill="#FFFFFF">浏览器扩展在网页登录时安全取用。</text>
@@ -46,7 +46,7 @@
     <text x="870" y="484" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">从保存到填充的闭环</text>
   </g>
   <g id="footer">
-    <text x="64" y="654" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="16" fill="#6B7280">Source: BearPassword README</text>
+    <text x="64" y="654" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="16" fill="#6B7280">Source: PPWD README</text>
     <text x="1140" y="654" font-family="Microsoft YaHei, PingFang SC, Arial, sans-serif" font-size="16" fill="#6B7280">02 / 08</text>
   </g>
 </svg>

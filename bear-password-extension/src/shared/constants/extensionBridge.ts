@@ -1,10 +1,13 @@
+import type { ThemePreferences } from '../../../../shared/ui/themeTypes'
+
 export const EXTENSION_BRIDGE_HOST = '127.0.0.1'
 export const EXTENSION_BRIDGE_PORT = 6892
 export const EXTENSION_BRIDGE_ORIGIN = `http://${EXTENSION_BRIDGE_HOST}:${EXTENSION_BRIDGE_PORT}`
+// Keep bridge auth identifiers stable for already-installed desktop apps.
 export const EXTENSION_BRIDGE_AUTH_HEADER = 'X-BearPassword-Bridge'
 export const EXTENSION_BRIDGE_AUTH_VALUE = 'BearPassword-Extension'
 
-export const DESKTOP_WAKE_PROTOCOL_URL = 'bearpassword://focus'
+export const DESKTOP_WAKE_PROTOCOL_URL = 'ppwd://focus'
 
 export interface ExtensionBridgeHealth {
   ready: boolean
@@ -13,5 +16,6 @@ export interface ExtensionBridgeHealth {
   locked: boolean
   username: string | null
   themePreference: string | null
+  themePreferences?: ThemePreferences
   localePreference: string | null
 }

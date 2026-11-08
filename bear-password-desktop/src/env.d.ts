@@ -57,7 +57,6 @@ interface TraySettingsState {
 }
 
 interface TrayAppearanceSnapshot {
-  theme: SharedTrayAppearanceSnapshot['theme']
   locale: SharedTrayAppearanceSnapshot['locale']
   font: SharedTrayAppearanceSnapshot['font']
   labels: SharedTrayAppearanceSnapshot['labels']
@@ -94,7 +93,6 @@ type TrayRendererCommand =
   | { action: 'vault' }
   | { action: 'favorites' }
   | { action: 'recent' }
-  | { action: 'set-theme'; value: string }
   | { action: 'set-locale'; value: string }
   | { action: 'set-font'; value: string }
 

@@ -49,7 +49,7 @@ async function getDesktopState(force = false): Promise<DesktopConnectionState | 
 async function assertDesktopUnlocked(): Promise<DesktopConnectionState> {
   const state = await getDesktopState(true)
   if (!state?.ready) {
-    throw new Error('无法连接 BearPassword 桌面端，请先启动桌面应用')
+    throw new Error('无法连接 PPWD 桌面端，请先启动桌面应用')
   }
   if (!state.loggedIn) {
     throw new Error('请先在桌面端登录')
@@ -72,6 +72,7 @@ async function refreshMatchingCredentials(
   const appearance = {
     desktopReady: state?.ready ?? false,
     themePreference: state?.themePreference ?? null,
+    themePreferences: state?.themePreferences,
     localePreference: state?.localePreference ?? null
   }
   if (!state?.unlocked) {
@@ -92,6 +93,7 @@ async function refreshMatchingCredentials(
         desktopUnlocked: false,
         desktopReady: latestState?.ready ?? false,
         themePreference: latestState?.themePreference ?? null,
+        themePreferences: latestState?.themePreferences,
         localePreference: latestState?.localePreference ?? null
       }
     }
@@ -100,6 +102,7 @@ async function refreshMatchingCredentials(
       desktopUnlocked: true,
       desktopReady: latestState.ready,
       themePreference: latestState.themePreference,
+      themePreferences: latestState.themePreferences,
       localePreference: latestState.localePreference
     }
   } catch (err) {
@@ -213,7 +216,7 @@ async function updateBadgeForActiveTab(): Promise<void> {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'bear-autofill',
-    title: '使用 BearPassword 填充',
+    title: '使用 PPWD 填充',
     contexts: ['editable']
   })
   chrome.contextMenus.create({

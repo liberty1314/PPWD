@@ -279,7 +279,7 @@ export function showInlinePicker(
   header.className = 'bear-picker-header'
   header.innerHTML = `
     <img class="bear-picker-logo" src="${chrome.runtime.getURL('public/icons/logo.png')}" alt="" />
-    <span class="bear-picker-title">BearPassword · ${escapeHtml(options.title)}</span>
+    <span class="bear-picker-title">PPWD · ${escapeHtml(options.title)}</span>
     <span class="bear-picker-count">${escapeHtml(tContent('content.picker.itemCount', { count: credentials.length }))}</span>
   `
 

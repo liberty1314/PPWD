@@ -16,19 +16,19 @@ const root = join(__dirname, '..')
 const macAssetsDir = join(root, 'build/mac')
 const dmgMountPoint = join(releaseDir, '.dmg-mount')
 const dmgStagingDir = join(releaseDir, '.dmg-staging')
-const dmgVolumeName = 'BearPassword'
-const dmgPath = join(releaseDir, 'BearPassword.dmg')
+const dmgVolumeName = 'PPWD'
+const dmgPath = join(releaseDir, 'PPWD.dmg')
 
 const helpers = ['安装说明.txt']
 
 const extraArtifacts = [
-  'BearPassword.zip',
-  'BearPassword.zip.blockmap',
-  'BearPassword.dmg.blockmap',
-  'BearPassword-mac-安装包.zip',
+  'PPWD.zip',
+  'PPWD.zip.blockmap',
+  'PPWD.dmg.blockmap',
+  'PPWD-mac-安装包.zip',
   'latest-mac.yml',
   '安装说明.txt',
-  'BearPassword.app',
+  'PPWD.app',
   'mac-arm64',
   'builder-debug.yml',
   'builder-effective-config.yaml'
@@ -51,9 +51,9 @@ function renameArtifact(oldName, newName) {
 }
 
 for (const name of readdirSync(releaseDir)) {
-  const match = name.match(/^BearPassword-.+\.dmg$/)
+  const match = name.match(/^PPWD-.+\.dmg$/)
   if (!match) continue
-  renameArtifact(name, 'BearPassword.dmg')
+  renameArtifact(name, 'PPWD.dmg')
 }
 
 function injectMacHelpersIntoDmg() {
@@ -62,7 +62,7 @@ function injectMacHelpersIntoDmg() {
     return
   }
 
-  const tempDmg = join(releaseDir, 'BearPassword-inject.dmg')
+  const tempDmg = join(releaseDir, 'PPWD-inject.dmg')
 
   rmSync(dmgStagingDir, { recursive: true, force: true })
   rmSync(dmgMountPoint, { recursive: true, force: true })
@@ -118,5 +118,5 @@ for (const name of extraArtifacts) {
 if (existsSync(dmgPath)) {
   console.log(`[after-mac-build] Mac 产物：${dmgPath}`)
 } else {
-  console.warn('[after-mac-build] 未生成 BearPassword.dmg')
+  console.warn('[after-mac-build] 未生成 PPWD.dmg')
 }

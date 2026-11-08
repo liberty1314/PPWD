@@ -20,12 +20,12 @@ export const SHORTCUT_ACTION_OPTIONS: {
 }[] = [
   {
     id: 'open',
-    label: '打开 BearPassword',
+    label: '打开 PPWD',
     description: '全局唤起并聚焦应用窗口'
   },
   {
     id: 'lock',
-    label: '锁定 BearPassword',
+    label: '锁定 PPWD',
     description: '立即锁定应用，需输入密码解锁'
   }
 ]

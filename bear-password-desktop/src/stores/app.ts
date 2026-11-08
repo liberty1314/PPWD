@@ -62,7 +62,6 @@ export const useAppStore = createStateStore(() => {
 
   function pushTrayAppearanceSnapshot(): void {
     void syncTrayAppearanceToMain({
-      theme: themePreference.value,
       locale: localePreference.value,
       font: fontPreference.value,
       resolvedLocale: resolveLocale(localePreference.value)
@@ -99,15 +98,6 @@ export const useAppStore = createStateStore(() => {
     localePreference.value = normalized
     storage.set('locale', normalized)
     applyLocale()
-    pushTrayAppearanceSnapshot()
-  }
-
-  /** 设置主题偏好 */
-  function setThemePreference(preference: unknown): void {
-    const normalized = normalizeThemePreference(preference)
-    themePreference.value = normalized
-    storage.set('theme', normalized)
-    applyTheme()
     pushTrayAppearanceSnapshot()
   }
 
@@ -170,7 +160,6 @@ export const useAppStore = createStateStore(() => {
     resolvedLocale,
     fontPreference,
     locale: resolvedLocale,
-    setThemePreference,
     setFontPreference,
     setLocalePreference,
     setLocale,

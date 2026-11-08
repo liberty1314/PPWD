@@ -6,8 +6,7 @@ interface PopupThemeState extends ThemePreferences {
   systemDark: boolean
   initialized: boolean
   initialize: () => Promise<void>
-  syncFromDesktop: (themePreference: string | null) => void
-  setPreference: <K extends keyof ThemePreferences>(key: K, value: ThemePreferences[K]) => void
+  syncFromDesktop: (themePreference: string | null, preferences?: ThemePreferences) => void
 }
 
 const STORAGE_KEYS = {
@@ -48,6 +47,7 @@ export const usePopupThemeStore = create<PopupThemeState>((set, get) => ({
       [STORAGE_KEYS.themeDesign]: preferences.themeDesign,
       [STORAGE_KEYS.accentColor]: preferences.accentColor
     })
+    await chrome.storage.local.remove('bear_extension_theme')
     applyTheme(preferences, systemDark)
     set({ ...preferences, systemDark, initialized: true })
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
@@ -58,22 +58,21 @@ export const usePopupThemeStore = create<PopupThemeState>((set, get) => ({
     })().finally(() => { initialization = null })
     return initialization
   },
-  syncFromDesktop: (theme) => {
-    const preferences = migrateThemePreferences({ theme })
+  syncFromDesktop: (theme, desktopPreferences) => {
+    const preferences = migrateThemePreferences({
+      theme,
+      appearanceMode: desktopPreferences?.appearanceMode,
+      themeDesign: desktopPreferences?.themeDesign,
+      accentColor: desktopPreferences?.accentColor
+    })
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     applyTheme(preferences, systemDark)
     set({ ...preferences, systemDark, initialized: true })
+    void chrome.storage.local.set({
+      [STORAGE_KEYS.appearanceMode]: preferences.appearanceMode,
+      [STORAGE_KEYS.themeDesign]: preferences.themeDesign,
+      [STORAGE_KEYS.accentColor]: preferences.accentColor
+    })
+    void chrome.storage.local.remove('bear_extension_theme')
   },
-  setPreference: (key, value) => {
-    const current = get()
-    const next = { ...current, [key]: value }
-    applyTheme(next, current.systemDark)
-    set({ [key]: value } as Pick<PopupThemeState, typeof key>)
-    const storageKey = key === 'appearanceMode'
-      ? STORAGE_KEYS.appearanceMode
-      : key === 'themeDesign'
-        ? STORAGE_KEYS.themeDesign
-        : STORAGE_KEYS.accentColor
-    void chrome.storage.local.set({ [storageKey]: value })
-  }
 }))

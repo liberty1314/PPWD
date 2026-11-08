@@ -4,14 +4,13 @@ import { migrateThemePreferences } from '@/utils/themePreferenceMigration'
 import { DEFAULT_THEME_PREFERENCES, type ThemePreferences } from '../../../shared/ui/themeTypes'
 import { desktopThemeAdapter } from '@/platform/desktopThemeAdapter'
 
-const MIGRATION_VERSION = 1
+const MIGRATION_VERSION = 2
 let initialization: Promise<void> | null = null
 
 interface ReactThemeState extends ThemePreferences {
   systemDark: boolean
   initialized: boolean
   initialize: () => Promise<void>
-  setPreference: <K extends keyof ThemePreferences>(key: K, value: ThemePreferences[K]) => void
 }
 
 function applyTheme(preferences: ThemePreferences, systemDark: boolean): void {
@@ -45,10 +44,11 @@ export const useReactThemeStore = create<ReactThemeState>((set, get) => ({
       accentColor: storage.get<unknown>('accentColor')
     })
     const systemDark = await desktopThemeAdapter.isSystemDark().catch(() => false)
+    storage.remove('theme')
     persistTheme(preferences)
     applyTheme(preferences, systemDark)
     set({ ...preferences, systemDark, initialized: true })
-    void desktopThemeAdapter.syncTrayAppearance(preferences)
+    void desktopThemeAdapter.syncTrayAppearance()
     desktopThemeAdapter.subscribeSystemAppearance((dark) => {
       const current = get()
       applyTheme(current, dark)
@@ -57,12 +57,4 @@ export const useReactThemeStore = create<ReactThemeState>((set, get) => ({
     })().finally(() => { initialization = null })
     return initialization
   },
-  setPreference: (key, value) => {
-    const current = get()
-    const next = { ...current, [key]: value }
-    persistTheme(next)
-    applyTheme(next, current.systemDark)
-    set({ [key]: value } as Pick<ReactThemeState, typeof key>)
-    void desktopThemeAdapter.syncTrayAppearance(next)
-  }
 }))

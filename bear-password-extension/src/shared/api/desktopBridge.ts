@@ -38,7 +38,7 @@ const BRIDGE_AUTH_HEADERS = {
 
 function resolveBridgeErrorMessage(response: Response, payload?: BridgeEnvelope<unknown> | null): string {
   if (response.status === 403) {
-    return '桌面端桥接认证失败，请确认 BearPassword 桌面端与浏览器扩展均已更新'
+    return '桌面端桥接认证失败，请确认 PPWD 桌面端与浏览器扩展均已更新'
   }
   return payload?.message || '桌面端请求失败'
 }
@@ -59,7 +59,7 @@ async function bridgeFetch<T>(path: string, init?: RequestInit): Promise<T> {
     payload = (await response.json()) as BridgeEnvelope<T>
   } catch {
     if (!response.ok) {
-      throw new DesktopBridgeError('无法连接 BearPassword 桌面端')
+      throw new DesktopBridgeError('无法连接 PPWD 桌面端')
     }
   }
 
@@ -89,7 +89,7 @@ export async function probeDesktopBridge(): Promise<ExtensionBridgeHealth> {
     return payload.data
   } catch (err) {
     if (err instanceof DesktopBridgeError) throw err
-    throw new DesktopBridgeError('无法连接 BearPassword 桌面端，请先启动桌面应用')
+    throw new DesktopBridgeError('无法连接 PPWD 桌面端，请先启动桌面应用')
   } finally {
     clearTimeout(timer)
   }

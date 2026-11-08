@@ -9,6 +9,7 @@ import { useStoreSnapshot } from './stores/reactiveStore'
 import { generatePhoneTokenRecoveryKey, generatePhoneTokenSecret, createPhoneTokenQrDataUrl } from './utils/phoneToken'
 import { isSixDigitTotp, validateSetupPassword } from './utils/reactGateRules'
 import { Button, TextField } from './ui/primitives'
+import logoUrl from './assets/logo.png'
 
 type ErrorReason = 'invalid' | 'locked' | 'unavailable' | 'unbound'
 
@@ -221,21 +222,23 @@ export function UnlockPage() {
     }
   }
 
-  return <GateFrame eyebrow={translate('unlock.localVault')}>
+  return <GateFrame eyebrow={translate('unlock.localVault')} showSteps={false}>
     <h1>{translate('unlock.title')}</h1>
-    {!biometricLoaded ? <p className="react-gate__description" role="status">{translate('unlock.checkingBiometric')}</p> : <>
-      <p className="react-gate__description">{biometricAvailable && biometricEnabled && !fallback ? translate('unlock.biometricHint') : translate('unlock.totpHint')}</p>
-      {biometricEnabled && !biometricAvailable && <p className="react-form__warning" role="status">{translate('unlock.biometricUnavailable')}</p>}
-      {biometricAvailable && biometricEnabled && !fallback && <Button className="react-gate__wide" tone="primary" icon={<Fingerprint size={16} />} onClick={() => void unlockBiometric()} disabled={biometricBusy}>{biometricKind === 'touchId' ? translate('unlock.touchId') : translate('unlock.windowsHello')}</Button>}
-      {(!biometricAvailable || !biometricEnabled || fallback) && <form className="react-form" onSubmit={(event) => void submit(event)}>
-        <TextField label={translate('unlock.tokenCode')} inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={busy} />
-        {error && <p className="react-form__error" role="alert">{error}</p>}
-        <Button type="submit" tone="primary" disabled={busy}>{translate('unlock.totpUnlock')}</Button>
-      </form>}
-      {biometricAvailable && biometricEnabled && <Button tone="quiet" className="react-gate__center" onClick={() => setFallback(!fallback)}>{fallback ? translate('unlock.useBiometric') : translate('unlock.useTotp')}</Button>}
-      <Button tone="quiet" className="react-gate__center" onClick={() => navigate('/recover')}>{translate('unlock.recoverAccess')}</Button>
-    </>}
-    {error && biometricAvailable && biometricEnabled && !fallback && <p className="react-form__error" role="alert">{error}</p>}
+    <p className="react-gate__description">{biometricLoaded && biometricAvailable && biometricEnabled && !fallback ? translate('unlock.biometricHint') : translate('unlock.totpHint')}</p>
+    <div className="react-gate__unlock-method" aria-busy={!biometricLoaded || biometricBusy || busy}>
+      {!biometricLoaded ? <p className="react-gate__method-status" role="status">{translate('unlock.checkingBiometric')}</p> : <>
+        {biometricEnabled && !biometricAvailable && <p className="react-form__warning" role="status">{translate('unlock.biometricUnavailable')}</p>}
+        {biometricAvailable && biometricEnabled && !fallback
+          ? <Button className="react-gate__wide" tone="primary" icon={<Fingerprint size={16} />} onClick={() => void unlockBiometric()} disabled={biometricBusy}>{biometricKind === 'touchId' ? translate('unlock.touchId') : translate('unlock.windowsHello')}</Button>
+          : <form className="react-form" onSubmit={(event) => void submit(event)}>
+            <TextField label={translate('unlock.tokenCode')} inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={busy} />
+            {error && <p className="react-form__error" role="alert">{error}</p>}
+            <Button type="submit" tone="primary" disabled={busy}>{translate('unlock.totpUnlock')}</Button>
+          </form>}
+      </>}
+    </div>
+    {biometricLoaded && biometricAvailable && biometricEnabled && <Button tone="quiet" className="react-gate__center react-gate__method-switch" onClick={() => { setFallback(!fallback); setError('') }}>{fallback ? translate('unlock.useBiometric') : translate('unlock.useTotp')}</Button>}
+    <Button tone="quiet" className="react-gate__center react-gate__recovery-link" onClick={() => navigate('/recover')}>{translate('unlock.recoverAccess')}</Button>
   </GateFrame>
 }
 
@@ -357,11 +360,11 @@ export function BindPage() {
   </GateFrame>
 }
 
-function GateFrame({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
+function GateFrame({ eyebrow, children, showSteps = true }: { eyebrow: string; children: ReactNode; showSteps?: boolean }) {
   const { translate } = useDesktopLocale()
   return <main className="react-gate-layout">
     <aside className="react-gate-aside">
-      <div className="react-gate__brand"><span className="react-gate__mark" aria-hidden="true">B</span><span>BearPassword</span></div>
+      <div className="react-gate__brand"><img src={logoUrl} alt="" /><span>PPWD</span></div>
       <div className="react-gate__message">
         <h2>{translate('unlock.assuranceTitle')}</h2>
         <p>{translate('unlock.assuranceBody')}</p>
@@ -369,8 +372,8 @@ function GateFrame({ eyebrow, children }: { eyebrow: string; children: ReactNode
       <p className="react-gate-layout__note"><ShieldCheck size={14} />{translate('unlock.assuranceFoot')}</p>
     </aside>
     <section className="react-gate-main">
-      <div className="react-gate" aria-busy="false">
-        <div className="react-gate__steps" aria-hidden="true"><i /><i className="is-complete" /><i /></div>
+      <div className="react-gate">
+        {showSteps && <div className="react-gate__steps" aria-hidden="true"><i /><i className="is-complete" /><i /></div>}
         <p className="react-eyebrow">{eyebrow}</p>
         {children}
       </div>

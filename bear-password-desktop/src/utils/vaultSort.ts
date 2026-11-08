@@ -119,6 +119,7 @@ export function sortEntries(
   getTitle: (entry: PasswordEntry) => string
 ): PasswordEntry[] {
   const copied = [...list]
+  const recentAccess = sort.field === 'recent' ? loadRecentAccessMap() : null
   copied.sort((a, b) => {
     switch (sort.field) {
       case 'title':
@@ -128,7 +129,11 @@ export function sortEntries(
       case 'updateTime':
         return compareNumbers(getDateValue(a, 'updateTime'), getDateValue(b, 'updateTime'), sort.order)
       case 'recent':
-        return compareNumbers(getRecentAccessTime(a.id), getRecentAccessTime(b.id), sort.order)
+        return compareNumbers(
+          recentAccess?.[toVaultEntryId(a.id)] ?? 0,
+          recentAccess?.[toVaultEntryId(b.id)] ?? 0,
+          sort.order
+        )
       default:
         return 0
     }

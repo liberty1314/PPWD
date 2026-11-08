@@ -2,7 +2,7 @@
 
 ## 项目结构与模块组织
 
-本仓库是 BearPassword monorepo。`bear-password-server/` 是 Java 17 + Spring Boot 3 后端，源码在 `src/main/java`，测试在 `src/test/java`，数据库初始化脚本在 `sql/init.sql`。`bear-password-web/` 是 Vue 3/Vite 网页端，`bear-password-desktop/` 是 Electron + Vue 桌面端，二者共享相近的 `src/api`、`src/components`、`src/stores`、`src/utils` 结构。`bear-password-extension/` 是浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup`。`bear-password-index/` 是官网静态页面，截图资源在 `assets/screenshots/`。
+本仓库是 PPWD monorepo。`bear-password-server/` 是 Java 17 + Spring Boot 3 后端，源码在 `src/main/java`，测试在 `src/test/java`，数据库初始化脚本在 `sql/init.sql`。`bear-password-web/` 是 Vue 3/Vite 网页端，`bear-password-desktop/` 是 Electron + Vue 桌面端，二者共享相近的 `src/api`、`src/components`、`src/stores`、`src/utils` 结构。`bear-password-extension/` 是浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup`。`bear-password-index/` 是官网静态页面，截图资源在 `assets/screenshots/`。
 
 ## 构建、测试与开发命令
 

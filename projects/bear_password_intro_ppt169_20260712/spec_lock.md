@@ -6,7 +6,7 @@
 
 ## mode
 - mode: custom
-- mode_behavior: problem-solution product story; each page starts from a concrete pain or use moment, then resolves it through BearPassword capabilities; titles are benefit-led, not feature inventory labels.
+- mode_behavior: problem-solution product story; each page starts from a concrete pain or use moment, then resolves it through PPWD capabilities; titles are benefit-led, not feature inventory labels.
 
 ## visual_style
 - visual_style: soft-rounded

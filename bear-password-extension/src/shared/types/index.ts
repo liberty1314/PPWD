@@ -1,3 +1,5 @@
+import type { ThemePreferences } from '../../../../shared/ui/themeTypes'
+
 /** API 通用类型 */
 export interface ApiResponse<T = unknown> {
   code: number
@@ -149,6 +151,7 @@ export interface DesktopConnectionState {
   locked: boolean
   username: string | null
   themePreference: string | null
+  themePreferences?: ThemePreferences
   localePreference: string | null
 }
 
@@ -218,5 +221,6 @@ export interface MatchingCredentialsResult {
   /** 桌面端桥接是否可用（用于 content 同步主题/语言） */
   desktopReady?: boolean
   themePreference?: string | null
+  themePreferences?: ThemePreferences
   localePreference?: string | null
 }

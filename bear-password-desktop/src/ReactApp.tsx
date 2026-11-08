@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { HashRouter, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Activity, Clock3, Home, KeyRound, Minimize2, Settings2, ShieldCheck, Square, Star, X } from 'lucide-react'
 import type { TrayRendererCommand } from '../shared/trayMenu'
@@ -17,7 +17,7 @@ import { SetupPage, UnlockPage, RecoverPage, BindPage } from './ReactAuthPages'
 import { SettingsPage } from './ReactSettingsPage'
 import { useDesktopLocale } from './ui/useDesktopLocale'
 import { resolveReactGateRoute } from './utils/reactGateRules'
-import logoUrl from './assets/logo.svg'
+import logoUrl from './assets/logo.png'
 import './reactApp.css'
 
 function IslandPage() {
@@ -50,7 +50,7 @@ function GateRouter() {
     }
   }, [session.initialized, session.hasLocalVault, session.hasBinding, session.hasVaultAccess, location.pathname, location.search, navigate])
 
-  if (!session.initialized) return <main className="react-gate-loading" role="status">BearPassword</main>
+  if (!session.initialized) return <main className="react-gate-loading" role="status">PPWD</main>
 
   return <Routes>
     <Route path="/setup" element={<SetupPage />} />
@@ -65,7 +65,12 @@ function ReactShellRoutes() {
   const [isMac, setIsMac] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const workspaceRef = useRef<HTMLDivElement>(null)
   const { translate } = useDesktopLocale()
+
+  useEffect(() => {
+    workspaceRef.current?.scrollTo({ top: 0 })
+  }, [location.pathname])
 
   useEffect(() => {
     void useReactThemeStore.getState().initialize()
@@ -79,8 +84,6 @@ function ReactShellRoutes() {
       if (command.action === 'lock') {
         const auth = useAuthStore()
         if (auth.isLoggedIn && !useSecurityStore().isMigrating) useAutoLockStore().lock()
-      } else if (command.action === 'set-theme') {
-        useReactThemeStore.getState().setPreference('appearanceMode', command.value === 'system' ? 'system' : ['dark', 'midnight', 'noir'].includes(command.value) ? 'dark' : 'light')
       } else if (command.action === 'quick-search') {
         navigate('/vault?focus=1')
       }
@@ -107,11 +110,11 @@ function ReactShellRoutes() {
   if (location.pathname === '/island') return <IslandPage />
   return <div className="react-shell">
     <header className={`react-titlebar bp-glass ${isMac ? 'react-titlebar--mac' : ''}`} aria-label={translate('window.controls')}>
-      <span className="react-titlebar__drag">BearPassword</span>
+      <span className="react-titlebar__drag">PPWD</span>
       {!isMac && <div className="react-titlebar__controls"><button type="button" aria-label={translate('window.minimize')} title={translate('window.minimize')} onClick={() => desktopThemeAdapter.minimize()}><Minimize2 size={13} /></button><button type="button" aria-label={translate('window.maximize')} title={translate('window.maximize')} onClick={() => desktopThemeAdapter.maximize()}><Square size={12} /></button><button type="button" aria-label={translate('window.close')} title={translate('window.close')} onClick={() => desktopThemeAdapter.close()}><X size={14} /></button></div>}
     </header>
     <aside className="react-sidebar bp-glass">
-      <div className="react-brand"><img src={logoUrl} alt="" /><span>BearPassword</span><small>{translate('unlock.localVault')}</small></div>
+      <div className="react-brand"><img src={logoUrl} alt="" /><span>PPWD</span><small>{translate('unlock.localVault')}</small></div>
       <nav aria-label={translate('app.navigation')}>
         <NavLink to="/" end title={translate('nav.dashboard')}><Home size={16} />{translate('nav.dashboard')}</NavLink>
         <NavLink to="/vault" title={translate('nav.vault')}><KeyRound size={16} />{translate('nav.vault')}</NavLink>
@@ -122,7 +125,7 @@ function ReactShellRoutes() {
       </nav>
       <div className="react-sidebar__status"><span className="react-status-dot" />{translate('dashboard.vaultProtected')}</div>
     </aside>
-    <div className="react-workspace"><Routes><Route path="/" element={<ReactDashboardPage />} /><Route path="/vault" element={<ReactVaultWorkspace mode="vault" />} /><Route path="/favorites" element={<ReactVaultWorkspace mode="favorites" />} /><Route path="/recent" element={<ReactVaultWorkspace mode="recent" />} /><Route path="/security" element={<ReactSecurityCenterPage />} /><Route path="/settings/:section" element={<SettingsPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<ReactDashboardPage />} /></Routes></div>
+    <div ref={workspaceRef} className={`react-workspace ${['/vault', '/favorites', '/recent'].includes(location.pathname) ? 'react-workspace--vault' : ''}`}><Routes><Route path="/" element={<ReactDashboardPage />} /><Route path="/vault" element={<ReactVaultWorkspace mode="vault" />} /><Route path="/favorites" element={<ReactVaultWorkspace mode="favorites" />} /><Route path="/recent" element={<ReactVaultWorkspace mode="recent" />} /><Route path="/security" element={<ReactSecurityCenterPage />} /><Route path="/settings/:section" element={<SettingsPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<ReactDashboardPage />} /></Routes></div>
   </div>
 }
 

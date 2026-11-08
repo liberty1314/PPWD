@@ -3,6 +3,21 @@ import { isEncryptedContent } from '@/utils/contentCrypto'
 import { resolveEntryTitle } from '@/utils/passwordTitle'
 import { resolveEntryType } from '@/utils/vaultEntryDisplay'
 
+const SENSITIVE_SEARCH_KEY = /password|secret|token|otp|authenticator|cvv|card.?number|id.?number|private.?key|recovery|pin|one.?time.?code|verification.?code/i
+const SENSITIVE_FIELD_LABEL = /password|secret|token|otp|authenticator|cvv|card.?number|id.?number|private.?key|recovery|pin|one.?time.?code|verification.?code|密码|密钥|验证码|安全码|卡号|证件号/i
+
+function collectExtraFieldStrings(value: unknown, out: string[]): void {
+  if (!Array.isArray(value)) return
+  for (const field of value) {
+    if (!field || typeof field !== 'object') continue
+    const item = field as Record<string, unknown>
+    const label = typeof item.label === 'string' ? item.label.trim() : ''
+    if (label) out.push(label)
+    if (item.type === 'password' || item.type === 'authenticator' || SENSITIVE_FIELD_LABEL.test(label)) continue
+    collectStrings(item.value, out)
+  }
+}
+
 function collectStrings(value: unknown, out: string[]): void {
   if (value == null) return
   if (typeof value === 'string') {
@@ -15,13 +30,18 @@ function collectStrings(value: unknown, out: string[]): void {
     return
   }
   if (typeof value === 'object') {
-    for (const nested of Object.values(value as Record<string, unknown>)) {
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      if (SENSITIVE_SEARCH_KEY.test(key)) continue
+      if (key === 'extraFields' || key === 'fields') {
+        collectExtraFieldStrings(nested, out)
+        continue
+      }
       collectStrings(nested, out)
     }
   }
 }
 
-/** 本地关键词匹配（解密后的 title、标签、备注、content 等） */
+/** 本地关键词匹配；仅搜索非敏感字段，不检索密码、验证码和密钥。 */
 export function matchesVaultKeyword(entry: PasswordEntry, keyword: string): boolean {
   const query = keyword.trim().toLowerCase()
   if (!query) return true
