@@ -9,7 +9,6 @@ import { useStoreSnapshot } from './stores/reactiveStore'
 import { generatePhoneTokenRecoveryKey, generatePhoneTokenSecret, createPhoneTokenQrDataUrl } from './utils/phoneToken'
 import { isSixDigitTotp, validateSetupPassword } from './utils/reactGateRules'
 import { Button, TextField } from './ui/primitives'
-import logoUrl from './assets/logo.svg'
 
 type ErrorReason = 'invalid' | 'locked' | 'unavailable' | 'unbound'
 
@@ -359,5 +358,22 @@ export function BindPage() {
 }
 
 function GateFrame({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
-  return <main className="react-gate-layout"><section className="react-gate bp-glass" aria-busy="false"><div className="react-gate__brand"><img src={logoUrl} alt="" /><span>BearPassword</span></div><p className="react-eyebrow">{eyebrow}</p>{children}</section><p className="react-gate-layout__note"><ShieldCheck size={14} />BearPassword</p></main>
+  const { translate } = useDesktopLocale()
+  return <main className="react-gate-layout">
+    <aside className="react-gate-aside">
+      <div className="react-gate__brand"><span className="react-gate__mark" aria-hidden="true">B</span><span>BearPassword</span></div>
+      <div className="react-gate__message">
+        <h2>{translate('unlock.assuranceTitle')}</h2>
+        <p>{translate('unlock.assuranceBody')}</p>
+      </div>
+      <p className="react-gate-layout__note"><ShieldCheck size={14} />{translate('unlock.assuranceFoot')}</p>
+    </aside>
+    <section className="react-gate-main">
+      <div className="react-gate" aria-busy="false">
+        <div className="react-gate__steps" aria-hidden="true"><i /><i className="is-complete" /><i /></div>
+        <p className="react-eyebrow">{eyebrow}</p>
+        {children}
+      </div>
+    </section>
+  </main>
 }

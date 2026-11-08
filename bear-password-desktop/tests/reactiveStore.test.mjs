@@ -1,6 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { computed, createStateStore, ref } from '../src/stores/reactiveStore.ts'
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import { computed, createStateStore, ref, useStoreSnapshot } from '../src/stores/reactiveStore.ts'
 
 test('framework-neutral stores expose unwrapped state and notify subscribers', () => {
   const useCounter = createStateStore(() => {
@@ -26,4 +28,20 @@ test('framework-neutral stores expose unwrapped state and notify subscribers', (
   counter.count = 3
   assert.equal(counter.doubled, 6)
   assert.equal(notifications, 1)
+})
+
+test('useStoreSnapshot returns the subscribable store instance', () => {
+  const useCounter = createStateStore(() => ({ count: ref(1) }))
+  let snapshot
+
+  function Probe() {
+    snapshot = useStoreSnapshot(useCounter)
+    return React.createElement('span')
+  }
+
+  renderToString(React.createElement(Probe))
+
+  assert.equal(snapshot, useCounter())
+  assert.equal(typeof snapshot.subscribe, 'function')
+  assert.equal(snapshot.count, 1)
 })

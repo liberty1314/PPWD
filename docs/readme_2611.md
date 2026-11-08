@@ -879,3 +879,31 @@
     - shared/ui/themeMigration.ts
     - shared/ui/themeTypes.ts
     - shared/ui/tokens.css
+
+[2026-11-08 12:55] feat(ui): 完善桌面认证界面并补齐发布验收记录
+  - Body: 调整桌面认证页和密码库/窗口栏的样式，补充设置标签导航并更新 React Router 依赖。补齐 TASK-UIR-09 自动化结果、真人验收清单及发布回滚文档，明确当前发布门禁为 HOLD。
+  - Files:
+    - bear-password-desktop/README.md
+    - bear-password-desktop/package.json
+    - bear-password-desktop/pnpm-lock.yaml
+    - bear-password-desktop/src/ReactApp.tsx
+    - bear-password-desktop/src/ReactAuthPages.tsx
+    - bear-password-desktop/src/ReactVaultWorkspace.tsx
+    - bear-password-desktop/src/locales/en.ts
+    - bear-password-desktop/src/locales/ja.ts
+    - bear-password-desktop/src/locales/zh-CN.ts
+    - bear-password-desktop/src/reactApp.css
+    - bear-password-desktop/src/reactVault.css
+    - bear-password-desktop/src/stores/reactiveStore.ts
+    - bear-password-desktop/tests/reactiveStore.test.mjs
+    - bear-password-extension/README.md
+    - bear-password-extension/package.json
+    - bear-password-extension/pnpm-lock.yaml
+    - bear-password-extension/pnpm-workspace.yaml
+    - docs/project/task-ui-refactor-09-development-report.md
+    - docs/project/task-ui-refactor-09-manual-acceptance.md
+    - docs/project/task-ui-refactor-09-release-readiness.md
+    - docs/project/ui-refactor-development-plan.md
+    - pnpm-lock.yaml
+    - shared/ui/tokens.css
+    - docs/readme_2611.md

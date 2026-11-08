@@ -51,6 +51,9 @@ const messages: MessageDict = {
   'nav.settings': 'Settings',
 
   'unlock.localVault': 'Local vault',
+  'unlock.assuranceTitle': 'Security starts here,\nunder your control.',
+  'unlock.assuranceBody': 'Your passwords are encrypted on this device. Vault contents are available only after verification.',
+  'unlock.assuranceFoot': 'AES-256 encrypted · Personal vault',
   'unlock.setup': 'Create vault',
   'unlock.saveRecovery': 'Save recovery key',
   'unlock.recoveryMaterials': 'Recovery material',

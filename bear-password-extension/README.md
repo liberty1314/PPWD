@@ -53,9 +53,11 @@
 
 **开发者本地加载：**
 
+**要求：** Node.js ≥ 20，pnpm
+
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 在浏览器打开 `chrome://extensions`，开启「开发者模式」，选择「加载已解压的扩展程序」，指向本项目的 `dist` 目录。
@@ -67,8 +69,8 @@ npm run dev
 ## 构建发布
 
 ```bash
-npm run build      # 生成 dist/
-npm run package    # 构建并打包为 zip
+pnpm run build      # 生成 dist/
+pnpm run package    # 构建并打包为 zip
 ```
 
 打包产物位于仓库根目录 `release/BearPassword-Extension.zip`。
@@ -88,7 +90,7 @@ npm run package    # 构建并打包为 zip
 
 ## 技术概要
 
-Manifest V3 · Vue 3 · TypeScript · Vite · CRXJS
+Manifest V3 · React · TypeScript · Vite · CRXJS
 
 ---
 

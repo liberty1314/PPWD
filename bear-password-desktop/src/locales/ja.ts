@@ -51,6 +51,9 @@ const messages: MessageDict = {
   'nav.settings': '設定',
 
   'unlock.localVault': 'ローカル保管庫',
+  'unlock.assuranceTitle': '安全はローカルから。\n管理するのはあなたです。',
+  'unlock.assuranceBody': 'パスワードはこの端末で暗号化して保存されます。認証後にのみ保管庫へアクセスできます。',
+  'unlock.assuranceFoot': 'AES-256 暗号化 · 個人用保管庫',
   'unlock.setup': '保管庫を作成',
   'unlock.saveRecovery': '復旧キーを保存',
   'unlock.recoveryMaterials': '復旧情報',

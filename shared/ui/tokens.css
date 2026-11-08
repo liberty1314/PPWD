@@ -87,10 +87,16 @@
 
 :root[data-theme-design='liquid'] {
   --bp-shadow: 0 10px 30px rgb(24 32 34 / 9%);
+  --bp-glass-surface: #eef2f5;
+  --bp-glass-border: rgb(255 255 255 / 88%);
+  --bp-glass-highlight: inset 0 1px 0 rgb(255 255 255 / 82%);
 }
 
 :root[data-theme-design='liquid'][data-appearance='dark'] {
   --bp-shadow: 0 12px 32px rgb(0 0 0 / 30%);
+  --bp-glass-surface: #293033;
+  --bp-glass-border: rgb(255 255 255 / 12%);
+  --bp-glass-highlight: inset 0 1px 0 rgb(255 255 255 / 10%);
 }
 
 :root[data-accent='teal'] { --bp-accent: #268c8a; --bp-accent-soft: #e4f3f1; }
@@ -127,26 +133,29 @@ button { color: inherit; }
 .bp-sensitive { background: var(--bp-sensitive-surface); }
 
 .bp-glass {
-  background: var(--bp-surface);
-  border: 1px solid var(--bp-border);
+  background: var(--bp-glass-surface, var(--bp-surface));
+  border: 1px solid var(--bp-glass-border, var(--bp-border));
+  box-shadow: var(--bp-glass-highlight, none);
 }
 
 @supports (backdrop-filter: blur(14px)) {
-  @media (prefers-reduced-transparency: no-preference) {
   :root[data-theme-design='liquid'] .bp-glass {
     background: rgb(255 255 255 / 82%);
+    -webkit-backdrop-filter: blur(16px) saturate(1.12);
     backdrop-filter: blur(16px) saturate(1.12);
   }
 
   :root[data-theme-design='liquid'][data-appearance='dark'] .bp-glass {
     background: rgb(34 40 42 / 84%);
   }
-  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   :root[data-theme-design='liquid'] .bp-glass {
-    background: var(--bp-surface-raised);
+    background: var(--bp-glass-surface);
+    border-color: var(--bp-glass-border);
+    box-shadow: var(--bp-glass-highlight);
+    -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }

@@ -51,6 +51,9 @@ const messages: MessageDict = {
   'nav.settings': '设置',
 
   'unlock.localVault': '本机保险库',
+  'unlock.assuranceTitle': '安全始于本地，\n由你掌握。',
+  'unlock.assuranceBody': '你的密码在设备上加密保存。只有通过验证后，才能访问保险库内容。',
+  'unlock.assuranceFoot': 'AES-256 加密保护 · 个人保险库',
   'unlock.setup': '创建保险库',
   'unlock.saveRecovery': '保存恢复密钥',
   'unlock.recoveryMaterials': '恢复材料',

@@ -55,7 +55,7 @@
 
 ## 从源码运行（开发者）
 
-**要求：** Node.js ≥ 18，pnpm
+**要求：** Node.js ≥ 20，pnpm
 
 ```bash
 pnpm install
@@ -72,7 +72,7 @@ pnpm run typecheck    # 类型检查
 
 ## 技术概要
 
-Electron · Vue 3 · TypeScript · Pinia · Element Plus · Vite
+Electron · React · TypeScript · Zustand · Radix UI · Vite
 
 ---
 

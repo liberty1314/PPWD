@@ -106,7 +106,7 @@ function ReactShellRoutes() {
 
   if (location.pathname === '/island') return <IslandPage />
   return <div className="react-shell">
-    <header className={`react-titlebar ${isMac ? 'react-titlebar--mac' : ''}`} aria-label={translate('window.controls')}>
+    <header className={`react-titlebar bp-glass ${isMac ? 'react-titlebar--mac' : ''}`} aria-label={translate('window.controls')}>
       <span className="react-titlebar__drag">BearPassword</span>
       {!isMac && <div className="react-titlebar__controls"><button type="button" aria-label={translate('window.minimize')} title={translate('window.minimize')} onClick={() => desktopThemeAdapter.minimize()}><Minimize2 size={13} /></button><button type="button" aria-label={translate('window.maximize')} title={translate('window.maximize')} onClick={() => desktopThemeAdapter.maximize()}><Square size={12} /></button><button type="button" aria-label={translate('window.close')} title={translate('window.close')} onClick={() => desktopThemeAdapter.close()}><X size={14} /></button></div>}
     </header>

@@ -77,5 +77,6 @@ export function createStateStore<T extends Record<string, unknown>>(
 
 export function useStoreSnapshot<T extends StoreGeneric>(store: () => T): T {
   const instance = store()
-  return useSyncExternalStore(instance.subscribe, () => instance.version, () => instance.version) as unknown as T
+  useSyncExternalStore(instance.subscribe, () => instance.version, () => instance.version)
+  return instance
 }
