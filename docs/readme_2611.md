@@ -676,3 +676,35 @@
     - docs/prototypes/bearpassword-vault-concept.html
     - docs/prototypes/bearpassword-vault-concept.png
     - docs/readme_2611.md
+[2026-11-08 10:58] docs(ui): 完善桌面端全页面原型与 React 改版计划
+  Body: 扩展桌面端全页面交互原型及场景预览，补充 React UI 重构的范围、阶段、依赖与验收要求，明确保留本地保险库和扩展安全边界。
+  Files:
+    - docs/design-proposal.md
+    - docs/project/ui-refactor-development-plan.md
+    - docs/prototypes/all-pages.html
+    - docs/prototypes/all-pages/backup.png
+    - docs/prototypes/all-pages/batch.png
+    - docs/prototypes/all-pages/bind.png
+    - docs/prototypes/all-pages/create-login.png
+    - docs/prototypes/all-pages/create-type.png
+    - docs/prototypes/all-pages/dashboard.png
+    - docs/prototypes/all-pages/delete-confirm.png
+    - docs/prototypes/all-pages/empty.png
+    - docs/prototypes/all-pages/error.png
+    - docs/prototypes/all-pages/favorites.png
+    - docs/prototypes/all-pages/first-run.png
+    - docs/prototypes/all-pages/island.png
+    - docs/prototypes/all-pages/loading.png
+    - docs/prototypes/all-pages/narrow.png
+    - docs/prototypes/all-pages/no-results.png
+    - docs/prototypes/all-pages/recent.png
+    - docs/prototypes/all-pages/recover.png
+    - docs/prototypes/all-pages/security-center.png
+    - docs/prototypes/all-pages/settings-appearance.png
+    - docs/prototypes/all-pages/settings-general.png
+    - docs/prototypes/all-pages/settings-security.png
+    - docs/prototypes/all-pages/settings-shortcuts.png
+    - docs/prototypes/all-pages/setup.png
+    - docs/prototypes/all-pages/unlock.png
+    - docs/prototypes/all-pages/vault.png
+    - docs/readme_2611.md
