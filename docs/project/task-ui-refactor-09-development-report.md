@@ -21,15 +21,15 @@ ego lite 中 BearPassword `26.9.9` 扩展已启用。检查时 Service Worker �
 
 | 检查 | 命令/证据 | 结果 |
 | --- | --- | --- |
-| Desktop 类型检查和生产构建 | `cd bear-password-desktop && pnpm run typecheck && pnpm run build` | 通过；main、preload、renderer 均生成 |
+| Desktop 类型检查和生产构建 | `cd ppwd-desktop && pnpm run typecheck && pnpm run build` | 通过；main、preload、renderer 均生成 |
 | Desktop 纯逻辑/状态测试 | `pnpm run test:phone-token`、`pnpm run test:encrypted-backup`、`pnpm run test:theme-migration`、`pnpm run test:reactive-store` | 17 项通过，0 失败 |
-| Extension 类型检查、生产构建和打包 | `cd bear-password-extension && pnpm run typecheck && pnpm run package` | 通过 |
+| Extension 类型检查、生产构建和打包 | `cd ppwd-extension && pnpm run typecheck && pnpm run package` | 通过 |
 | Extension locale 测试 | `pnpm run test:locale` | 3 项通过，0 失败 |
 | E2E 自动化 | 搜索两端 package scripts 与源码中的 Playwright/Cypress/E2E runner | 未发现已配置的 E2E runner/命令；核心用户旅程仍需真人验收，自动化 E2E 是待补质量缺口 |
 | 根级扩展构建入口 | `pnpm run build:extension` | 通过；根脚本调用 pnpm 并生成扩展 ZIP |
 | Extension ZIP 归档 | `unzip -t release/BearPassword-Extension.zip`；归档清单 37 项（含目录） | 所列文件均通过压缩完整性检查；MV3 manifest、service worker、popup、wake 入口存在 |
-| Desktop 生产依赖审计 | `cd bear-password-desktop && pnpm audit --prod` | `No known vulnerabilities found` |
-| Extension 生产依赖审计 | `cd bear-password-extension && pnpm audit --prod` | `No known vulnerabilities found` |
+| Desktop 生产依赖审计 | `cd ppwd-desktop && pnpm audit --prod` | `No known vulnerabilities found` |
+| Extension 生产依赖审计 | `cd ppwd-extension && pnpm audit --prod` | `No known vulnerabilities found` |
 | 补丁空白检查 | `git diff --check` | 通过 |
 
 测试期间有 Node `MODULE_TYPELESS_PACKAGE_JSON` 性能提示；desktop renderer 有 `desktopThemeAdapter` 动态/静态导入提示；extension 构建有四个图标重复输出提示。均未导致本轮构建或测试失败，发布前仍应评估扩展图标重复输出的配置来源。
@@ -47,7 +47,7 @@ ego lite 中 BearPassword `26.9.9` 扩展已启用。检查时 Service Worker �
 使用独立下载缓存和 `/tmp` 输出目录执行当前 `26.9.9` desktop 构建：
 
 ```sh
-cd bear-password-desktop
+cd ppwd-desktop
 pnpm exec electron-builder --mac --publish never \
   --config.directories.output=/tmp/bearpassword-ui-refactor-09-mac-output \
   --config.electronDownload.cache=/tmp/bearpassword-ui-refactor-09-electron-cache

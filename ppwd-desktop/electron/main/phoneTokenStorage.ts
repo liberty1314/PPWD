@@ -43,7 +43,7 @@ interface PhoneTokenState {
 
 export type PhoneTokenResult =
   | { ok: true; vuk: string }
-  | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'unbound' | 'alreadyBound' | 'alreadyConfigured' | 'existingData' }
+  | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'stateUnavailable' | 'credentialUnavailable' | 'unbound' | 'alreadyBound' | 'alreadyConfigured' | 'existingData' }
 
 export interface PhoneTokenStatus {
   available: boolean
@@ -273,7 +273,7 @@ export async function unlockWithPhoneToken(
     try {
       state = readPhoneTokenState()
     } catch {
-      return { ok: false, reason: 'unavailable' }
+      return { ok: false, reason: 'stateUnavailable' }
     }
     if (!state.secret) return { ok: false, reason: 'unbound' }
     if (state.lockedUntil > now) return { ok: false, reason: 'locked' }
@@ -288,15 +288,19 @@ export async function unlockWithPhoneToken(
       if (!checked.ok) return failureResult(state, now)
 
       const value = await verifyCredential()
-      if (!value) return { ok: false, reason: 'unavailable' }
+      if (!value) return { ok: false, reason: 'credentialUnavailable' }
 
       state.lastAcceptedStep = checked.acceptedStep
       Object.assign(state, resetPhoneTokenFailureState())
-      writePhoneTokenState(state)
+      try {
+        writePhoneTokenState(state)
+      } catch {
+        return { ok: false, reason: 'stateUnavailable' }
+      }
       tokenVerifiedThisSession = true
       return { ok: true, vuk: value.toString('base64') }
     } catch {
-      return { ok: false, reason: 'unavailable' }
+      return { ok: false, reason: 'stateUnavailable' }
     }
   })
 }
@@ -417,7 +421,7 @@ export async function rebindPhoneToken(
 export async function recoverPhoneToken(
   masterPassword: string,
   recoveryKey: string
-): Promise<{ ok: true } | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' }> {
+): Promise<{ ok: true } | { ok: false; reason: 'invalid' | 'locked' | 'unavailable' | 'stateUnavailable' | 'vaultConfigUnavailable' }> {
   return enqueue(async () => {
     const now = Date.now()
     if (!currentAvailability()) return { ok: false, reason: 'unavailable' }
@@ -425,13 +429,18 @@ export async function recoverPhoneToken(
     try {
       state = readPhoneTokenState()
     } catch {
-      return { ok: false, reason: 'unavailable' }
+      return { ok: false, reason: 'stateUnavailable' }
     }
     if (state.lockedUntil > now) return { ok: false, reason: 'locked' }
 
     try {
-      const meta = loadStoredLocalVaultCrypto()
-      if (!meta) return { ok: false, reason: 'unavailable' }
+      let meta: LocalVaultCryptoMeta | null
+      try {
+        meta = loadStoredLocalVaultCrypto()
+      } catch {
+        return { ok: false, reason: 'vaultConfigUnavailable' }
+      }
+      if (!meta) return { ok: false, reason: 'vaultConfigUnavailable' }
       const vuk = await verifyPasswordAndRecoverKey(masterPassword, recoveryKey, meta)
       if (!vuk) {
         const failure = failureResult(state, now)
@@ -440,13 +449,17 @@ export async function recoverPhoneToken(
       state.failedAttempts = 0
       state.lockedUntil = 0
       state.secret = null
-      writePhoneTokenState(state)
+      try {
+        writePhoneTokenState(state)
+      } catch {
+        return { ok: false, reason: 'stateUnavailable' }
+      }
       tokenVerifiedThisSession = false
       recoveryKeyReadAuthorized = false
       writeAuditEvent('phone_token_recovery_started')
       return { ok: true }
     } catch {
-      return { ok: false, reason: 'unavailable' }
+      return { ok: false, reason: 'vaultConfigUnavailable' }
     }
   })
 }

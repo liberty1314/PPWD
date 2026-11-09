@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="bear-password-desktop/src/assets/logo.png" alt="PPWD" width="96" height="96" />
+  <img src="ppwd-desktop/src/assets/logo.png" alt="PPWD" width="96" height="96" />
 </p>
 
 <h1 align="center">PPWD 本地版</h1>
@@ -23,7 +23,7 @@
 安装桌面端依赖并启动开发模式：
 
 ```bash
-cd bear-password-desktop
+cd ppwd-desktop
 pnpm install
 pnpm run dev
 ```
@@ -31,7 +31,7 @@ pnpm run dev
 安装扩展依赖并启动开发模式：
 
 ```bash
-cd bear-password-extension
+cd ppwd-extension
 pnpm install
 pnpm run dev
 ```
@@ -50,7 +50,7 @@ pnpm run build:extension
 桌面端开发检查：
 
 ```bash
-cd bear-password-desktop
+cd ppwd-desktop
 pnpm run typecheck
 pnpm run build
 ```

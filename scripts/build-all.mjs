@@ -22,8 +22,8 @@ import { releaseDir } from './release-dir.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
-const desktopDir = join(root, 'bear-password-desktop')
-const extensionDir = join(root, 'bear-password-extension')
+const desktopDir = join(root, 'ppwd-desktop')
+const extensionDir = join(root, 'ppwd-extension')
 
 const RELEASE_ARTIFACTS = [
   'PPWD.dmg',

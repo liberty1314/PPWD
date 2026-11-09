@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../bear-password-desktop/src/assets/logo.svg" alt="PPWD" width="80" height="80" />
+  <img src="../ppwd-desktop/src/assets/logo.svg" alt="PPWD" width="80" height="80" />
 </p>
 
 <h1 align="center">PPWD 服务端</h1>

@@ -58,9 +58,9 @@ supersedes: []
 
 ## 证据与追溯
 
-- T20：`bear-password-desktop/src/utils/phoneToken.ts`、`bear-password-desktop/tests/phoneToken.test.mjs`。
-- T21：`bear-password-desktop/electron/main/phoneTokenStorage.ts`、`bear-password-desktop/electron/main/recoveryKeyStorage.ts`、`bear-password-desktop/electron/main/localVaultCryptoStorage.ts`。
-- T22–T26：`bear-password-desktop/src/views/unlock/`、`bear-password-desktop/src/stores/auth.ts`、`bear-password-desktop/src/stores/security.ts`、`bear-password-desktop/electron/main/phoneTokenIpc.ts`。
+- T20：`ppwd-desktop/src/utils/phoneToken.ts`、`ppwd-desktop/tests/phoneToken.test.mjs`。
+- T21：`ppwd-desktop/electron/main/phoneTokenStorage.ts`、`ppwd-desktop/electron/main/recoveryKeyStorage.ts`、`ppwd-desktop/electron/main/localVaultCryptoStorage.ts`。
+- T22–T26：`ppwd-desktop/src/views/unlock/`、`ppwd-desktop/src/stores/auth.ts`、`ppwd-desktop/src/stores/security.ts`、`ppwd-desktop/electron/main/phoneTokenIpc.ts`。
 - 测试结论与命令：`docs/project/test-report-m2.md`。
 - 链路：`REQ-M2-001` → `UX-M2-001` / `TECH-M2-001` → `TASK-M2-001` → `TEST-M2-002` / `TEST-MANUAL-M2-001`。
 

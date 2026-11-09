@@ -12,7 +12,7 @@ const logoPngPath = join(root, '..', 'docs', 'img', 'logo.png')
 const traySvgPath = join(resourcesDir, 'tray-icon.svg')
 const publicDir = join(root, 'public')
 const desktopLogoPath = join(root, 'src', 'assets', 'logo.png')
-const extensionIconsDir = join(root, '..', 'bear-password-extension', 'public', 'icons')
+const extensionIconsDir = join(root, '..', 'ppwd-extension', 'public', 'icons')
 
 const sourcePngBuffer = await sharp(logoPngPath).resize(1024, 1024).png().toBuffer()
 const roundedMask = Buffer.from(

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, nativeTheme, shell } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { writeFile } from 'fs/promises'
-import { existsSync } from 'fs'
+import { existsSync, renameSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { basename, join } from 'path'
 import {
@@ -50,12 +50,14 @@ import { registerPhoneTokenIpc } from './phoneTokenIpc'
 import { deriveVerifiedVaultUnlockKey, isPhoneTokenSessionVerified } from './phoneTokenStorage'
 import { saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
 
-/**
- * 保持旧版 userData 目录，改产品显示名时不能让已有用户看到一个空保险库。
- * macOS: ~/Library/Application Support/BearPassword；Windows: %APPDATA%/BearPassword。
- */
 app.setName('PPWD')
-app.setPath('userData', join(app.getPath('appData'), 'BearPassword'))
+const appDataPath = app.getPath('appData')
+const currentUserDataPath = join(appDataPath, 'PPWD')
+const legacyUserDataPath = join(appDataPath, 'BearPassword')
+if (!existsSync(currentUserDataPath) && existsSync(legacyUserDataPath)) {
+  renameSync(legacyUserDataPath, currentUserDataPath)
+}
+app.setPath('userData', currentUserDataPath)
 
 const DESKTOP_WAKE_PROTOCOLS = ['ppwd', 'bearpassword'] as const
 let pendingWakeUrl: string | null = null

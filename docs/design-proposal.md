@@ -37,7 +37,7 @@
 
 ## 前端 React 迁移方案
 
-- **迁移范围**：桌面端 `bear-password-desktop` renderer 和浏览器扩展 `bear-password-extension` popup 一并迁移到 React。Electron main、preload、IPC 通道、本地保险库与加密逻辑、扩展 manifest、background、content scripts 和扩展通信契约保持原有职责与边界。
+- **迁移范围**：桌面端 `ppwd-desktop` renderer 和浏览器扩展 `ppwd-extension` popup 一并迁移到 React。Electron main、preload、IPC 通道、本地保险库与加密逻辑、扩展 manifest、background、content scripts 和扩展通信契约保持原有职责与边界。
 - **目标技术栈**：React、TypeScript、Vite（桌面端继续由 electron-vite 管理 main/preload/renderer 构建）、React Router、Zustand、Tailwind CSS、Radix UI/shadcn。扩展继续使用 `@crxjs/vite-plugin`，替换 Vue 插件为 React 插件。图标统一使用 `lucide-react`；复杂表单采用 React Hook Form 与 Zod，前提是评估后确认与现有校验规则兼容。
 - **保留和重用**：优先保留与框架无关的 Electron IPC 类型/契约、加密工具、数据适配、文件格式、manifest、background/content scripts、常量、国际化词条和业务规则。桌面与 popup 的 Vue 单文件组件、Pinia store、Vue composable、Element Plus 组件和依赖 Vue 响应式的代码需要逐步替换。
 - **状态边界**：Zustand 只管理 UI 与应用偏好状态；敏感保险库数据仍遵循现有锁定生命周期和加密边界，不为迁移而长期缓存明文密码。Electron API 继续只通过 preload 暴露的窄接口调用，React 组件不得直接导入 Electron 模块或访问 Node API。扩展 background/content script 不挂载 React，不将 React runtime 注入网页。

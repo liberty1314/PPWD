@@ -11,10 +11,13 @@ import { isSixDigitTotp, validateSetupPassword } from './utils/reactGateRules'
 import { Button, TextField } from './ui/primitives'
 import logoUrl from './assets/logo.png'
 
-type ErrorReason = 'invalid' | 'locked' | 'unavailable' | 'unbound'
+type ErrorReason = 'invalid' | 'locked' | 'unavailable' | 'stateUnavailable' | 'credentialUnavailable' | 'vaultConfigUnavailable' | 'unbound'
 
 function verificationError(reason: ErrorReason | 'alreadyBound', translate: (key: string) => string): string {
   if (reason === 'unavailable') return translate('unlock.storageUnavailable')
+  if (reason === 'stateUnavailable') return translate('unlock.stateUnavailable')
+  if (reason === 'credentialUnavailable') return translate('unlock.credentialUnavailable')
+  if (reason === 'vaultConfigUnavailable') return translate('unlock.vaultConfigUnavailable')
   if (reason === 'locked') return translate('unlock.tooManyAttempts')
   if (reason === 'unbound') return translate('unlock.verificationFailed')
   if (reason === 'alreadyBound') return translate('unlock.verificationFailed')
@@ -117,12 +120,29 @@ export function SetupPage() {
     }
   }
 
+  async function regenerateRecoveryKey(): Promise<void> {
+    if (busy) return
+    setBusy(true)
+    setError('')
+    try {
+      const nextKey = generatePhoneTokenRecoveryKey()
+      const nextFingerprint = await desktopAuthAdapter.fingerprintRecoveryKey(nextKey)
+      setRecoveryKey(nextKey)
+      setFingerprint(nextFingerprint)
+      setSaved(false)
+    } catch {
+      setError(translate('unlock.setup.createFailed'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <GateFrame eyebrow={translate(step === 'password' ? 'unlock.localVault' : 'unlock.recoveryMaterials')}>
       {step === 'password' ? <>
         <h1>{translate('unlock.setup')}</h1>
         <p className="react-gate__description">{translate('unlock.createHint')}</p>
-        <form className="react-form" onSubmit={(event) => void prepareRecovery(event)}>
+        <form className="react-form react-gate__form" onSubmit={(event) => void prepareRecovery(event)}>
           <TextField label={translate('unlock.masterPassword')} type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} />
           <TextField label={translate('unlock.confirmPassword')} type="password" autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} disabled={busy} />
           {error && <p className="react-form__error" role="alert">{error}</p>}
@@ -131,14 +151,16 @@ export function SetupPage() {
       </> : <>
         <h1>{translate('unlock.saveRecovery')}</h1>
         <p className="react-gate__description">{translate('unlock.recoveryOnceHint')}</p>
-        <label className="bp-field" htmlFor="setup-recovery-key"><span className="bp-field__label">{translate('unlock.recoveryKey')}</span><textarea id="setup-recovery-key" className="bp-input react-secret" value={recoveryKey} readOnly rows={4} /></label>
-        <p className="react-gate__fingerprint">{translate('unlock.fingerprint', { fingerprint })}</p>
-        <label className="react-check"><input type="checkbox" checked={saved} onChange={(event) => setSaved(event.target.checked)} /><span>{translate('unlock.recoverySaved')}</span></label>
-        <div className="react-gate__actions">
-          <Button icon={<Download size={15} />} onClick={() => void exportRecoveryKit()} disabled={busy}>{translate('unlock.exportKit')}</Button>
-          <Button tone="primary" icon={<Check size={15} />} onClick={() => void createVault()} disabled={busy || !saved}>{translate('unlock.createContinue')}</Button>
+        <div className="react-gate__recovery">
+          <label className="bp-field react-gate__key-field" htmlFor="setup-recovery-key"><span className="bp-field__label">{translate('unlock.recoveryKey')}</span><textarea id="setup-recovery-key" className="bp-input react-secret" value={recoveryKey} readOnly rows={4} /></label>
+          <p className="react-gate__fingerprint">{translate('unlock.fingerprint', { fingerprint })}</p>
+          <label className="react-check react-gate__recovery-confirm"><input type="checkbox" checked={saved} onChange={(event) => setSaved(event.target.checked)} /><span>{translate('unlock.recoverySaved')}</span></label>
+          <div className="react-gate__actions">
+            <Button icon={<Download size={15} />} onClick={() => void exportRecoveryKit()} disabled={busy}>{translate('unlock.exportKit')}</Button>
+            <Button tone="primary" icon={<Check size={15} />} onClick={() => void createVault()} disabled={busy || !saved}>{translate('unlock.createContinue')}</Button>
+          </div>
+          <Button className="react-gate__utility-action" tone="quiet" icon={<RefreshCw size={15} />} onClick={() => void regenerateRecoveryKey()} disabled={busy}>{translate('unlock.regenerate')}</Button>
         </div>
-        <Button tone="quiet" onClick={() => { setError(''); const nextKey = generatePhoneTokenRecoveryKey(); setRecoveryKey(nextKey); void desktopAuthAdapter.fingerprintRecoveryKey(nextKey).then(setFingerprint); setSaved(false) }} disabled={busy}>{translate('unlock.regenerate')}</Button>
         {error && <p className="react-form__error" role="alert">{error}</p>}
       </>}
       {!safeStorageAvailable && <p className="react-form__warning" role="status">{translate('unlock.safeStorageUnavailable')}</p>}
@@ -222,7 +244,7 @@ export function UnlockPage() {
     }
   }
 
-  return <GateFrame eyebrow={translate('unlock.localVault')} showSteps={false}>
+  return <GateFrame eyebrow={translate('unlock.localVault')}>
     <h1>{translate('unlock.title')}</h1>
     <p className="react-gate__description">{biometricLoaded && biometricAvailable && biometricEnabled && !fallback ? translate('unlock.biometricHint') : translate('unlock.totpHint')}</p>
     <div className="react-gate__unlock-method" aria-busy={!biometricLoaded || biometricBusy || busy}>
@@ -280,13 +302,13 @@ export function RecoverPage() {
   return <GateFrame eyebrow={translate('unlock.recoveryTitle')}>
     <h1>{translate('unlock.verifyRecovery')}</h1>
     <p className="react-gate__description">{translate('unlock.recoveryHint')}</p>
-    <form className="react-form" onSubmit={(event) => void submit(event)}>
+    <form className="react-form react-gate__form" onSubmit={(event) => void submit(event)}>
       <TextField label={translate('unlock.masterPassword')} type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} />
       <label className="bp-field" htmlFor="recovery-key"><span className="bp-field__label">{translate('unlock.recoveryKey')}</span><textarea id="recovery-key" className="bp-input react-secret" rows={3} autoComplete="off" value={recoveryKey} onChange={(event) => setRecoveryKey(event.target.value)} disabled={busy} /></label>
       {error && <p className="react-form__error" role="alert">{error}</p>}
       <Button type="submit" tone="primary" disabled={busy}>{translate('unlock.verifyRebind')}</Button>
     </form>
-    <Button tone="quiet" className="react-gate__center" icon={<ArrowLeft size={15} />} onClick={() => navigate('/unlock')}>{translate('unlock.backUnlock')}</Button>
+    <Button tone="quiet" className="react-gate__center react-gate__utility-action" icon={<ArrowLeft size={15} />} onClick={() => navigate('/unlock')}>{translate('unlock.backUnlock')}</Button>
   </GateFrame>
 }
 
@@ -348,19 +370,19 @@ export function BindPage() {
     <h1>{translate('unlock.bind')}</h1>
     <p className="react-gate__description">{translate('unlock.bindHint')}</p>
     {!storageAvailable && <p className="react-form__warning" role="alert">{translate('unlock.storageBindUnavailable')}</p>}
-    {qrData && <img className="react-gate__qr" src={qrData} alt={translate('unlock.bind')} />}
-    <label className="bp-field" htmlFor="manual-token-secret"><span className="bp-field__label">{translate('unlock.manualSecret')}</span><input id="manual-token-secret" className="bp-input react-secret" value={secret} readOnly /></label>
-    <form className="react-form" onSubmit={(event) => void submit(event)}>
+    {qrData && <div className="react-gate__qr-panel"><img className="react-gate__qr" src={qrData} alt={translate('unlock.bind')} /></div>}
+    <label className="bp-field react-gate__key-field" htmlFor="manual-token-secret"><span className="bp-field__label">{translate('unlock.manualSecret')}</span><input id="manual-token-secret" className="bp-input react-secret" value={secret} readOnly /></label>
+    <form className="react-form react-gate__form" onSubmit={(event) => void submit(event)}>
       <TextField label={translate('unlock.masterPassword')} type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} disabled={!storageAvailable || busy} />
       <TextField label={translate('unlock.tokenCode')} inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={!storageAvailable || busy} />
       {error && <p className="react-form__error" role="alert">{error}</p>}
       <Button type="submit" tone="primary" disabled={!storageAvailable || busy}>{translate('unlock.verifyBind')}</Button>
     </form>
-    {!isRebinding && <Button tone="quiet" className="react-gate__center" icon={<RefreshCw size={15} />} onClick={() => { setError(''); generate() }} disabled={busy}>{translate('unlock.regenerateSecret')}</Button>}
+    {!isRebinding && <Button tone="quiet" className="react-gate__center react-gate__utility-action" icon={<RefreshCw size={15} />} onClick={() => { setError(''); generate() }} disabled={busy}>{translate('unlock.regenerateSecret')}</Button>}
   </GateFrame>
 }
 
-function GateFrame({ eyebrow, children, showSteps = true }: { eyebrow: string; children: ReactNode; showSteps?: boolean }) {
+function GateFrame({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
   const { translate } = useDesktopLocale()
   return <main className="react-gate-layout">
     <aside className="react-gate-aside">
@@ -373,7 +395,6 @@ function GateFrame({ eyebrow, children, showSteps = true }: { eyebrow: string; c
     </aside>
     <section className="react-gate-main">
       <div className="react-gate">
-        {showSteps && <div className="react-gate__steps" aria-hidden="true"><i /><i className="is-complete" /><i /></div>}
         <p className="react-eyebrow">{eyebrow}</p>
         {children}
       </div>

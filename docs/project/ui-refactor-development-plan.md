@@ -24,8 +24,8 @@ supersedes: []
 
 计划范围包括：
 
-- `bear-password-desktop` 的 renderer、页面组件、路由、状态适配、设计 token 和主题设置。
-- `bear-password-extension` 的 popup、wake 页面、共享 locale/theme 响应式耦合与 Vite 插件配置。
+- `ppwd-desktop` 的 renderer、页面组件、路由、状态适配、设计 token 和主题设置。
+- `ppwd-extension` 的 popup、wake 页面、共享 locale/theme 响应式耦合与 Vite 插件配置。
 - 桌面端与扩展的依赖、pnpm 锁文件、类型检查、构建和回归验证流程。
 - 原型覆盖的 24 个桌面场景及扩展登录、保险库、设置和从网页唤起桌面端的流程。
 
@@ -113,7 +113,7 @@ TASK-UIR-04 + TASK-UIR-05 + TASK-UIR-06 + TASK-UIR-07
 
 **上下文简报**：扩展 `src/shared/locale/locale.ts` 当前导入 Vue `ref`；其他 shared 状态也要检查 Vue/Pinia 依赖。Background/content script 不能携带 UI 框架运行时，desktop 与 popup 要能分别用 React 状态层适配相同规则。
 
-**变更边界**：`bear-password-desktop/src` 和 `bear-password-extension/src/shared` 中被多入口复用的框架无关逻辑；不改 IPC/扩展消息协议、加密格式和浏览器权限。
+**变更边界**：`ppwd-desktop/src` 和 `ppwd-extension/src/shared` 中被多入口复用的框架无关逻辑；不改 IPC/扩展消息协议、加密格式和浏览器权限。
 
 **执行项**：
 
@@ -313,9 +313,9 @@ TASK-UIR-04 + TASK-UIR-05 + TASK-UIR-06 + TASK-UIR-07
 - 设计输入：[docs/design-proposal.md](../design-proposal.md)
 - 全页面原型：[docs/prototypes/all-pages.html](../prototypes/all-pages.html)
 - 密码库独立原型：[docs/prototypes/bearpassword-vault-concept.html](../prototypes/bearpassword-vault-concept.html)
-- 当前桌面入口：[bear-password-desktop/electron.vite.config.ts](../../bear-password-desktop/electron.vite.config.ts)
-- 当前扩展构建：[bear-password-extension/vite.config.ts](../../bear-password-extension/vite.config.ts)
-- 当前扩展 manifest：[bear-password-extension/manifest.config.ts](../../bear-password-extension/manifest.config.ts)
+- 当前桌面入口：[ppwd-desktop/electron.vite.config.ts](../../ppwd-desktop/electron.vite.config.ts)
+- 当前扩展构建：[ppwd-extension/vite.config.ts](../../ppwd-extension/vite.config.ts)
+- 当前扩展 manifest：[ppwd-extension/manifest.config.ts](../../ppwd-extension/manifest.config.ts)
 - 现有主题迁移规则：[docs/design-proposal.md](../design-proposal.md#旧主题配置迁移)
 - 安全检查证据、执行命令及人工验收记录见各任务开发报告和 [TASK-UIR-09 测试报告](task-ui-refactor-09-development-report.md)、[人工验收记录](task-ui-refactor-09-manual-acceptance.md)、[发布准备与回滚](task-ui-refactor-09-release-readiness.md)。
 

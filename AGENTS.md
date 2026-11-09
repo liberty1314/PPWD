@@ -2,17 +2,17 @@
 
 ## 项目结构与模块组织
 
-本仓库是 PPWD monorepo。`bear-password-server/` 是 Java 17 + Spring Boot 3 后端，源码在 `src/main/java`，测试在 `src/test/java`，数据库初始化脚本在 `sql/init.sql`。`bear-password-web/` 是 Vue 3/Vite 网页端，`bear-password-desktop/` 是 Electron + Vue 桌面端，二者共享相近的 `src/api`、`src/components`、`src/stores`、`src/utils` 结构。`bear-password-extension/` 是浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup`。`bear-password-index/` 是官网静态页面，截图资源在 `assets/screenshots/`。
+本仓库是 PPWD monorepo。`bear-password-server/` 是 Java 17 + Spring Boot 3 后端，源码在 `src/main/java`，测试在 `src/test/java`，数据库初始化脚本在 `sql/init.sql`。`bear-password-web/` 是 Vue 3/Vite 网页端，`ppwd-desktop/` 是 Electron + Vue 桌面端，二者共享相近的 `src/api`、`src/components`、`src/stores`、`src/utils` 结构。`ppwd-extension/` 是浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup`。`bear-password-index/` 是官网静态页面，截图资源在 `assets/screenshots/`。
 
 ## 构建、测试与开发命令
 
-- `npm install --prefix bear-password-web`、`npm install --prefix bear-password-desktop`、`npm install --prefix bear-password-extension`：分别安装前端模块依赖，避免在根目录混装。
+- `npm install --prefix bear-password-web`、`npm install --prefix ppwd-desktop`、`npm install --prefix ppwd-extension`：分别安装前端模块依赖，避免在根目录混装。
 - `npm run build:all`：从根目录聚合构建桌面端、扩展等产物，输出到 `release/`。
 - `npm run build:web`：打包网页端并生成发布 zip。
 - `cd bear-password-server && mvn spring-boot:run`：启动本地后端，默认 API 为 `http://localhost:8080/api`。
 - `cd bear-password-server && mvn package`：构建后端 jar。
 - `cd bear-password-server && mvn test`：运行后端 JUnit/Spring Boot 测试。
-- `cd bear-password-web && npm run dev`、`cd bear-password-desktop && npm run dev`、`cd bear-password-extension && npm run dev`：分别启动对应前端模块开发模式。
+- `cd bear-password-web && npm run dev`、`cd ppwd-desktop && npm run dev`、`cd ppwd-extension && npm run dev`：分别启动对应前端模块开发模式。
 - `npm run typecheck`：在各前端子目录执行 TypeScript/Vue 类型检查。
 
 ## 代码风格与命名约定
@@ -33,4 +33,35 @@ Git 历史采用 Conventional Commits 风格，如 `feat(web): ...`、`fix: ...`
 
 ## Agent 特定说明
 
-保持改动聚焦在目标模块，不要顺手重排生成文件、截图或锁文件。新增功能时优先复用 `bear-password-web` 与 `bear-password-desktop` 中已有的共享结构和命名，避免两端行为漂移。调试扩展时在 `chrome://extensions` 加载 `bear-password-extension/dist`。除发布任务外，不要提交 `release/` 或 `dist/` 产物。
+保持改动聚焦在目标模块，不要顺手重排生成文件、截图或锁文件。新增功能时优先复用 `bear-password-web` 与 `ppwd-desktop` 中已有的共享结构和命名，避免两端行为漂移。调试扩展时在 `chrome://extensions` 加载 `ppwd-extension/dist`。除发布任务外，不要提交 `release/` 或 `dist/` 产物。
+
+<!-- ASTRYX:START -->
+Astryx v0.7.11 · 90+ components
+CLI: run every command as `astryx <cmd>` (shown below as `astryx ...`).
+
+SETUP (once, in app entry e.g. main.tsx) — without these, components render unstyled:
+  import "@astryxdesign/core/reset.css";
+  import "@astryxdesign/core/astryx.css";
+
+WORKFLOW — start every page from a template, never from scratch:
+1. `astryx build "<idea>"` — names the template to scaffold from and the parts it lacks.
+2. `astryx template <name> <path>` — scaffold it; keep its frame, gap and padding; replace the content.
+3. `astryx template <Block>` for parts it lacks; `astryx component <Name>` to read props before using one.
+Changing an existing page? Keep it: skip step 2 and add blocks/components inside its sections.
+
+RULES:
+- No <div> — components handle all layout and spacing.
+- Read `astryx docs layout` before changing a template's frame.
+- Dense data = rows (Table, List/Item), not Card-wrapped lists. Badge = counts only.
+- Style with component props first, then tokens (var(--color-*|--spacing-*|--radius-*)). No raw hex/px. No StyleX/Tailwind compiler here — don't use xstyle/utility classes directly. Some templates use StyleX and need a compiler plugin; see `astryx docs styling-overview`.
+- Palettes and custom colors go through the theme, never :root overrides. Run `astryx theme add <slug>` to import; `theme eject <slug>` only forks source. See `astryx docs theme`.
+- SELF-CHECK: re-read the file; replace any raw <div>/<span>, imported .css/@apply, or hardcoded #hex/px with the component or a token.
+
+`astryx help` lists every command. Key ones beyond the workflow:
+  search "<query>"   find any component / hook / doc / template
+  discover <words>   integrations you could add
+  docs <topic>       getting-started, principles, tokens, theme … (`astryx docs` lists all)
+  docs cli           commands and API reference
+  docs authoring     build an integration package, and every field it holds
+  upgrade --from <old version> --apply   run after a dependency bump
+<!-- ASTRYX:END -->

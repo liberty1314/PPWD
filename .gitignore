@@ -64,7 +64,7 @@ hs_err_pid*
 replay_pid*
 
 # ==============================
-# Node / Electron（bear-password-desktop）
+# Node / Electron（ppwd-desktop）
 # ==============================
 node_modules/
 dist/

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="bear-password-desktop/src/assets/logo.svg" alt="PPWD" width="96" height="96" />
+  <img src="ppwd-desktop/src/assets/logo.svg" alt="PPWD" width="96" height="96" />
 </p>
 
 <h1 align="center">PPWD</h1>
@@ -82,8 +82,8 @@ PPWD 是一套完整的密码管理方案，由**桌面应用**和**浏览器扩
 
 | 目录 | 面向谁 | 说明 |
 |------|--------|------|
-| [bear-password-desktop](bear-password-desktop/) | 所有用户 | 桌面客户端 |
-| [bear-password-extension](bear-password-extension/) | 所有用户 | 浏览器扩展 |
+| [ppwd-desktop](ppwd-desktop/) | 所有用户 | 桌面客户端 |
+| [ppwd-extension](ppwd-extension/) | 所有用户 | 浏览器扩展 |
 | [bear-password-server](bear-password-server/) | 自建部署 | 账号与数据同步服务 |
 | [bear-password-index](bear-password-index/) | — | 官网静态页面 |
 
@@ -102,14 +102,14 @@ PPWD 是一套完整的密码管理方案，由**桌面应用**和**浏览器扩
 cd bear-password-server && mvn spring-boot:run
 
 # 桌面端
-cd bear-password-desktop && npm install && npm run dev
+cd ppwd-desktop && npm install && npm run dev
 
 # 浏览器扩展
-cd bear-password-extension && npm install && npm run dev
+cd ppwd-extension && npm install && npm run dev
 ```
 
 本地 API 默认地址：`http://127.0.0.1:8080`  
-扩展开发时在 `chrome://extensions` 加载 `bear-password-extension/dist` 目录。
+扩展开发时在 `chrome://extensions` 加载 `ppwd-extension/dist` 目录。
 
 更详细的构建与打包说明，请查看各子目录 README。
 

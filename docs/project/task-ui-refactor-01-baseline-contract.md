@@ -114,11 +114,11 @@ Desktop 的通用 storage 工具添加 `bear_` 前缀；已确认关键键有 `b
 
 | 命令 | 结果 | 观察 |
 | --- | --- | --- |
-| `cd bear-password-desktop && pnpm run typecheck` | 通过 | `vue-tsc --noEmit` |
-| `cd bear-password-desktop && pnpm run build` | 通过 | main/preload/renderer 均产出；legacy Sass JS API 有重复弃用提示；renderer 主 JS 约 2708 kB，字体资源约 27.8 MB（构建报告值） |
-| `cd bear-password-extension && pnpm run typecheck` | 通过 | `vue-tsc --noEmit` |
-| `cd bear-password-extension && pnpm run build` | 通过 | CRXJS 报告 4 个 `public/icons/icon-*.png` 同名覆盖输出提示；popup JS 约 90.8 kB，gzip 约 34.7 kB |
-| `cd bear-password-extension && pnpm run package` | 通过 | 脚本内部仍使用 `npm run build`；生成 `release/PPWD-Extension.zip`（约 0.53 MB） |
+| `cd ppwd-desktop && pnpm run typecheck` | 通过 | `vue-tsc --noEmit` |
+| `cd ppwd-desktop && pnpm run build` | 通过 | main/preload/renderer 均产出；legacy Sass JS API 有重复弃用提示；renderer 主 JS 约 2708 kB，字体资源约 27.8 MB（构建报告值） |
+| `cd ppwd-extension && pnpm run typecheck` | 通过 | `vue-tsc --noEmit` |
+| `cd ppwd-extension && pnpm run build` | 通过 | CRXJS 报告 4 个 `public/icons/icon-*.png` 同名覆盖输出提示；popup JS 约 90.8 kB，gzip 约 34.7 kB |
+| `cd ppwd-extension && pnpm run package` | 通过 | 脚本内部仍使用 `npm run build`；生成 `release/PPWD-Extension.zip`（约 0.53 MB） |
 | `pnpm run build:all -- --extension` | 通过 | 根脚本正确委派到扩展 package，生成同名发布包 |
 | `pnpm run build:all -- --help` | 通过 | 根脚本 help 入口可运行 |
 
@@ -151,10 +151,10 @@ Desktop 的通用 storage 工具添加 `bear_` 前缀；已确认关键键有 `b
 
 ## 证据来源
 
-- Desktop 入口和 preload：`bear-password-desktop/electron.vite.config.ts`、`bear-password-desktop/electron/preload/index.ts`、`bear-password-desktop/electron/main/`
-- Desktop 状态/安全：`bear-password-desktop/src/stores/`、`src/utils/sensitiveClipboard.ts`、`src/composables/useAutoLockActivity.ts`、`src/utils/theme.ts`
-- Extension 入口/契约：`bear-password-extension/vite.config.ts`、`manifest.config.ts`、`src/shared/types/index.ts`、`src/background/index.ts`、`src/content/index.ts`
-- Bridge 常量：`shared/extensionBridge.ts`、`bear-password-extension/src/shared/constants/extensionBridge.ts`
+- Desktop 入口和 preload：`ppwd-desktop/electron.vite.config.ts`、`ppwd-desktop/electron/preload/index.ts`、`ppwd-desktop/electron/main/`
+- Desktop 状态/安全：`ppwd-desktop/src/stores/`、`src/utils/sensitiveClipboard.ts`、`src/composables/useAutoLockActivity.ts`、`src/utils/theme.ts`
+- Extension 入口/契约：`ppwd-extension/vite.config.ts`、`manifest.config.ts`、`src/shared/types/index.ts`、`src/background/index.ts`、`src/content/index.ts`
+- Bridge 常量：`shared/extensionBridge.ts`、`ppwd-extension/src/shared/constants/extensionBridge.ts`
 - 设计追溯：`docs/design-proposal.md`、`docs/project/technical-design-m2.md`、`docs/prototypes/all-pages.html`
 
 ## 变更记录

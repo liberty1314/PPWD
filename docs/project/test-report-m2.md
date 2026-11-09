@@ -51,7 +51,7 @@ supersedes: []
 
 ## 证据与追溯
 
-- T20：`bear-password-desktop/tests/phoneToken.test.mjs`。
+- T20：`ppwd-desktop/tests/phoneToken.test.mjs`。
 - `pnpm run test:phone-token`：2026-11-04，通过 7/7。
 - `pnpm run build`：2026-11-04，通过。
 - `pnpm run typecheck`：2026-11-04，退出码 2；基线错误未消除。

@@ -114,13 +114,17 @@
 .react-gate-layout__note svg { flex: 0 0 auto; }
 .react-gate-main { display: grid; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; place-items: center; padding: 36px clamp(24px, 4vw, 64px); }
 .react-gate { width: min(420px, 100%); }
-.react-gate__steps { display: flex; gap: 7px; margin-bottom: 22px; }
-.react-gate__steps i { width: 27px; height: 3px; border-radius: 3px; background: var(--bp-border); }
-.react-gate__steps i.is-complete { background: var(--bp-accent); }
 .react-gate > .react-eyebrow { margin: 0 0 7px; color: var(--bp-text-muted); font-size: 11px; font-weight: 500; }
 .react-gate h1 { margin: 0 0 7px; color: var(--bp-text); font-size: 21px; line-height: 1.35; font-weight: 680; }
 .react-gate__description { margin: 0 0 20px; color: var(--bp-text-secondary); font-size: 12px; line-height: 1.7; }
 .react-gate .react-form { display: grid; gap: 13px; }
+.react-gate__form { margin-top: 2px; }
+.react-gate__recovery { display: grid; gap: 12px; }
+.react-gate__key-field { gap: 8px; }
+.react-gate .react-secret { min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; letter-spacing: .02em; }
+.react-gate .react-gate__key-field textarea { min-height: 104px; line-height: 1.65; overflow-wrap: anywhere; }
+.react-gate__recovery-confirm { display: flex; min-height: 44px; align-items: center; gap: 10px; border: 1px solid var(--bp-border); border-radius: 6px; padding: 9px 11px; color: var(--bp-text-secondary); font-size: 12px; line-height: 1.45; cursor: pointer; }
+.react-gate__recovery-confirm input { width: 16px; height: 16px; flex: 0 0 auto; margin: 0; accent-color: var(--bp-accent); }
 .react-gate__unlock-method { display: flex; min-height: 136px; flex-direction: column; justify-content: center; gap: 10px; }
 .react-gate__method-status { display: grid; min-height: 48px; place-items: center; color: var(--bp-text-muted); font-size: 12px; }
 .react-gate__unlock-method > .react-form { width: 100%; }
@@ -136,10 +140,13 @@
 .react-gate .react-form__error, .react-gate .react-form__warning { margin: 0; border-radius: 6px; padding: 9px 10px; font-size: 12px; line-height: 1.55; }
 .react-gate .react-form__error { border: 1px solid color-mix(in srgb, var(--bp-danger) 18%, transparent); background: color-mix(in srgb, var(--bp-danger) 7%, var(--bp-surface)); color: var(--bp-danger); }
 .react-gate .react-form__warning { border: 1px solid color-mix(in srgb, var(--bp-warning) 22%, transparent); background: color-mix(in srgb, var(--bp-warning) 8%, var(--bp-surface)); color: var(--bp-warning); }
-.react-gate__fingerprint { overflow-wrap: anywhere; color: var(--bp-text-muted); font-size: 11px; }
-.react-gate__actions { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin: 14px 0; }
-.react-gate__qr { display: block; width: 160px; height: 160px; margin: 16px auto; }
-.react-gate .react-secret { resize: vertical; }
+.react-gate__fingerprint { overflow-wrap: anywhere; margin: -3px 0 0; color: var(--bp-text-muted); font-size: 11px; line-height: 1.5; }
+.react-gate__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px; margin: 2px 0 0; }
+.react-gate__actions > .bp-button { min-width: 0; min-height: 44px; padding-inline: 10px; }
+.react-gate__utility-action { justify-self: start; }
+.react-gate .bp-button.react-gate__utility-action { width: auto; }
+.react-gate__qr-panel { display: grid; min-height: 188px; place-items: center; margin: 2px 0 16px; border: 1px solid var(--bp-border); border-radius: 8px; background: var(--bp-surface); }
+.react-gate__qr { display: block; width: 160px; height: 160px; object-fit: contain; }
 .react-gate-loading { display: grid; min-height: 100vh; place-items: center; color: var(--bp-text-muted); }
 
 @media (max-width: 900px) {
@@ -178,14 +185,17 @@
 @media (max-width: 520px) {
   .react-backup-settings__actions { display: grid; grid-template-columns: minmax(0, 1fr); }
   .react-backup-settings__actions > .bp-button { justify-content: flex-start; }
+  .react-gate__actions { grid-template-columns: minmax(0, 1fr); }
+  .react-gate__actions > .bp-button { justify-content: flex-start; }
 }
 
 @media (max-width: 420px) {
   .react-gate-layout { height: 100vh; }
   .react-gate-aside { padding: 12px 16px; }
   .react-gate-main { align-items: start; padding: 28px 20px 36px; }
-  .react-gate__steps { margin-bottom: 18px; }
   .react-gate h1 { font-size: 20px; }
+  .react-gate__qr-panel { min-height: 168px; }
+  .react-gate__qr { width: 144px; height: 144px; }
   .react-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .react-sidebar { min-height: auto; flex-direction: row; align-items: center; justify-content: space-between; overflow: hidden; border-right: 0; border-bottom: 1px solid var(--bp-border); padding: 42px 12px 8px; }
   .react-sidebar.bp-glass { border-width: 0 0 1px; }
@@ -204,4 +214,58 @@
   .react-dashboard__stats { grid-template-columns: 1fr; gap: 8px; }
   .react-dashboard__stat { padding: 11px; }
   .react-dashboard__stat strong { margin-top: 6px; }
+}
+
+/* Dashboard surfaces: one clear focus area, quieter metric cards and grouped content. */
+.react-dashboard { padding-bottom: 18px; }
+.react-dashboard > .react-page__header {
+  position: relative;
+  align-items: center;
+  border: 1px solid var(--bp-card-border);
+  border-radius: 16px;
+  padding: 24px 26px;
+  background: linear-gradient(120deg, var(--bp-card-bg), color-mix(in srgb, var(--bp-accent-soft) 42%, var(--bp-card-bg)));
+  box-shadow: var(--bp-card-shadow);
+  backdrop-filter: var(--bp-card-backdrop);
+}
+.react-dashboard > .react-page__header h1 { margin-top: 7px; font-size: 26px; letter-spacing: -.025em; }
+.react-dashboard > .react-page__header .react-page__description { margin-top: 7px; }
+.react-dashboard__stats { gap: 10px; padding: 14px 0 20px; }
+.react-dashboard__stat {
+  position: relative;
+  min-height: 104px;
+  border-radius: 12px;
+  padding: 16px 17px;
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+.react-dashboard__stat:hover { transform: translateY(-2px); box-shadow: var(--bp-card-shadow), 0 5px 16px color-mix(in srgb, var(--bp-text) 6%, transparent); }
+.react-dashboard__stat:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 2px; }
+.react-dashboard__stat-head { font-size: 12px; }
+.react-dashboard__stat-head span:last-child { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: var(--bp-accent-soft); }
+.react-dashboard__stat--warning .react-dashboard__stat-head span:last-child { background: color-mix(in srgb, var(--bp-warning) 13%, var(--bp-card-bg)); }
+.react-dashboard__stat--success .react-dashboard__stat-head span:last-child { background: color-mix(in srgb, var(--bp-success) 13%, var(--bp-card-bg)); }
+.react-dashboard__stat strong { margin-top: 13px; font-size: 27px; font-variant-numeric: tabular-nums; }
+.react-dashboard__lower { grid-template-columns: minmax(0, 1.25fr) minmax(250px, .75fr); gap: 14px; }
+.react-dashboard__section { border: 1px solid var(--bp-card-border); border-radius: 13px; padding: 18px; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
+.react-dashboard__section > header h2 { font-size: 14px; letter-spacing: -.01em; }
+.react-dashboard__recent { margin-top: 14px; }
+.react-dashboard__recent li > button { min-height: 60px; grid-template-columns: 34px minmax(0, 1fr) max-content; gap: 11px; border-top-color: color-mix(in srgb, var(--bp-border) 72%, transparent); }
+.react-dashboard__entry-icon { width: 32px; height: 32px; border-radius: 9px; }
+.react-dashboard__security-status { margin: 18px 0 9px; }
+.react-dashboard__security .react-status-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--bp-success) 14%, transparent); }
+.react-dashboard__security > p { line-height: 1.65; }
+.react-dashboard__quick-actions { display: grid; grid-template-columns: 1fr; }
+.react-dashboard__quick-actions .bp-button { justify-content: flex-start; min-height: 38px; }
+
+@media (max-width: 640px) {
+  .react-dashboard > .react-page__header { padding: 19px; }
+  .react-dashboard > .react-page__header h1 { font-size: 22px; }
+  .react-dashboard__stat { min-height: 92px; padding: 12px; }
+  .react-dashboard__stat strong { font-size: 23px; }
+  .react-dashboard__section { padding: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-dashboard__stat { transition: none; }
+  .react-dashboard__stat:hover { transform: none; }
 }

@@ -8,8 +8,8 @@
 
 | 检查 | 结果 | 证据 |
 |---|---|---|
-| `pnpm run typecheck` | 通过 | `bear-password-desktop`，`vue-tsc --noEmit` |
-| `pnpm run build` | 通过 | `bear-password-desktop`，`electron-vite build` |
+| `pnpm run typecheck` | 通过 | `ppwd-desktop`，`vue-tsc --noEmit` |
+| `pnpm run build` | 通过 | `ppwd-desktop`，`electron-vite build` |
 | `pnpm run test:phone-token` | 通过 | 9/9 |
 | `pnpm run test:encrypted-backup` | 通过 | 3/3 |
 | `pnpm run build:mac` | 失败 | electron-builder 在 `Electron.app/Contents/MacOS/Electron` 重命名为 `BearPassword` 时返回 ENOENT；已清理中间目录复试，问题仍存在 |
