@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { HashRouter, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Activity, Clock3, Home, KeyRound, Minimize2, Settings2, ShieldCheck, Square, Star, X } from 'lucide-react'
 import type { TrayRendererCommand } from '../shared/trayMenu'
 import { ToastProvider } from './ui/primitives'
@@ -16,6 +16,7 @@ import { ReactSecurityCenterPage, ReactVaultWorkspace } from './ReactVaultWorksp
 import { SetupPage, UnlockPage, RecoverPage, BindPage } from './ReactAuthPages'
 import { SettingsPage } from './ReactSettingsPage'
 import { useDesktopLocale } from './ui/useDesktopLocale'
+import { Sidebar, type SidebarSection } from './components/ui/sidebar'
 import { resolveReactGateRoute } from './utils/reactGateRules'
 import logoUrl from './assets/logo.png'
 import './reactApp.css'
@@ -67,6 +68,15 @@ function ReactShellRoutes() {
   const navigate = useNavigate()
   const workspaceRef = useRef<HTMLDivElement>(null)
   const { translate } = useDesktopLocale()
+  const activeRoute = location.pathname.startsWith('/settings') ? '/settings/general' : location.pathname
+  const navigationSections: SidebarSection[] = [{ items: [
+    { id: '/', label: translate('nav.dashboard'), icon: <Home size={16} /> },
+    { id: '/vault', label: translate('nav.vault'), icon: <KeyRound size={16} /> },
+    { id: '/favorites', label: translate('nav.favorites'), icon: <Star size={16} /> },
+    { id: '/recent', label: translate('nav.recent'), icon: <Clock3 size={16} /> },
+    { id: '/security', label: translate('securityCenter.title'), icon: <ShieldCheck size={16} /> },
+    { id: '/settings/general', label: translate('nav.settings'), icon: <Settings2 size={16} /> }
+  ] }]
 
   useEffect(() => {
     workspaceRef.current?.scrollTo({ top: 0 })
@@ -113,18 +123,16 @@ function ReactShellRoutes() {
       <span className="react-titlebar__drag">PPWD</span>
       {!isMac && <div className="react-titlebar__controls"><button type="button" aria-label={translate('window.minimize')} title={translate('window.minimize')} onClick={() => desktopThemeAdapter.minimize()}><Minimize2 size={13} /></button><button type="button" aria-label={translate('window.maximize')} title={translate('window.maximize')} onClick={() => desktopThemeAdapter.maximize()}><Square size={12} /></button><button type="button" aria-label={translate('window.close')} title={translate('window.close')} onClick={() => desktopThemeAdapter.close()}><X size={14} /></button></div>}
     </header>
-    <aside className="react-sidebar bp-glass">
-      <div className="react-brand"><img src={logoUrl} alt="" /><span>PPWD</span><small>{translate('unlock.localVault')}</small></div>
-      <nav aria-label={translate('app.navigation')}>
-        <NavLink to="/" end title={translate('nav.dashboard')}><Home size={16} />{translate('nav.dashboard')}</NavLink>
-        <NavLink to="/vault" title={translate('nav.vault')}><KeyRound size={16} />{translate('nav.vault')}</NavLink>
-        <NavLink to="/favorites" title={translate('nav.favorites')}><Star size={16} />{translate('nav.favorites')}</NavLink>
-        <NavLink to="/recent" title={translate('nav.recent')}><Clock3 size={16} />{translate('nav.recent')}</NavLink>
-        <NavLink to="/security" title={translate('securityCenter.title')}><ShieldCheck size={16} />{translate('securityCenter.title')}</NavLink>
-        <NavLink to="/settings/general" title={translate('nav.settings')}><Settings2 size={16} />{translate('nav.settings')}</NavLink>
-      </nav>
-      <div className="react-sidebar__status"><span className="react-status-dot" />{translate('dashboard.vaultProtected')}</div>
-    </aside>
+    <Sidebar
+      className="react-library-sidebar"
+      sections={navigationSections}
+      activeId={activeRoute}
+      onActiveChange={navigate}
+      toggleLabel={translate('sidebar.collapse')}
+      expandLabel={translate('sidebar.expand')}
+      header={<div className="react-brand"><img src={logoUrl} alt="" /><span>PPWD</span><small>{translate('unlock.localVault')}</small></div>}
+      footer={<div className="react-sidebar__status"><span className="react-status-dot" />{translate('dashboard.vaultProtected')}</div>}
+    />
     <div ref={workspaceRef} className={`react-workspace ${['/vault', '/favorites', '/recent'].includes(location.pathname) ? 'react-workspace--vault' : ''}`}><Routes><Route path="/" element={<ReactDashboardPage />} /><Route path="/vault" element={<ReactVaultWorkspace mode="vault" />} /><Route path="/favorites" element={<ReactVaultWorkspace mode="favorites" />} /><Route path="/recent" element={<ReactVaultWorkspace mode="recent" />} /><Route path="/security" element={<ReactSecurityCenterPage />} /><Route path="/settings/:section" element={<SettingsPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<ReactDashboardPage />} /></Routes></div>
   </div>
 }

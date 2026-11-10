@@ -68,6 +68,15 @@
   --bp-glass-control-shadow: none;
   --bp-glass-control-backdrop: none;
   --bp-segment-backdrop: none;
+  --bg: var(--bp-bg);
+  --text-primary: var(--bp-text);
+  --text-secondary: var(--bp-text-secondary);
+  --text-muted: var(--bp-text-muted);
+  --text-subtle: var(--bp-text-muted);
+  --surface: var(--bp-surface);
+  --surface-raised: var(--bp-surface-raised);
+  --surface-hover: var(--bp-control-hover-bg);
+  --border-hover: var(--bp-control-hover-border);
 }
 
 :root[data-appearance='dark'] {

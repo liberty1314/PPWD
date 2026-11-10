@@ -49,15 +49,29 @@ import { registerOfflineVaultIpc } from './offlineVaultIpc'
 import { registerPhoneTokenIpc } from './phoneTokenIpc'
 import { deriveVerifiedVaultUnlockKey, isPhoneTokenSessionVerified } from './phoneTokenStorage'
 import { saveStoredVaultUnlockKey } from './vaultUnlockKeyStorage'
+import { completePendingLocalDataReset, registerLocalDataResetIpc } from './localDataReset'
 
 app.setName('PPWD')
 const appDataPath = app.getPath('appData')
 const currentUserDataPath = join(appDataPath, 'PPWD')
 const legacyUserDataPath = join(appDataPath, 'BearPassword')
-if (!existsSync(currentUserDataPath) && existsSync(legacyUserDataPath)) {
-  renameSync(legacyUserDataPath, currentUserDataPath)
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
+if (!gotSingleInstanceLock) {
+  app.quit()
+} else {
+  try {
+    completePendingLocalDataReset(join(appDataPath, '.ppwd-reset-pending.json'), appDataPath, currentUserDataPath, legacyUserDataPath)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '本机数据重置失败，原数据备份已保留'
+    console.error('[local-data-reset] startup cleanup failed', error)
+    dialog.showErrorBox('PPWD 本机数据重置失败', message)
+    process.exit(1)
+  }
+  if (!existsSync(currentUserDataPath) && existsSync(legacyUserDataPath)) {
+    renameSync(legacyUserDataPath, currentUserDataPath)
+  }
+  app.setPath('userData', currentUserDataPath)
 }
-app.setPath('userData', currentUserDataPath)
 
 const DESKTOP_WAKE_PROTOCOLS = ['ppwd', 'bearpassword'] as const
 let pendingWakeUrl: string | null = null
@@ -861,6 +875,10 @@ function startApp(): void {
     registerClipboardIpc()
     registerOfflineVaultIpc(() => mainWindow)
     registerPhoneTokenIpc()
+    registerLocalDataResetIpc(currentUserDataPath, legacyUserDataPath, () => {
+      app.relaunch()
+      app.quit()
+    })
     registerVaultPasswordIpc()
     registerBiometricIpc()
     registerExtensionBridgeIpc()
@@ -903,8 +921,6 @@ app.on('open-url', (event, url) => {
   }
   pendingWakeUrl = url
 })
-
-const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
 if (!gotSingleInstanceLock) {
   app.quit()

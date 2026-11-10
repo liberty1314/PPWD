@@ -10,6 +10,9 @@ import { APP_VERSION, AUTHOR_GITHUB_URL, AUTHOR_NAME, OFFICIAL_WEBSITE_URL } fro
 import { usePopupLocaleStore } from './stores/reactLocale'
 import { useReactPopupStore } from './stores/reactPopup'
 import { usePopupThemeStore } from './stores/reactTheme'
+import { Button as EasyButton, type ButtonProps as EasyButtonProps } from '../components/ui/Button'
+import { Form } from '../components/ui/Form'
+import { LockInput } from '../components/ui/LockInput'
 import './reactPopup.css'
 
 function usePopupT() {
@@ -19,6 +22,12 @@ function usePopupT() {
 
 function AppLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
   return <img className={`popup-logo popup-logo--${size}`} src={chrome.runtime.getURL('public/icons/logo.png')} alt="" />
+}
+
+function PopupButton({ className = '', ...props }: EasyButtonProps) {
+  const variant = className.includes('popup-button--primary') ? 'primary' : className.includes('popup-button--danger') ? 'destructive' : className.includes('popup-button--quiet') || className.includes('popup-credential__main') || className.includes('popup-empty__add') ? 'ghost' : 'secondary'
+  const size = className.includes('popup-icon-button') ? 'icon' : 'sm'
+  return <EasyButton variant={variant} size={size} className={className} {...props} />
 }
 
 function PopupContent() {
@@ -61,14 +70,14 @@ function LoginPage() {
   const hintKey = `login.hint${status === 'notLoggedIn' ? 'NotLoggedIn' : status[0].toUpperCase() + status.slice(1)}`
 
   return <main className="popup-login">
-    <header className="popup-login__top"><span className="popup-login__brand"><AppLogo />PPWD</span><button type="button" className="popup-icon-button" title={t('login.settings')} aria-label={t('login.settings')} onClick={state.openSettings}><Settings2 size={17} /></button></header>
+    <header className="popup-login__top"><span className="popup-login__brand"><AppLogo />PPWD</span><PopupButton type="button" className="popup-icon-button" title={t('login.settings')} aria-label={t('login.settings')} onClick={state.openSettings}><Settings2 size={17} /></PopupButton></header>
     <section className="popup-login__panel">
       <AppLogo size="lg" />
       <p className="popup-login__subtitle">{t('login.subtitle')}</p>
       <div className="popup-status"><div><span>{t('login.connectionStatus')}</span><strong className={`popup-status__badge popup-status__badge--${status}`}>{t(statusKey)}</strong></div><p>{t(hintKey)}</p>{state.sessionError && <p className="popup-error" role="alert">{state.sessionError}</p>}</div>
-      <button className="popup-button popup-button--primary popup-login__open" type="button" disabled={state.waking || state.sessionLoading} onClick={() => void state.wakeDesktop()}>{state.waking ? <LoaderCircle size={15} className="is-spinning" /> : <ArrowUpRight size={15} />}{state.waking ? t('login.openingDesktop') : t('login.openDesktop')}</button>
+      <PopupButton className="popup-button popup-button--primary popup-login__open" type="button" disabled={state.waking || state.sessionLoading} onClick={() => void state.wakeDesktop()}>{state.waking ? <LoaderCircle size={15} className="is-spinning" /> : <ArrowUpRight size={15} />}{state.waking ? t('login.openingDesktop') : t('login.openDesktop')}</PopupButton>
       {state.wakeHint && <p className="popup-login__hint" role="status">{state.wakeHint}</p>}
-      <button className="popup-button popup-button--quiet popup-login__refresh" type="button" disabled={state.sessionLoading} onClick={() => void state.refreshDesktopState()}><RefreshCw size={14} />{state.sessionLoading ? t('login.refreshing') : t('login.refresh')}</button>
+      <PopupButton className="popup-button popup-button--quiet popup-login__refresh" type="button" disabled={state.sessionLoading} onClick={() => void state.refreshDesktopState()}><RefreshCw size={14} />{state.sessionLoading ? t('login.refreshing') : t('login.refresh')}</PopupButton>
     </section>
     <a className="popup-external-link" href={OFFICIAL_WEBSITE_URL} target="_blank" rel="noopener noreferrer">{t('settings.officialWebsiteLink')}<ExternalLink size={12} /></a>
   </main>
@@ -80,13 +89,13 @@ function VaultPage({ credentials }: { credentials: FillCredential[] }) {
   const pageHost = getPageHostLabel(state.currentUrl)
 
   return <main className="popup-vault">
-    <header className="popup-topbar"><AppLogo /><span className="popup-topbar__username" title={state.desktopState?.username ?? ''}>{state.desktopState?.username}</span><button className="popup-icon-button" type="button" title={t('vault.settings')} aria-label={t('vault.settings')} onClick={state.openSettings}><Settings2 size={16} /></button></header>
+    <header className="popup-topbar"><AppLogo /><span className="popup-topbar__username" title={state.desktopState?.username ?? ''}>{state.desktopState?.username}</span><PopupButton className="popup-icon-button" type="button" title={t('vault.settings')} aria-label={t('vault.settings')} onClick={state.openSettings}><Settings2 size={16} /></PopupButton></header>
     <label className="popup-search"><Search size={15} aria-hidden="true" /><input id="popup-vault-search" type="search" value={state.keyword} onChange={(event) => state.setKeyword(event.target.value)} placeholder={t('vault.searchPlaceholder')} aria-label={t('vault.searchPlaceholder')} /></label>
-    <section className="popup-vault__heading"><div className="popup-vault__site"><Globe2 size={14} /><h1>{t('vault.thisSite')}</h1>{pageHost && <span title={state.currentUrl}>{pageHost}</span>}<small>{credentials.length}</small></div><button className="popup-button popup-button--primary popup-vault__add" type="button" title={t('vault.addTitle')} aria-label={t('vault.addTitle')} onClick={state.openCreate}><Plus size={15} />{t('vault.add')}</button></section>
+    <section className="popup-vault__heading"><div className="popup-vault__site"><Globe2 size={14} /><h1>{t('vault.thisSite')}</h1>{pageHost && <span title={state.currentUrl}>{pageHost}</span>}<small>{credentials.length}</small></div><PopupButton className="popup-button popup-button--primary popup-vault__add" type="button" title={t('vault.addTitle')} aria-label={t('vault.addTitle')} onClick={state.openCreate}><Plus size={15} />{t('vault.add')}</PopupButton></section>
     <section className={`popup-vault__list ${state.vaultLoading ? 'is-loading' : ''}`} aria-label={t('vault.thisSite')} aria-busy={state.vaultLoading}>
-      {state.vaultError && <div className="popup-empty popup-empty--error" role="alert"><CircleAlert size={21} /><p>{state.vaultError}</p><button className="popup-button popup-button--quiet" type="button" onClick={() => void state.refreshVault()}><RefreshCw size={14} />{t('login.refresh')}</button></div>}
-      {!state.vaultError && !state.vaultLoading && credentials.length === 0 && state.needsSecurityKey && !state.keyword && <div className="popup-empty"><KeyRound size={24} /><strong>{t('vault.emptyEncryptedTitle')}</strong><p>{t('vault.emptyEncryptedDesc')}</p><button className="popup-button popup-button--quiet" type="button" onClick={() => void state.refreshDesktopState()}>{t('vault.configureKey')}</button></div>}
-      {!state.vaultError && !state.vaultLoading && credentials.length === 0 && !(state.needsSecurityKey && !state.keyword) && <div className="popup-empty"><KeyRound size={24} /><p>{state.keyword ? t('vault.emptyNoMatch') : t('vault.emptyNoEntries')}</p>{!state.keyword && <button className="popup-empty__add" type="button" onClick={state.openCreate}>{t('vault.addEntry')}</button>}</div>}
+      {state.vaultError && <div className="popup-empty popup-empty--error" role="alert"><CircleAlert size={21} /><p>{state.vaultError}</p><PopupButton className="popup-button popup-button--quiet" type="button" onClick={() => void state.refreshVault()}><RefreshCw size={14} />{t('login.refresh')}</PopupButton></div>}
+      {!state.vaultError && !state.vaultLoading && credentials.length === 0 && state.needsSecurityKey && !state.keyword && <div className="popup-empty"><KeyRound size={24} /><strong>{t('vault.emptyEncryptedTitle')}</strong><p>{t('vault.emptyEncryptedDesc')}</p><PopupButton className="popup-button popup-button--quiet" type="button" onClick={() => void state.refreshDesktopState()}>{t('vault.configureKey')}</PopupButton></div>}
+      {!state.vaultError && !state.vaultLoading && credentials.length === 0 && !(state.needsSecurityKey && !state.keyword) && <div className="popup-empty"><KeyRound size={24} /><p>{state.keyword ? t('vault.emptyNoMatch') : t('vault.emptyNoEntries')}</p>{!state.keyword && <PopupButton className="popup-empty__add" type="button" onClick={state.openCreate}>{t('vault.addEntry')}</PopupButton>}</div>}
       {state.vaultLoading && credentials.length === 0 && <div className="popup-skeleton" aria-label={t('app.loading')}>{[0, 1, 2].map((item) => <i key={item} />)}</div>}
       {credentials.map((credential) => <CredentialRow key={credential.id} credential={credential} />)}
     </section>
@@ -115,13 +124,13 @@ function CredentialRow({ credential }: { credential: FillCredential }) {
   }
 
   return <article className="popup-credential">
-    <button className="popup-credential__main" type="button" title={t('credential.autofill')} onClick={() => void state.autofill(credential.id)}><strong>{credential.title}</strong><span>{credential.username || t('credential.noUsername')}</span></button>
+    <PopupButton className="popup-credential__main" type="button" title={t('credential.autofill')} onClick={() => void state.autofill(credential.id)}><strong>{credential.title}</strong><span>{credential.username || t('credential.noUsername')}</span></PopupButton>
     <div className="popup-credential__actions">
-      {credential.authenticator && <div className="popup-totp"><button type="button" className="popup-icon-button popup-totp__trigger" title={t('credential.totpView')} aria-label={t('credential.totpView')} onClick={() => void copyTotp()}><ShieldCheck size={15} /></button><div className="popup-totp__popover" role="tooltip"><button type="button" onClick={() => void copyTotp()} title={t('credential.totpCopy')}><code>{totp?.code.match(/.{1,3}/g)?.join(' ') ?? '------'}</code><span>{totp?.remainingSeconds ?? '--'}s</span></button></div></div>}
-      <button type="button" className="popup-icon-button" title={t('credential.edit')} aria-label={t('credential.edit')} onClick={() => state.openEdit(credential)}><Pencil size={14} /></button>
-      <button type="button" className="popup-icon-button" title={t('credential.share')} aria-label={t('credential.share')} onClick={() => void state.shareCredential(credential)}><Share2 size={15} /></button>
-      <button type="button" className={`popup-icon-button ${credential.favorite ? 'is-favorite' : ''}`} title={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} aria-label={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} onClick={() => void state.toggleFavorite(credential)}><Star size={15} fill={credential.favorite ? 'currentColor' : 'none'} /></button>
-      <button type="button" className="popup-icon-button popup-icon-button--danger" title={t('credential.delete')} aria-label={t('credential.delete')} onClick={() => state.requestDelete(credential)}><Trash2 size={15} /></button>
+      {credential.authenticator && <div className="popup-totp"><PopupButton type="button" className="popup-icon-button popup-totp__trigger" title={t('credential.totpView')} aria-label={t('credential.totpView')} onClick={() => void copyTotp()}><ShieldCheck size={15} /></PopupButton><div className="popup-totp__popover" role="tooltip"><PopupButton type="button" onClick={() => void copyTotp()} title={t('credential.totpCopy')}><code>{totp?.code.match(/.{1,3}/g)?.join(' ') ?? '------'}</code><span>{totp?.remainingSeconds ?? '--'}s</span></PopupButton></div></div>}
+      <PopupButton type="button" className="popup-icon-button" title={t('credential.edit')} aria-label={t('credential.edit')} onClick={() => state.openEdit(credential)}><Pencil size={14} /></PopupButton>
+      <PopupButton type="button" className="popup-icon-button" title={t('credential.share')} aria-label={t('credential.share')} onClick={() => void state.shareCredential(credential)}><Share2 size={15} /></PopupButton>
+      <PopupButton type="button" className={`popup-icon-button ${credential.favorite ? 'is-favorite' : ''}`} title={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} aria-label={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} onClick={() => void state.toggleFavorite(credential)}><Star size={15} fill={credential.favorite ? 'currentColor' : 'none'} /></PopupButton>
+      <PopupButton type="button" className="popup-icon-button popup-icon-button--danger" title={t('credential.delete')} aria-label={t('credential.delete')} onClick={() => state.requestDelete(credential)}><Trash2 size={15} /></PopupButton>
     </div>
   </article>
 }
@@ -166,14 +175,14 @@ function EntryEditor() {
     <Dialog.Portal>
       <Dialog.Overlay className="popup-dialog-overlay" />
       <Dialog.Content className="popup-editor" aria-describedby="popup-editor-description">
-        <header className="popup-editor__header"><button type="button" className="popup-icon-button" title={t('common.back')} aria-label={t('common.back')} disabled={state.entrySaving} onClick={state.closeEditor}><ArrowLeft size={17} /></button><div><Dialog.Title>{t(editing ? 'entry.edit' : 'entry.create')}</Dialog.Title><Dialog.Description id="popup-editor-description">{t('entry.websiteHint')}</Dialog.Description></div><button className="popup-button popup-button--primary" type="submit" form="popup-entry-form" disabled={state.entrySaving}>{state.entrySaving ? t('entry.saving') : t('entry.save')}</button></header>
-        <form id="popup-entry-form" className="popup-editor__body" onSubmit={submit}>
-          <label className="popup-field"><span>{t('entry.titlePlaceholder')}</span><input autoFocus maxLength={PASSWORD_TITLE_MAX_LENGTH} value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t('entry.titlePlaceholder')} disabled={state.entrySaving} /></label>
-          <label className="popup-field"><span>{t('entry.username')}</span><input autoComplete="off" value={username} onChange={(event) => setUsername(event.target.value)} placeholder={t('entry.usernamePlaceholder')} disabled={state.entrySaving} /></label>
-          <label className="popup-field"><span>{t('entry.password')}</span><span className="popup-password-field"><input autoComplete="new-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={t('entry.passwordPlaceholder')} disabled={state.entrySaving} /><button type="button" className="popup-icon-button" title={t(showPassword ? 'entry.hidePassword' : 'entry.showPassword')} aria-label={t(showPassword ? 'entry.hidePassword' : 'entry.showPassword')} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={15} /> : <Eye size={15} />}</button><button type="button" className="popup-icon-button" title={t('entry.generatePassword')} aria-label={t('entry.generatePassword')} onClick={() => void generate()}><RefreshCw size={15} /></button></span></label>
-          <label className="popup-field"><span>{t('entry.website')}</span><input autoComplete="url" value={websiteValue} onChange={(event) => setWebsiteValue(event.target.value)} placeholder={t('entry.websitePlaceholder')} disabled={state.entrySaving} /></label>
+        <header className="popup-editor__header"><PopupButton type="button" className="popup-icon-button" title={t('common.back')} aria-label={t('common.back')} disabled={state.entrySaving} onClick={state.closeEditor}><ArrowLeft size={17} /></PopupButton><div><Dialog.Title>{t(editing ? 'entry.edit' : 'entry.create')}</Dialog.Title><Dialog.Description id="popup-editor-description">{t('entry.websiteHint')}</Dialog.Description></div><PopupButton className="popup-button popup-button--primary" type="submit" form="popup-entry-form" disabled={state.entrySaving}>{state.entrySaving ? t('entry.saving') : t('entry.save')}</PopupButton></header>
+        <Form id="popup-entry-form" className="popup-editor__body" onSubmit={(event) => submit(event)}>
+          <div className="popup-field"><span>{t('entry.titlePlaceholder')}</span><LockInput autoFocus maxLength={PASSWORD_TITLE_MAX_LENGTH} value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t('entry.titlePlaceholder')} disabled={state.entrySaving} /></div>
+          <div className="popup-field"><span>{t('entry.username')}</span><LockInput autoComplete="off" value={username} onChange={(event) => setUsername(event.target.value)} placeholder={t('entry.usernamePlaceholder')} disabled={state.entrySaving} /></div>
+          <div className="popup-field"><span>{t('entry.password')}</span><span className="popup-password-field"><LockInput autoComplete="new-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={t('entry.passwordPlaceholder')} disabled={state.entrySaving} /><PopupButton type="button" className="popup-icon-button" title={t(showPassword ? 'entry.hidePassword' : 'entry.showPassword')} aria-label={t(showPassword ? 'entry.hidePassword' : 'entry.showPassword')} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={15} /> : <Eye size={15} />}</PopupButton><PopupButton type="button" className="popup-icon-button" title={t('entry.generatePassword')} aria-label={t('entry.generatePassword')} onClick={() => void generate()}><RefreshCw size={15} /></PopupButton></span></div>
+          <div className="popup-field"><span>{t('entry.website')}</span><LockInput autoComplete="url" value={websiteValue} onChange={(event) => setWebsiteValue(event.target.value)} placeholder={t('entry.websitePlaceholder')} disabled={state.entrySaving} /></div>
           {error && <p className="popup-error" role="alert">{error}</p>}
-        </form>
+        </Form>
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>
@@ -183,7 +192,7 @@ function DeleteDialog() {
   const state = useReactPopupStore()
   const t = usePopupT()
   return <Dialog.Root open={!!state.pendingDelete} onOpenChange={(open) => { if (!open) state.cancelDelete() }}>
-    <Dialog.Portal><Dialog.Overlay className="popup-dialog-overlay popup-dialog-overlay--confirm" /><Dialog.Content className="popup-confirm"><div className="popup-confirm__icon"><Trash2 size={19} /></div><Dialog.Title>{t('vault.deleteTitle')}</Dialog.Title><Dialog.Description>{t('vault.deleteMessage', { title: state.pendingDelete?.title ?? '' })}</Dialog.Description><div className="popup-confirm__actions"><button className="popup-button popup-button--quiet" type="button" disabled={state.deleting} onClick={state.cancelDelete}>{t('common.cancel')}</button><button className="popup-button popup-button--danger" type="button" disabled={state.deleting} onClick={() => void state.confirmDelete()}>{state.deleting ? t('common.deleting') : t('vault.deleteConfirm')}</button></div></Dialog.Content></Dialog.Portal>
+    <Dialog.Portal><Dialog.Overlay className="popup-dialog-overlay popup-dialog-overlay--confirm" /><Dialog.Content className="popup-confirm"><div className="popup-confirm__icon"><Trash2 size={19} /></div><Dialog.Title>{t('vault.deleteTitle')}</Dialog.Title><Dialog.Description>{t('vault.deleteMessage', { title: state.pendingDelete?.title ?? '' })}</Dialog.Description><div className="popup-confirm__actions"><PopupButton className="popup-button popup-button--quiet" type="button" disabled={state.deleting} onClick={state.cancelDelete}>{t('common.cancel')}</PopupButton><PopupButton className="popup-button popup-button--danger" type="button" disabled={state.deleting} onClick={() => void state.confirmDelete()}>{state.deleting ? t('common.deleting') : t('vault.deleteConfirm')}</PopupButton></div></Dialog.Content></Dialog.Portal>
   </Dialog.Root>
 }
 
@@ -192,7 +201,7 @@ function SettingsPage() {
   const t = usePopupT()
   const status = !state.desktopState?.ready ? 'offline' : !state.desktopState.loggedIn ? 'notLoggedIn' : state.desktopState.locked || !state.desktopState.unlocked ? 'locked' : 'ready'
   const statusKey = `settings.desktop${status === 'notLoggedIn' ? 'NotLoggedIn' : status === 'offline' ? 'Offline' : status === 'locked' ? 'Locked' : 'Ready'}`
-  return <main className="popup-settings"><header className="popup-topbar"><button className="popup-icon-button" type="button" title={t('common.back')} aria-label={t('common.back')} onClick={() => { state.openVault(); if (state.desktopState?.unlocked) void state.refreshVault() }}><ArrowLeft size={17} /></button><h1>{t('settings.title')}</h1></header><div className="popup-settings__content"><section className="popup-settings__section"><h2>{t('settings.desktop')}</h2><div className="popup-settings__status"><span>{t('settings.desktopStatus')}</span><strong className={`popup-status__badge popup-status__badge--${status}`}>{t(statusKey)}</strong></div><p>{t('settings.desktopNote')}</p><p>{t('settings.appearanceFromDesktop')}</p></section><section className="popup-settings__section"><h2>{t('settings.about')}</h2><div className="popup-settings__row"><span>{t('settings.version')}</span><strong>{APP_VERSION}</strong></div><div className="popup-settings__row"><span>{t('settings.author')}</span><a href={AUTHOR_GITHUB_URL} target="_blank" rel="noopener noreferrer">{AUTHOR_NAME}<ExternalLink size={12} /></a></div><div className="popup-settings__row"><span>{t('settings.officialWebsite')}</span><a href={OFFICIAL_WEBSITE_URL} target="_blank" rel="noopener noreferrer">{t('settings.officialWebsiteLink')}<ExternalLink size={12} /></a></div></section></div><button className="popup-settings__refresh" type="button" disabled={state.sessionLoading} onClick={() => void state.refreshDesktopState()}><RefreshCw size={14} />{t('login.refresh')}</button></main>
+  return <main className="popup-settings"><header className="popup-topbar"><PopupButton className="popup-icon-button" type="button" title={t('common.back')} aria-label={t('common.back')} onClick={() => { state.openVault(); if (state.desktopState?.unlocked) void state.refreshVault() }}><ArrowLeft size={17} /></PopupButton><h1>{t('settings.title')}</h1></header><div className="popup-settings__content"><section className="popup-settings__section"><h2>{t('settings.desktop')}</h2><div className="popup-settings__status"><span>{t('settings.desktopStatus')}</span><strong className={`popup-status__badge popup-status__badge--${status}`}>{t(statusKey)}</strong></div><p>{t('settings.desktopNote')}</p><p>{t('settings.appearanceFromDesktop')}</p></section><section className="popup-settings__section"><h2>{t('settings.about')}</h2><div className="popup-settings__row"><span>{t('settings.version')}</span><strong>{APP_VERSION}</strong></div><div className="popup-settings__row"><span>{t('settings.author')}</span><a href={AUTHOR_GITHUB_URL} target="_blank" rel="noopener noreferrer">{AUTHOR_NAME}<ExternalLink size={12} /></a></div><div className="popup-settings__row"><span>{t('settings.officialWebsite')}</span><a href={OFFICIAL_WEBSITE_URL} target="_blank" rel="noopener noreferrer">{t('settings.officialWebsiteLink')}<ExternalLink size={12} /></a></div></section></div><PopupButton className="popup-settings__refresh" type="button" disabled={state.sessionLoading} onClick={() => void state.refreshDesktopState()}><RefreshCw size={14} />{t('login.refresh')}</PopupButton></main>
 }
 
 export default function PopupReactApp() {

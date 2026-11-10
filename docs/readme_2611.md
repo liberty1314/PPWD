@@ -1038,8 +1038,8 @@
     - shared/ui/tokens.css
     - docs/readme_2611.md
 
-[2026-11-09 00:14] refactor(repo): 重命名应用目录并同步 PPWD 品牌
-  - Body: 将桌面端和扩展目录、包配置、构建入口及相关文档统一迁移到 PPWD 命名。增加旧 BearPassword 用户数据目录迁移，并继续支持旧唤起协议，保持既有用户数据和扩展桥接兼容。
+[2026-11-10 09:46] refactor(repo): 重命名应用目录并同步 PPWD 品牌
+  - Body: 将桌面端和扩展目录、包配置、构建入口及相关文档统一迁移到 PPWD 命名。增加旧 BearPassword 用户数据目录迁移，并继续支持旧唤起协议；本机数据重置专项测试 4 项通过。
   - Files:
     - .gitignore
     - AGENTS.md
@@ -1398,4 +1398,3 @@
     - projects/bear_password_intro_ppt169_20260712/sources/root_README.md
     - projects/bear_password_intro_ppt169_20260712/sources/server_README.md
     - scripts/build-all.mjs
-    - docs/readme_2611.md

@@ -291,6 +291,14 @@ interface OfflineVaultApi {
   recordRecent: (passwordId: string) => Promise<{ ok: true } | { ok: false; error: string }>
 }
 
+interface LocalDataResetApi {
+  chooseBackupLocation: () => Promise<{ token: string; path: string } | null>
+  reset: (token: string, confirmation: string) => Promise<
+    | { ok: true; backupPath: string }
+    | { ok: false; reason: 'confirmation' | 'location' | 'canceled' }
+  >
+}
+
 interface SecureStorageApi {
   isAvailable: () => Promise<boolean>
   get: () => Promise<string | null>
@@ -317,6 +325,7 @@ declare global {
     islandApi?: IslandApi
     extensionBridgeApi?: ExtensionBridgeApi
     offlineVaultApi?: OfflineVaultApi
+    localDataResetApi?: LocalDataResetApi
   }
 }
 

@@ -7,6 +7,7 @@ import { useAutoLockStore } from './stores/autoLock'
 import { useStoreSnapshot } from './stores/reactiveStore'
 import { useDesktopLocale } from './ui/useDesktopLocale'
 import { Button } from './ui/primitives'
+import { StatCard } from './components/ui/StatCard'
 import type { DashboardStats, PasswordEntry } from './types'
 
 const EMPTY_STATS: DashboardStats = { totalPasswords: 0, favoriteCount: 0, recentCount: 0 }
@@ -43,7 +44,9 @@ export function ReactDashboardPage() {
     <header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.dashboard')}</p><h1>{translate('dashboard.welcome')}</h1><p className="react-page__description">{translate('dashboard.tagline')}</p></div><Button icon={<LockKeyhole size={15} />} onClick={() => autoLock.lock({ hideWindow: false })}>{translate('dashboard.actionLockApp')}</Button></header>
     {error && <p className="react-form__error" role="alert">{error}</p>}
     <section className="react-dashboard__stats" aria-label={translate('dashboard.summary')}>
-      {statItems.map((item, index) => <button type="button" key={item.label} onClick={() => navigate(['/vault', '/favorites', '/recent'][index])} className={`react-dashboard__stat react-dashboard__stat--${item.tone}`}><div className="react-dashboard__stat-head"><span>{item.label}</span><span aria-hidden="true">{item.icon}</span></div><strong>{loading ? '—' : item.value}</strong></button>)}
+      {statItems.map((item, index) => <button type="button" key={item.label} onClick={() => navigate(['/vault', '/favorites', '/recent'][index])} className={`react-dashboard__stat-button react-dashboard__stat--${item.tone}`}>
+        <StatCard label={item.label} value={loading ? 0 : item.value} trend={loading ? [0, 0] : [Math.max(0, item.value - 2), Math.max(0, item.value - 1), item.value]} delta={loading ? 0 : 8} period={translate('dashboard.summary')} color={item.tone === 'warning' ? 'var(--bp-warning)' : item.tone === 'success' ? 'var(--bp-success)' : 'var(--bp-accent)'} />
+      </button>)}
     </section>
     <section className="react-dashboard__lower">
       <div className="react-dashboard__section"><header><div><h2>{translate('dashboard.recent')}</h2><p>{translate('dashboard.recentDescription')}</p></div><Button tone="quiet" onClick={() => navigate('/recent')}>{translate('nav.recent')}</Button></header>

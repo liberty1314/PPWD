@@ -1,54 +1,32 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import * as SelectPrimitive from '@radix-ui/react-select'
 import * as ToastPrimitive from '@radix-ui/react-toast'
-import { Children, createContext, isValidElement, useContext, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
-import { Check, ChevronDown, X } from 'lucide-react'
+import { Children, createContext, isValidElement, useContext, useState, type InputHTMLAttributes, type ReactNode } from 'react'
+import { Check, X } from 'lucide-react'
+import { Button as EasyButton, type ButtonProps as EasyButtonProps } from '../components/ui/Button'
+import { LockInput } from '../components/ui/LockInput'
+import { SpringSelect } from '../components/ui/SpringSelect'
+import { cn } from '../components/ui/utils'
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { tone?: 'primary' | 'neutral' | 'quiet' | 'danger'; icon?: ReactNode }
+type ButtonProps = Omit<EasyButtonProps, 'variant' | 'leftIcon' | 'children'> & { tone?: 'primary' | 'neutral' | 'quiet' | 'danger'; icon?: ReactNode; children?: ReactNode }
 
-export function Button({ tone = 'neutral', icon, children, className = '', ...props }: ButtonProps) {
-  return <button className={`bp-button bp-button--${tone} ${className}`} {...props}>{icon}{children && <span>{children}</span>}</button>
+export function Button({ tone = 'neutral', size = 'md', icon, children, className = '', ...props }: ButtonProps) {
+  const variant = tone === 'danger' ? 'destructive' : tone === 'quiet' ? 'ghost' : tone === 'neutral' ? 'secondary' : 'primary'
+  return <EasyButton variant={variant} size={size} leftIcon={icon} className={cn('bp-button', className)} {...props}>{children}</EasyButton>
 }
 
 export function TextField({ label, description, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; description?: string }) {
   const id = props.id ?? props.name ?? label.toLowerCase().replace(/\s+/g, '-')
-  return <label className="bp-field" htmlFor={id}><span className="bp-field__label">{label}</span><input className="bp-input" id={id} {...props} />{description && <span className="bp-field__description">{description}</span>}</label>
+  return <div className="bp-field"><LockInput id={id} label={label} description={description} className="bp-input" {...props} /></div>
 }
 
 type SelectOptionProps = { value?: string; disabled?: boolean; children?: ReactNode }
-const EMPTY_SELECT_VALUE = '__bear_password_empty_select_value__'
-
-export function SelectField({ label, children, id, value, disabled, onValueChange }: { label: string; id: string; value: string; disabled?: boolean; onValueChange: (value: string) => void; children: ReactNode }) {
+export function SelectField({ label, labelHidden = false, children, id, value, disabled, onValueChange }: { label: string; labelHidden?: boolean; id: string; value: string; disabled?: boolean; onValueChange: (value: string) => void; children: ReactNode }) {
   const options = Children.toArray(children).flatMap((child) => {
     if (!isValidElement<SelectOptionProps>(child) || child.type !== 'option') return []
     return [child]
   })
-  const selectedValue = value === '' ? EMPTY_SELECT_VALUE : value
-
-  return <div className="bp-field">
-    <span id={`${id}-label`} className="bp-field__label">{label}</span>
-    <SelectPrimitive.Root value={selectedValue} disabled={disabled} onValueChange={(next) => onValueChange(next === EMPTY_SELECT_VALUE ? '' : next)}>
-      <SelectPrimitive.Trigger id={id} className="bp-select-trigger" aria-labelledby={`${id}-label`}>
-        <SelectPrimitive.Value />
-        <SelectPrimitive.Icon asChild><ChevronDown size={15} aria-hidden="true" /></SelectPrimitive.Icon>
-      </SelectPrimitive.Trigger>
-      <SelectPrimitive.Portal>
-        <SelectPrimitive.Content className="bp-select-content" position="popper" sideOffset={4}>
-          <SelectPrimitive.Viewport>
-            {options.map((option, index) => {
-              const optionValue = String(option.props.value ?? option.props.children ?? '')
-              const itemValue = optionValue === '' ? EMPTY_SELECT_VALUE : optionValue
-              return <SelectPrimitive.Item key={option.key ?? `${itemValue}-${index}`} className="bp-select-item" value={itemValue} disabled={option.props.disabled}>
-                <SelectPrimitive.ItemText>{option.props.children}</SelectPrimitive.ItemText>
-                <SelectPrimitive.ItemIndicator className="bp-select-item__indicator"><Check size={14} aria-hidden="true" /></SelectPrimitive.ItemIndicator>
-              </SelectPrimitive.Item>
-            })}
-          </SelectPrimitive.Viewport>
-        </SelectPrimitive.Content>
-      </SelectPrimitive.Portal>
-    </SelectPrimitive.Root>
-  </div>
+  return <SpringSelect id={id} label={label} labelHidden={labelHidden} value={value} disabled={disabled} onChange={onValueChange} options={options.map((option) => ({ value: String(option.props.value ?? option.props.children ?? ''), label: String(option.props.children ?? ''), disabled: option.props.disabled }))} />
 }
 
 export const Dialog = DialogPrimitive.Root

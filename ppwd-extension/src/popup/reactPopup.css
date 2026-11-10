@@ -66,7 +66,8 @@ button { color: inherit; }
 .popup-credential { display: flex; min-height: 59px; align-items: center; gap: 6px; margin-bottom: 7px; border: 1px solid var(--bp-card-border); border-radius: var(--bp-radius-md); padding: 7px 7px 7px 10px; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
 .popup-credential:hover, .popup-credential:focus-within { border-color: var(--bp-control-hover-border); background: var(--bp-card-hover-bg); }
 .popup-credential__main { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: flex-start; gap: 3px; border: 0; padding: 0; background: transparent; text-align: left; cursor: pointer; }
-.popup-credential__main strong, .popup-credential__main span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popup-credential__main > span { display: flex; min-width: 0; max-width: 100%; flex-direction: column; align-items: flex-start; gap: 3px; overflow: visible; white-space: normal; }
+.popup-credential__main strong, .popup-credential__main > span > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .popup-credential__main strong { color: var(--bp-text); font-size: 12px; font-weight: 650; }
 .popup-credential__main span { color: var(--bp-text-muted); font-size: 11px; }
 .popup-credential__actions { display: flex; flex: 0 0 auto; align-items: center; gap: 1px; }

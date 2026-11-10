@@ -1,8 +1,8 @@
-import { useEffect, useReducer, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import type { StoreGeneric } from './stores/reactiveStore'
 import { useStoreSnapshot } from './stores/reactiveStore'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Fingerprint, FolderOpen, KeyRound, RotateCcw, Trash2 } from 'lucide-react'
+import { Fingerprint, FolderOpen, HardDrive, KeyRound, Keyboard, RotateCcw, Settings2, Shield, Trash2 } from 'lucide-react'
 import { useAppStore } from './stores/app'
 import { useAutoLockStore } from './stores/autoLock'
 import { useAuthStore } from './stores/auth'
@@ -18,6 +18,7 @@ import { desktopAuthAdapter } from './platform/desktopAuthAdapter'
 import { desktopSettingsAdapter } from './platform/desktopSettingsAdapter'
 import { useDesktopLocale } from './ui/useDesktopLocale'
 import { Button, Dialog, DialogClose, DialogContent, SelectField, TextField, useToast } from './ui/primitives'
+import { AnimatedTabs } from './components/ui/AnimatedTabs'
 import { AUTO_LOCK_OPTIONS, type AutoLockMinutes } from './types/autoLock'
 import { CLIPBOARD_CLEAR_OPTIONS, type ClipboardClearSeconds } from './types/clipboardClear'
 import { SHORTCUT_ACTION_OPTIONS, type ShortcutActionId } from './types/shortcut'
@@ -27,6 +28,7 @@ import { FONT_OPTIONS } from './utils/font'
 import { formatAccelerator, keyboardEventToAccelerator } from './utils/shortcut'
 import { normalizeAcceleratorString } from '../shared/acceleratorMatch'
 import { persistVaultPassword } from './utils/vaultPasswordStorage'
+import { LocalDataReset } from './components/LocalDataReset'
 const SETTINGS_SECTIONS = ['general', 'security', 'shortcuts', 'backup'] as const
 type SettingsSection = typeof SETTINGS_SECTIONS[number]
 
@@ -137,11 +139,11 @@ export function SettingsPage() {
     setRecoveryKey('')
   }, [])
 
-  const settingTabs: Array<{ id: SettingsSection; label: string }> = [
-    { id: 'general', label: translate('settings.general') },
-    { id: 'security', label: translate('settings.security') },
-    { id: 'shortcuts', label: translate('settings.shortcuts') },
-    { id: 'backup', label: translate('backup.title') }
+  const settingTabs: Array<{ id: SettingsSection; label: string; icon: ReactNode }> = [
+    { id: 'general', label: translate('settings.general'), icon: <Settings2 size={14} /> },
+    { id: 'security', label: translate('settings.security'), icon: <Shield size={14} /> },
+    { id: 'shortcuts', label: translate('settings.shortcuts'), icon: <Keyboard size={14} /> },
+    { id: 'backup', label: translate('backup.title'), icon: <HardDrive size={14} /> }
   ]
 
   async function updateTrayEnabled(enabled: boolean): Promise<void> {
@@ -318,25 +320,32 @@ export function SettingsPage() {
 
   return <main className="react-page react-settings-page">
     <header className="react-page__header"><div><p className="react-eyebrow">{translate('settings.title')}</p><h1>{currentSection?.label}</h1><p className="react-page__description">{translate('settings.subtitle')}</p></div></header>
-    <nav className="react-settings-tabs" aria-label={translate('settings.title')} role="tablist">
-      {settingTabs.map((item) => <button key={item.id} type="button" role="tab" aria-selected={section === item.id} onClick={() => navigate(`/settings/${item.id}`)}>{item.label}</button>)}
-    </nav>
+    <AnimatedTabs
+      className="react-settings-tabs-root"
+      tabs={settingTabs}
+      activeTab={section}
+      onChange={(id) => navigate(`/settings/${id}`)}
+      renderContent={false}
+      tabsContainerClassName="react-settings-tabs"
+    />
 
     {section === 'general' && <section className="react-settings" aria-label={translate('settings.general')}>
       <ToggleRow title={translate('settings.launchAtLogin')} description={translate('settings.launchAtLoginDesc')} checked={launchAtLogin.enabled} disabled={!launchAtLogin.available || launchAtLogin.loading} onChange={async (enabled) => { const result = await launchAtLogin.setEnabled(enabled); if (result.ok) toast(translate(enabled ? 'msg.launchAtLoginOn' : 'msg.launchAtLoginOff')); else toast(result.error ?? translate('common.settingsFailed')) }} />
       <ToggleRow title={translate('settings.tray')} description={translate('settings.trayDesc')} checked={tray.enabled} disabled={!tray.available || tray.loading} onChange={updateTrayEnabled} />
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.trayClickAction')}</h2><p>{translate('settings.trayClickActionDesc')}</p></div><SelectField label={translate('settings.trayClickAction')} id="tray-click-action" value={tray.clickAction} onValueChange={(value) => void tray.updateSettings({ clickAction: value as TrayClickAction })}><option value="vault">{translate('nav.vault')}</option><option value="favorites">{translate('nav.favorites')}</option><option value="recent">{translate('nav.recent')}</option><option value="settings">{translate('nav.settings')}</option></SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.trayClickAction')}</h2><p>{translate('settings.trayClickActionDesc')}</p></div><SelectField label={translate('settings.trayClickAction')} labelHidden id="tray-click-action" value={tray.clickAction} onValueChange={(value) => void tray.updateSettings({ clickAction: value as TrayClickAction })}><option value="vault">{translate('nav.vault')}</option><option value="favorites">{translate('nav.favorites')}</option><option value="recent">{translate('nav.recent')}</option><option value="settings">{translate('nav.settings')}</option></SelectField></div>
       <ToggleRow title={translate('settings.dockHidden')} description={translate('settings.dockHiddenDesc')} checked={dock.hidden} disabled={!dock.available || dock.loading} onChange={updateDockHidden} />
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.font')}</h2><p>{translate(app.fontPreference === 'system' ? 'font.systemDesc' : 'font.cangerDesc')}</p></div><SelectField label={translate('settings.font')} id="font-preference" value={app.fontPreference} onValueChange={(value) => app.setFontPreference(value)}>{FONT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(`font.${option.value}`)}</option>)}</SelectField></div>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.subtitle')}</p></div><SelectField label={translate('settings.language')} id="locale-preference" value={app.localePreference} onValueChange={(value) => app.setLocalePreference(value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.font')}</h2><p>{translate(app.fontPreference === 'system' ? 'font.systemDesc' : 'font.cangerDesc')}</p></div><SelectField label={translate('settings.font')} labelHidden id="font-preference" value={app.fontPreference} onValueChange={(value) => app.setFontPreference(value)}>{FONT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(`font.${option.value}`)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.subtitle')}</p></div><SelectField label={translate('settings.language')} labelHidden id="locale-preference" value={app.localePreference} onValueChange={(value) => app.setLocalePreference(value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</SelectField></div>
       <div className="react-setting-row react-setting-row--directory"><div className="react-setting-row__copy"><h2>{translate('settings.offlineDataDir')}</h2><p>{offline.dataDir || offline.defaultDataDir || translate('settings.offlineDataDirUnset')}</p></div><Button icon={<FolderOpen size={15} />} onClick={requestDirectoryChange} disabled={offline.saving}>{translate('settings.offlineDataDirChoose')}</Button></div>
     </section>}
 
     {section === 'security' && <section className="react-settings" aria-label={translate('settings.security')}>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.autoLock')}</h2><p>{translate('settings.autoLockDesc')}</p></div><SelectField label={translate('settings.autoLock')} id="auto-lock-minutes" value={String(autoLock.lockMinutes)} disabled={security.isMigrating} onValueChange={(value) => autoLock.setLockMinutes(Number(value) as AutoLockMinutes)}>{AUTO_LOCK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.value === 0 ? 'autoLock.never' : `autoLock.${option.value}`)}</option>)}</SelectField></div>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.clipboardClear')}</h2><p>{translate('settings.clipboardClearDesc')}</p></div><SelectField label={translate('settings.clipboardClear')} id="clipboard-clear-seconds" value={String(clipboard.clearSeconds)} disabled={security.isMigrating} onValueChange={(value) => clipboard.setClearSeconds(Number(value) as ClipboardClearSeconds)}>{CLIPBOARD_CLEAR_OPTIONS.map((seconds) => <option key={seconds} value={seconds}>{translate(seconds === 0 ? 'clipboardClear.never' : `clipboardClear.${seconds}`)}</option>)}</SelectField></div>
+      <section className="react-subsection react-security-options"><h2>{translate('settings.vaultProtectionGroup')}</h2>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.autoLock')}</h2><p>{translate('settings.autoLockDesc')}</p></div><SelectField label={translate('settings.autoLock')} labelHidden id="auto-lock-minutes" value={String(autoLock.lockMinutes)} disabled={security.isMigrating} onValueChange={(value) => autoLock.setLockMinutes(Number(value) as AutoLockMinutes)}>{AUTO_LOCK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.value === 0 ? 'autoLock.never' : `autoLock.${option.value}`)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.clipboardClear')}</h2><p>{translate('settings.clipboardClearDesc')}</p></div><SelectField label={translate('settings.clipboardClear')} labelHidden id="clipboard-clear-seconds" value={String(clipboard.clearSeconds)} disabled={security.isMigrating} onValueChange={(value) => clipboard.setClearSeconds(Number(value) as ClipboardClearSeconds)}>{CLIPBOARD_CLEAR_OPTIONS.map((seconds) => <option key={seconds} value={seconds}>{translate(seconds === 0 ? 'clipboardClear.never' : `clipboardClear.${seconds}`)}</option>)}</SelectField></div>
       <ToggleRow title={translate('settings.preferBiometricUnlock')} description={translate(biometricSupported ? 'settings.preferBiometricUnlockDesc' : 'settings.preferBiometricUnlockDesc')} checked={biometric.preferBiometricUnlock} disabled={!biometricSupported || security.isMigrating} onChange={(enabled) => { if (!enabled) biometric.setPreferBiometricUnlock(false); else { setSecurityError(''); setBiometricPromptOpen(true) } }} />
       {security.isMigrating && <p className="react-form__warning" role="status">{security.migrationProgress.message}</p>}
+      </section>
       <section className="react-subsection"><h2>{translate('phoneToken.title')}</h2><p>{translate(auth.hasPhoneTokenBinding ? 'phoneToken.bound' : 'phoneToken.unbound')}{auth.status?.fingerprint ? ` · ${translate('phoneToken.fingerprint', { fingerprint: auth.status.fingerprint })}` : ''}</p>
         {auth.hasPhoneTokenBinding && <div className="react-inline-form"><TextField label={translate('phoneToken.masterPassword')} type="password" autoComplete="current-password" value={rebindPassword} onChange={(event) => setRebindPassword(event.target.value)} /><TextField label={translate('phoneToken.oldCode')} inputMode="numeric" maxLength={6} value={rebindCode} onChange={(event) => setRebindCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button tone="primary" disabled={securityBusy} onClick={() => void rebindToken()}>{translate('phoneToken.verifyRebind')}</Button></div>}
         {auth.hasRecoveryKey && <div className="react-inline-form"><h3>{translate('recoveryKey.title')}</h3><p>{translate('recoveryKey.viewHint')}</p>{!recoveryKey ? <><TextField label={translate('phoneToken.masterPassword')} type="password" value={recoveryPassword} onChange={(event) => setRecoveryPassword(event.target.value)} /><TextField label={translate('phoneToken.code')} inputMode="numeric" maxLength={6} value={recoveryCode} onChange={(event) => setRecoveryCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button disabled={securityBusy} onClick={() => void revealKey()}>{translate('recoveryKey.verifyView')}</Button></> : <><textarea className="bp-input react-secret" rows={3} value={recoveryKey} readOnly /><Button tone="quiet" onClick={() => setRecoveryKey('')}>{translate('recoveryKey.hide')}</Button></>}</div>}
@@ -344,17 +353,19 @@ export function SettingsPage() {
       </section>
     </section>}
 
-    {section === 'shortcuts' && <section className="react-settings" aria-label={translate('settings.shortcuts')}>
-      <p className="react-page__description">{translate('settings.shortcuts.globalOnlyDesktop')}</p>
+    {section === 'shortcuts' && <section className="react-settings react-shortcuts" aria-label={translate('settings.shortcuts')}>
+      <p className="react-page__description react-shortcuts__intro">{translate('settings.shortcuts.globalOnlyDesktop')}</p>
       {SHORTCUT_ACTION_OPTIONS.map((item) => <div className="react-setting-row" key={item.id}><div className="react-setting-row__copy"><h2>{translate(`shortcut.${item.id}`)}</h2><p>{translate(`shortcut.${item.id}Desc`)}</p></div><ShortcutRecorder action={item.id} value={shortcuts.settings[item.id]} disabled={shortcutBusy === item.id} onSave={(value) => saveShortcut(item.id, value)} /></div>)}
       {shortcutWarning && <p className="react-form__error" role="alert">{shortcutWarning}</p>}
-      <Button icon={<RotateCcw size={15} />} onClick={async () => { const result = await shortcuts.resetDefaults(); setShortcutWarning(result.ok ? '' : translate('settings.shortcuts.openFailed')); if (result.ok) toast(translate('msg.shortcutReset')) }}>{translate('settings.shortcuts.reset')}</Button>
+      <div className="react-settings-action-row"><Button icon={<RotateCcw size={15} />} onClick={async () => { const result = await shortcuts.resetDefaults(); setShortcutWarning(result.ok ? '' : translate('settings.shortcuts.openFailed')); if (result.ok) toast(translate('msg.shortcutReset')) }}>{translate('settings.shortcuts.reset')}</Button></div>
     </section>}
 
     {section === 'backup' && <section className="react-settings react-settings--stack react-backup-settings" aria-label={translate('backup.title')}>
       <div className="react-setting-row react-setting-row--stack"><div className="react-setting-row__copy"><h2>{translate('backup.title')}</h2><p>{translate('backup.description')}</p></div><TextField label={translate('backup.password')} type="password" autoComplete="new-password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></div>
       <p className="react-backup-settings__hint">{translate('backup.hint')}</p>
-      <div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></div>
+      <div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button></div>
+      <section className="react-subsection react-backup-danger"><h2>{translate('backup.dangerZone')}</h2><p>{translate('backup.dangerZoneDescription')}</p><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></section>
+      <div className="react-local-reset-row"><div className="react-setting-row__copy"><h2>{translate('resetLocal.sectionTitle')}</h2><p>{translate('resetLocal.sectionDescription')}</p></div><LocalDataReset /></div>
       {backupError && <p className="react-form__error" role="alert">{localizedMessage(backupError, translate)}</p>}
     </section>}
 

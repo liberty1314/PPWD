@@ -342,3 +342,14 @@ const offlineVaultApi = {
 }
 
 contextBridge.exposeInMainWorld('offlineVaultApi', offlineVaultApi)
+
+const localDataResetApi = {
+  chooseBackupLocation: () => ipcRenderer.invoke('local-data-reset:choose-backup-location') as Promise<{ token: string; path: string } | null>,
+  reset: (token: string, confirmation: string) =>
+    ipcRenderer.invoke('local-data-reset:reset', token, confirmation) as Promise<
+      | { ok: true; backupPath: string }
+      | { ok: false; reason: 'confirmation' | 'location' | 'canceled' }
+    >
+}
+
+contextBridge.exposeInMainWorld('localDataResetApi', localDataResetApi)

@@ -8,7 +8,7 @@
 .react-vault__search-clear { display: grid; width: 26px; height: 26px; flex: none; place-items: center; border: 0; border-radius: 4px; background: transparent; color: var(--bp-text-muted); cursor: pointer; }
 .react-vault__search-clear:hover { background: var(--bp-control-hover-bg); color: var(--bp-text); }
 .react-vault__search kbd { flex: none; border: 1px solid var(--bp-border); border-radius: 3px; padding: 2px 4px; color: var(--bp-text-muted); font-size: 10px; white-space: nowrap; }
-.react-vault__toolbar > .bp-button:last-child { width: 36px; min-width: 36px; height: 36px; justify-self: end; align-self: end; padding: 0; }
+.react-vault__toolbar > .bp-button:last-child { width: 36px; min-width: 36px; height: 36px; min-height: 36px; justify-self: end; align-self: end; padding: 0; }
 .react-vault__toolbar > .bp-button.is-active { border-color: var(--bp-accent); background: var(--bp-nav-active-bg); color: var(--bp-nav-active-text); }
 .react-vault__filter-status { display: flex; min-height: 38px; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; color: var(--bp-text-muted); font-size: 11px; }
 .react-vault__filter-status .bp-button { width: auto; min-height: 30px; margin: 0; padding-inline: 8px; }
