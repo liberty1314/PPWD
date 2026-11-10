@@ -10,7 +10,7 @@ import { generatePhoneTokenRecoveryKey, generatePhoneTokenSecret, createPhoneTok
 import { isSixDigitTotp, validateSetupPassword } from './utils/reactGateRules'
 import { Button, TextField } from './ui/primitives'
 import { Form } from './components/ui/Form'
-import logoUrl from './assets/logo.png'
+import logoUrl from './assets/brand-mark.png'
 import { LocalDataReset } from './components/LocalDataReset'
 
 type ErrorReason = 'invalid' | 'locked' | 'unavailable' | 'stateUnavailable' | 'credentialUnavailable' | 'vaultConfigUnavailable' | 'unbound'
@@ -264,7 +264,6 @@ export function UnlockPage() {
     </div>
     {biometricLoaded && biometricAvailable && biometricEnabled && <Button tone="quiet" className="react-gate__center react-gate__method-switch" onClick={() => { setFallback(!fallback); setError('') }}>{fallback ? translate('unlock.useBiometric') : translate('unlock.useTotp')}</Button>}
     <Button tone="quiet" className="react-gate__center react-gate__recovery-link" onClick={() => navigate('/recover')}>{translate('unlock.recoverAccess')}</Button>
-    <div className="react-gate__reset"><LocalDataReset /></div>
   </GateFrame>
 }
 
@@ -313,6 +312,7 @@ export function RecoverPage() {
       <Button type="submit" tone="primary" disabled={busy}>{translate('unlock.verifyRebind')}</Button>
     </Form>
     <Button tone="quiet" className="react-gate__center react-gate__utility-action" icon={<ArrowLeft size={15} />} onClick={() => navigate('/unlock')}>{translate('unlock.backUnlock')}</Button>
+    <div className="react-gate__reset"><LocalDataReset /></div>
   </GateFrame>
 }
 

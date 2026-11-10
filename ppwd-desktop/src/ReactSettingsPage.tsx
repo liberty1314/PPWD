@@ -2,7 +2,7 @@ import { useEffect, useReducer, useRef, useState, type KeyboardEvent, type React
 import type { StoreGeneric } from './stores/reactiveStore'
 import { useStoreSnapshot } from './stores/reactiveStore'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Fingerprint, FolderOpen, HardDrive, KeyRound, Keyboard, RotateCcw, Settings2, Shield, Trash2 } from 'lucide-react'
+import { Copy, Eye, EyeOff, Fingerprint, FolderOpen, HardDrive, KeyRound, Keyboard, RotateCcw, Settings2, Shield, Trash2 } from 'lucide-react'
 import { useAppStore } from './stores/app'
 import { useAutoLockStore } from './stores/autoLock'
 import { useAuthStore } from './stores/auth'
@@ -17,6 +17,8 @@ import { useTrayStore } from './stores/tray'
 import { desktopAuthAdapter } from './platform/desktopAuthAdapter'
 import { desktopSettingsAdapter } from './platform/desktopSettingsAdapter'
 import { useDesktopLocale } from './ui/useDesktopLocale'
+import { useReactThemeStore } from './stores/reactTheme'
+import type { AccentColor, AppearanceMode, ThemeDesign } from '../../shared/ui/themeTypes'
 import { Button, Dialog, DialogClose, DialogContent, SelectField, TextField, useToast } from './ui/primitives'
 import { AnimatedTabs } from './components/ui/AnimatedTabs'
 import { AUTO_LOCK_OPTIONS, type AutoLockMinutes } from './types/autoLock'
@@ -29,7 +31,7 @@ import { formatAccelerator, keyboardEventToAccelerator } from './utils/shortcut'
 import { normalizeAcceleratorString } from '../shared/acceleratorMatch'
 import { persistVaultPassword } from './utils/vaultPasswordStorage'
 import { LocalDataReset } from './components/LocalDataReset'
-const SETTINGS_SECTIONS = ['general', 'security', 'shortcuts', 'backup'] as const
+const SETTINGS_SECTIONS = ['general', 'appearance', 'security', 'shortcuts', 'backup'] as const
 type SettingsSection = typeof SETTINGS_SECTIONS[number]
 
 function useStoreUpdates(stores: StoreGeneric[], onMount?: () => void): void {
@@ -83,6 +85,7 @@ export function SettingsPage() {
   const tray = useTrayStore()
   const dock = useDockStore()
   const offline = useOfflineVaultStore()
+  const theme = useReactThemeStore()
   const [biometricSupported, setBiometricSupported] = useState(false)
   const [biometricPromptOpen, setBiometricPromptOpen] = useState(false)
   const [biometricPassword, setBiometricPassword] = useState('')
@@ -102,6 +105,7 @@ export function SettingsPage() {
   const [recoveryPassword, setRecoveryPassword] = useState('')
   const [recoveryCode, setRecoveryCode] = useState('')
   const [recoveryKey, setRecoveryKey] = useState('')
+  const [showFingerprint, setShowFingerprint] = useState(false)
   const [securityError, setSecurityError] = useState('')
   const [securityBusy, setSecurityBusy] = useState(false)
   const [selectedDataDir, setSelectedDataDir] = useState('')
@@ -139,8 +143,21 @@ export function SettingsPage() {
     setRecoveryKey('')
   }, [])
 
+  useEffect(() => {
+    if (section !== 'security') {
+      setRebindPassword('')
+      setRebindCode('')
+      setRecoveryPassword('')
+      setRecoveryCode('')
+      setRecoveryKey('')
+      setShowFingerprint(false)
+      setSecurityError('')
+    }
+  }, [section])
+
   const settingTabs: Array<{ id: SettingsSection; label: string; icon: ReactNode }> = [
     { id: 'general', label: translate('settings.general'), icon: <Settings2 size={14} /> },
+    { id: 'appearance', label: translate('settings.appearance'), icon: <Settings2 size={14} /> },
     { id: 'security', label: translate('settings.security'), icon: <Shield size={14} /> },
     { id: 'shortcuts', label: translate('settings.shortcuts'), icon: <Keyboard size={14} /> },
     { id: 'backup', label: translate('backup.title'), icon: <HardDrive size={14} /> }
@@ -230,6 +247,16 @@ export function SettingsPage() {
       setSecurityError(translate('recoveryKey.readFailed'))
     } finally {
       setSecurityBusy(false)
+    }
+  }
+
+  async function copyRecoveryKey(): Promise<void> {
+    if (!recoveryKey) return
+    try {
+      await navigator.clipboard.writeText(recoveryKey)
+      toast(translate('recoveryKey.copied'))
+    } catch {
+      setSecurityError(translate('recoveryKey.copyFailed'))
     }
   }
 
@@ -328,6 +355,7 @@ export function SettingsPage() {
       renderContent={false}
       tabsContainerClassName="react-settings-tabs"
     />
+    <div className="react-settings-content">
 
     {section === 'general' && <section className="react-settings" aria-label={translate('settings.general')}>
       <ToggleRow title={translate('settings.launchAtLogin')} description={translate('settings.launchAtLoginDesc')} checked={launchAtLogin.enabled} disabled={!launchAtLogin.available || launchAtLogin.loading} onChange={async (enabled) => { const result = await launchAtLogin.setEnabled(enabled); if (result.ok) toast(translate(enabled ? 'msg.launchAtLoginOn' : 'msg.launchAtLoginOff')); else toast(result.error ?? translate('common.settingsFailed')) }} />
@@ -339,16 +367,28 @@ export function SettingsPage() {
       <div className="react-setting-row react-setting-row--directory"><div className="react-setting-row__copy"><h2>{translate('settings.offlineDataDir')}</h2><p>{offline.dataDir || offline.defaultDataDir || translate('settings.offlineDataDirUnset')}</p></div><Button icon={<FolderOpen size={15} />} onClick={requestDirectoryChange} disabled={offline.saving}>{translate('settings.offlineDataDirChoose')}</Button></div>
     </section>}
 
-    {section === 'security' && <section className="react-settings" aria-label={translate('settings.security')}>
+    {section === 'appearance' && <section className="react-settings react-settings--stack" aria-label={translate('settings.appearance')}>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.themeMode')}</h2><p>{translate('theme.systemDesc')}</p></div><SelectField label={translate('settings.themeMode')} labelHidden id="appearance-mode" value={theme.appearanceMode} onValueChange={(value) => theme.updatePreferences({ appearanceMode: value as AppearanceMode })}><option value="system">{translate('theme.system')}</option><option value="light">{translate('theme.light')}</option><option value="dark">{translate('theme.dark')}</option></SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.themeDesign')}</h2><p>{translate('settings.themeDesignDesc')}</p></div><SelectField label={translate('settings.themeDesign')} labelHidden id="theme-design" value={theme.themeDesign} onValueChange={(value) => theme.updatePreferences({ themeDesign: value as ThemeDesign })}>{(['classic', 'liquid', 'soft', 'contrast'] as const).map((design) => <option key={design} value={design}>{translate(`settings.themeDesign.${design}`)}</option>)}</SelectField></div>
+      <div className="react-setting-row react-setting-row--accent"><div className="react-setting-row__copy"><h2>{translate('settings.accentColor')}</h2><p>{translate('settings.accentColorDesc')}</p></div><div className="react-accent-grid" role="group" aria-label={translate('settings.accentColor')}>
+        {(['blue', 'teal', 'green', 'purple', 'coral', 'amber'] as const).map((accent) => <button key={accent} type="button" className={`react-accent ${theme.accentColor === accent ? 'is-active' : ''}`} aria-label={translate(`accent.${accent}`)} aria-pressed={theme.accentColor === accent} title={translate(`accent.${accent}`)} onClick={() => theme.updatePreferences({ accentColor: accent as AccentColor })}><span className={`react-accent__swatch react-accent__swatch--${accent}`} /></button>)}
+      </div></div>
+    </section>}
+
+    {section === 'security' && <section className="react-settings react-security-settings" aria-label={translate('settings.security')}>
       <section className="react-subsection react-security-options"><h2>{translate('settings.vaultProtectionGroup')}</h2>
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.autoLock')}</h2><p>{translate('settings.autoLockDesc')}</p></div><SelectField label={translate('settings.autoLock')} labelHidden id="auto-lock-minutes" value={String(autoLock.lockMinutes)} disabled={security.isMigrating} onValueChange={(value) => autoLock.setLockMinutes(Number(value) as AutoLockMinutes)}>{AUTO_LOCK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.value === 0 ? 'autoLock.never' : `autoLock.${option.value}`)}</option>)}</SelectField></div>
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.clipboardClear')}</h2><p>{translate('settings.clipboardClearDesc')}</p></div><SelectField label={translate('settings.clipboardClear')} labelHidden id="clipboard-clear-seconds" value={String(clipboard.clearSeconds)} disabled={security.isMigrating} onValueChange={(value) => clipboard.setClearSeconds(Number(value) as ClipboardClearSeconds)}>{CLIPBOARD_CLEAR_OPTIONS.map((seconds) => <option key={seconds} value={seconds}>{translate(seconds === 0 ? 'clipboardClear.never' : `clipboardClear.${seconds}`)}</option>)}</SelectField></div>
       <ToggleRow title={translate('settings.preferBiometricUnlock')} description={translate(biometricSupported ? 'settings.preferBiometricUnlockDesc' : 'settings.preferBiometricUnlockDesc')} checked={biometric.preferBiometricUnlock} disabled={!biometricSupported || security.isMigrating} onChange={(enabled) => { if (!enabled) biometric.setPreferBiometricUnlock(false); else { setSecurityError(''); setBiometricPromptOpen(true) } }} />
       {security.isMigrating && <p className="react-form__warning" role="status">{security.migrationProgress.message}</p>}
       </section>
-      <section className="react-subsection"><h2>{translate('phoneToken.title')}</h2><p>{translate(auth.hasPhoneTokenBinding ? 'phoneToken.bound' : 'phoneToken.unbound')}{auth.status?.fingerprint ? ` · ${translate('phoneToken.fingerprint', { fingerprint: auth.status.fingerprint })}` : ''}</p>
-        {auth.hasPhoneTokenBinding && <div className="react-inline-form"><TextField label={translate('phoneToken.masterPassword')} type="password" autoComplete="current-password" value={rebindPassword} onChange={(event) => setRebindPassword(event.target.value)} /><TextField label={translate('phoneToken.oldCode')} inputMode="numeric" maxLength={6} value={rebindCode} onChange={(event) => setRebindCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button tone="primary" disabled={securityBusy} onClick={() => void rebindToken()}>{translate('phoneToken.verifyRebind')}</Button></div>}
-        {auth.hasRecoveryKey && <div className="react-inline-form"><h3>{translate('recoveryKey.title')}</h3><p>{translate('recoveryKey.viewHint')}</p>{!recoveryKey ? <><TextField label={translate('phoneToken.masterPassword')} type="password" value={recoveryPassword} onChange={(event) => setRecoveryPassword(event.target.value)} /><TextField label={translate('phoneToken.code')} inputMode="numeric" maxLength={6} value={recoveryCode} onChange={(event) => setRecoveryCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button disabled={securityBusy} onClick={() => void revealKey()}>{translate('recoveryKey.verifyView')}</Button></> : <><textarea className="bp-input react-secret" rows={3} value={recoveryKey} readOnly /><Button tone="quiet" onClick={() => setRecoveryKey('')}>{translate('recoveryKey.hide')}</Button></>}</div>}
+      <section className="react-subsection react-token-section"><h2>{translate('phoneToken.title')}</h2>
+        <div className="react-token-status-row"><div><span className={`react-token-status${auth.hasPhoneTokenBinding ? ' is-bound' : ''}`}><span aria-hidden="true" />{translate(auth.hasPhoneTokenBinding ? 'phoneToken.bound' : 'phoneToken.unbound')}</span><p>{translate('phoneToken.statusHint')}</p></div>
+          {auth.status?.fingerprint && <div className="react-token-fingerprint"><span>{translate('phoneToken.fingerprint', { fingerprint: showFingerprint ? auth.status.fingerprint : `${auth.status.fingerprint.slice(0, 6)}…${auth.status.fingerprint.slice(-4)}` })}</span><Button tone="quiet" icon={showFingerprint ? <EyeOff size={15} /> : <Eye size={15} />} aria-label={translate(showFingerprint ? 'phoneToken.hideFingerprint' : 'phoneToken.showFingerprint')} title={translate(showFingerprint ? 'phoneToken.hideFingerprint' : 'phoneToken.showFingerprint')} onClick={() => setShowFingerprint((visible) => !visible)} />
+          </div>}
+        </div>
+        {auth.hasPhoneTokenBinding && <div className="react-security-form"><div className="react-security-form__heading"><h3>{translate('phoneToken.rebind')}</h3><p>{translate('phoneToken.rebindHint')}</p></div><div className="react-inline-form"><TextField label={translate('phoneToken.masterPassword')} type="password" autoComplete="current-password" value={rebindPassword} onChange={(event) => setRebindPassword(event.target.value)} /><TextField label={translate('phoneToken.oldCode')} inputMode="numeric" maxLength={6} value={rebindCode} onChange={(event) => setRebindCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button tone="primary" disabled={securityBusy || !rebindPassword || rebindCode.length !== 6} onClick={() => void rebindToken()}>{translate('phoneToken.verifyRebind')}</Button></div></div>}
+        {auth.hasRecoveryKey && <div className="react-security-form react-recovery-key"><div className="react-security-form__heading"><h3>{translate('recoveryKey.title')}</h3><p>{translate('recoveryKey.viewHint')}</p></div>{!recoveryKey ? <div className="react-inline-form"><TextField label={translate('phoneToken.masterPassword')} type="password" autoComplete="current-password" value={recoveryPassword} onChange={(event) => setRecoveryPassword(event.target.value)} /><TextField label={translate('phoneToken.code')} inputMode="numeric" maxLength={6} value={recoveryCode} onChange={(event) => setRecoveryCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /><Button disabled={securityBusy || !recoveryPassword || recoveryCode.length !== 6} onClick={() => void revealKey()}>{translate('recoveryKey.verifyView')}</Button></div> : <div className="react-recovery-key__revealed"><textarea className="bp-input react-secret" rows={3} value={recoveryKey} readOnly aria-label={translate('recoveryKey.title')} /><div><Button icon={<Copy size={15} />} onClick={() => void copyRecoveryKey()}>{translate('recoveryKey.copy')}</Button><Button tone="quiet" icon={<EyeOff size={15} />} onClick={() => setRecoveryKey('')}>{translate('recoveryKey.hide')}</Button></div></div>}</div>}
         {securityError && <p className="react-form__error" role="alert">{securityError}</p>}
       </section>
     </section>}
@@ -362,12 +402,14 @@ export function SettingsPage() {
 
     {section === 'backup' && <section className="react-settings react-settings--stack react-backup-settings" aria-label={translate('backup.title')}>
       <div className="react-setting-row react-setting-row--stack"><div className="react-setting-row__copy"><h2>{translate('backup.title')}</h2><p>{translate('backup.description')}</p></div><TextField label={translate('backup.password')} type="password" autoComplete="new-password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></div>
-      <p className="react-backup-settings__hint">{translate('backup.hint')}</p>
-      <div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button></div>
-      <section className="react-subsection react-backup-danger"><h2>{translate('backup.dangerZone')}</h2><p>{translate('backup.dangerZoneDescription')}</p><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></section>
-      <div className="react-local-reset-row"><div className="react-setting-row__copy"><h2>{translate('resetLocal.sectionTitle')}</h2><p>{translate('resetLocal.sectionDescription')}</p></div><LocalDataReset /></div>
+      <div className="react-backup-actions-row"><div className="react-setting-row__copy"><p>{translate('backup.hint')}</p></div><div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button></div></div>
+      <section className="react-subsection react-backup-danger"><h2>{translate('backup.dangerZone')}</h2>
+        <div className="react-backup-danger__row"><div className="react-setting-row__copy"><h3>{translate('backup.deleteTitle')}</h3><p>{translate('backup.dangerZoneDescription')}</p></div><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></div>
+        <div className="react-backup-danger__row"><div className="react-setting-row__copy"><h3>{translate('resetLocal.sectionTitle')}</h3><p>{translate('resetLocal.sectionDescription')}</p></div><LocalDataReset /></div>
+      </section>
       {backupError && <p className="react-form__error" role="alert">{localizedMessage(backupError, translate)}</p>}
     </section>}
+      </div>
 
     <Dialog open={biometricPromptOpen} onOpenChange={(open) => { setBiometricPromptOpen(open); if (!open) setBiometricPassword('') }}><DialogContent title={translate('settings.biometricEnableTitle')} description={translate('settings.biometricEnablePasswordPrompt')}><div className="react-dialog-body"><TextField label={translate('settings.biometricEnablePasswordPlaceholder')} type="password" autoComplete="current-password" value={biometricPassword} onChange={(event) => setBiometricPassword(event.target.value)} />{securityError && <p className="react-form__error" role="alert">{securityError}</p>}<div className="react-dialog-actions"><DialogClose asChild><Button tone="quiet">{translate('common.cancel')}</Button></DialogClose><Button tone="primary" icon={<FingerprintIcon />} onClick={() => void enableBiometric()} disabled={biometricBusy || !biometricPassword}>{translate('settings.biometricEnableConfirm')}</Button></div></div></DialogContent></Dialog>
 

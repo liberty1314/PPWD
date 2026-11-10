@@ -111,7 +111,7 @@ export function Sidebar({
         animate={{ width: collapsed ? COLLAPSED : EXPANDED }}
         transition={spring}
         className={cn(
-          "hidden h-full shrink-0 overflow-hidden border-r border-neutral-200 bg-white md:block dark:border-neutral-800 dark:bg-neutral-950",
+          "hidden h-full shrink-0 overflow-hidden border-r md:block",
           className
         )}
       >
@@ -123,7 +123,7 @@ export function Sidebar({
           <div key="drawer" className="fixed inset-0 z-50 md:hidden">
             <motion.div
               aria-hidden
-              className="absolute inset-0 bg-neutral-950/40 backdrop-blur-[2px]"
+              className="absolute inset-0 bp-sidebar-overlay backdrop-blur-[2px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -133,7 +133,7 @@ export function Sidebar({
               role="dialog"
               aria-modal="true"
               aria-label="Navigation"
-              className="absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] overflow-hidden border-r border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-950"
+              className="absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] overflow-hidden border-r bp-sidebar-panel shadow-2xl"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -252,7 +252,7 @@ function Panel({
           aria-expanded={hasChildren ? isOpen : undefined}
           aria-current={isActive ? "page" : undefined}
           className={cn(
-            "relative flex h-9 w-full items-center gap-3 rounded-lg px-2.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-neutral-400/50 dark:focus-visible:ring-neutral-600/60",
+            "relative flex h-9 w-full items-center gap-3 rounded-lg px-2.5 text-sm outline-none transition-colors",
             isActive || childActive
               ? "text-neutral-900 dark:text-white"
               : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
@@ -262,7 +262,7 @@ function Panel({
             <motion.span
               layoutId={`${uid}-active`}
               transition={spring}
-              className="absolute inset-0 rounded-lg bg-neutral-200/70 dark:bg-neutral-800"
+              className="absolute inset-0 rounded-lg bp-sidebar-active"
             />
           )}
           <span className="relative grid size-5 shrink-0 place-items-center [&>svg]:size-[18px]">{item.icon}</span>
@@ -278,7 +278,7 @@ function Panel({
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="relative rounded-md bg-neutral-200/70 px-1.5 text-[11px] tabular-nums text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
+              className="relative rounded-md bp-sidebar-badge px-1.5 text-[11px] tabular-nums"
             >
               {item.badge}
             </motion.span>
@@ -319,7 +319,7 @@ function Panel({
                       }}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-[13px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-neutral-400/50 dark:focus-visible:ring-neutral-600/60",
+                        "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-[13px] outline-none transition-colors",
                         active
                           ? "text-neutral-900 dark:text-white"
                           : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
@@ -408,7 +408,7 @@ function Panel({
                 }}
                 onMouseLeave={() => setTip(null)}
                 aria-label={collapsed ? expandLabel : toggleLabel}
-                className="flex h-9 w-full items-center gap-3 rounded-lg px-2.5 text-sm text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-400/50 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white dark:focus-visible:ring-neutral-600/60"
+                className="flex h-9 w-full items-center gap-3 rounded-lg px-2.5 text-sm text-neutral-500 outline-none transition-colors hover:bg-neutral-100 hover:text-neutral-900"
               >
                 <span className="grid size-5 shrink-0 place-items-center">
                   <PanelLeft className="size-[18px]" />
@@ -444,7 +444,7 @@ function Panel({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12 }}
-              className="whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white shadow-lg dark:bg-white dark:text-neutral-900"
+              className="whitespace-nowrap rounded-md bp-sidebar-tooltip px-2 py-1 text-xs font-medium shadow-lg"
             >
               {tip.label}
             </motion.div>

@@ -101,12 +101,6 @@
 @keyframes bp-pulse { to { opacity: .48; } }
 
 @media (max-width: 900px) {
-  .react-vault__workspace { display: block; }
-  .react-vault__list { height: 100%; border-right: 0; }
-  .react-vault__detail { display: none; height: 100%; }
-  .react-vault__detail.is-open { display: block; }
-  .react-vault__workspace:has(.react-vault__detail.is-open) .react-vault__list { display: none; }
-  .react-vault__back { display: inline-grid; width: 34px; flex: none; padding: 0; }
   .react-vault__toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)) 36px; }
   .react-vault__search { grid-column: span 2; }
   .react-vault__toolbar > .bp-button:last-child { grid-column: 4; grid-row: 2; }

@@ -18,7 +18,7 @@ import { SettingsPage } from './ReactSettingsPage'
 import { useDesktopLocale } from './ui/useDesktopLocale'
 import { Sidebar, type SidebarSection } from './components/ui/sidebar'
 import { resolveReactGateRoute } from './utils/reactGateRules'
-import logoUrl from './assets/logo.png'
+import logoUrl from './assets/brand-mark.png'
 import './reactApp.css'
 
 function IslandPage() {
@@ -64,6 +64,7 @@ function GateRouter() {
 
 function ReactShellRoutes() {
   const [isMac, setIsMac] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const workspaceRef = useRef<HTMLDivElement>(null)
@@ -118,13 +119,15 @@ function ReactShellRoutes() {
   }, [])
 
   if (location.pathname === '/island') return <IslandPage />
-  return <div className="react-shell">
+  return <div className={`react-shell ${sidebarCollapsed ? 'react-shell--sidebar-collapsed' : ''}`}>
     <header className={`react-titlebar bp-glass ${isMac ? 'react-titlebar--mac' : ''}`} aria-label={translate('window.controls')}>
       <span className="react-titlebar__drag">PPWD</span>
       {!isMac && <div className="react-titlebar__controls"><button type="button" aria-label={translate('window.minimize')} title={translate('window.minimize')} onClick={() => desktopThemeAdapter.minimize()}><Minimize2 size={13} /></button><button type="button" aria-label={translate('window.maximize')} title={translate('window.maximize')} onClick={() => desktopThemeAdapter.maximize()}><Square size={12} /></button><button type="button" aria-label={translate('window.close')} title={translate('window.close')} onClick={() => desktopThemeAdapter.close()}><X size={14} /></button></div>}
     </header>
     <Sidebar
       className="react-library-sidebar"
+      collapsed={sidebarCollapsed}
+      onCollapsedChange={setSidebarCollapsed}
       sections={navigationSections}
       activeId={activeRoute}
       onActiveChange={navigate}

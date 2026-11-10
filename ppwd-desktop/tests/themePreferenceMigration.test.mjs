@@ -2,50 +2,39 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { migrateThemePreferences } from '../src/utils/themePreferenceMigration.ts'
 
-test('legacy theme choices migrate to liquid glass with system appearance', () => {
-  assert.deepEqual(migrateThemePreferences({ theme: 'midnight' }), {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
-  })
-  assert.deepEqual(migrateThemePreferences({ theme: 'rose' }), {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
-  })
-  assert.deepEqual(migrateThemePreferences({ theme: 'system' }), {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
-  })
+const defaults = {
+  appearanceMode: 'system',
+  themeDesign: 'liquid',
+  accentColor: 'blue'
+}
+
+test('legacy appearance choices migrate without discarding valid current fields', () => {
+  assert.deepEqual(migrateThemePreferences({ theme: 'midnight' }), { ...defaults, appearanceMode: 'dark' })
+  assert.deepEqual(migrateThemePreferences({ theme: 'rose' }), defaults)
+  assert.deepEqual(migrateThemePreferences({ theme: 'light' }), { ...defaults, appearanceMode: 'light' })
 })
 
-test('legacy preference fields are overridden and migration is idempotent', () => {
-  const existing = {
+test('valid theme preference fields survive migration', () => {
+  assert.deepEqual(migrateThemePreferences({
     appearanceMode: 'dark',
     themeDesign: 'contrast',
     accentColor: 'purple'
-  }
-  const first = migrateThemePreferences({ theme: 'noir', ...existing })
-  const second = migrateThemePreferences({ theme: 'noir', ...first })
-
-  assert.deepEqual(first, {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
+  }), {
+    appearanceMode: 'dark',
+    themeDesign: 'contrast',
+    accentColor: 'purple'
   })
-  assert.deepEqual(second, first)
 })
 
-test('missing and invalid legacy values use the new install defaults', () => {
-  assert.deepEqual(migrateThemePreferences({ theme: 'unknown' }), {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
-  })
-  assert.deepEqual(migrateThemePreferences({ theme: null }), {
-    appearanceMode: 'system',
-    themeDesign: 'liquid',
-    accentColor: 'blue'
-  })
+test('invalid preference fields use defaults independently', () => {
+  assert.deepEqual(migrateThemePreferences({
+    appearanceMode: 'sepia',
+    themeDesign: 'unknown',
+    accentColor: 'pink'
+  }), defaults)
+})
+
+test('missing and invalid legacy values use install defaults', () => {
+  assert.deepEqual(migrateThemePreferences({ theme: 'unknown' }), defaults)
+  assert.deepEqual(migrateThemePreferences({ theme: null }), defaults)
 })

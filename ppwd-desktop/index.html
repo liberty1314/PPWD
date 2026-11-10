@@ -18,7 +18,7 @@
           var designRaw = localStorage.getItem('bear_password_themeDesign')
           var accentRaw = localStorage.getItem('bear_password_accentColor')
           document.documentElement.dataset.appearance = resolvedMode
-          document.documentElement.dataset.themeDesign = designRaw ? JSON.parse(designRaw) : 'classic'
+          document.documentElement.dataset.themeDesign = designRaw ? JSON.parse(designRaw) : 'liquid'
           document.documentElement.dataset.accent = accentRaw ? JSON.parse(accentRaw) : 'blue'
           var fontRaw = localStorage.getItem('bear_password_font')
           var fontPref = fontRaw ? JSON.parse(fontRaw) : 'system'

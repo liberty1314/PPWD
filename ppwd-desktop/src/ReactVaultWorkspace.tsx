@@ -369,7 +369,7 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
   const hasMore = filtered.length > visibleLimit
   const shownEntries = filtered.slice(0, visibleLimit)
 
-  return <main className="react-page react-vault" aria-busy={loading}>
+  return <main className="react-page react-page--wide react-vault" aria-busy={loading}>
     <header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.dashboard')}</p><h1>{title}</h1><p className="react-page__description">{translate(mode === 'favorites' ? 'vault.favoriteSubtitle' : mode === 'recent' ? 'vault.recentSubtitle' : 'vault.subtitle')}</p></div><div className="react-vault__header-actions">{mode === 'vault' && <Button disabled={loading || items.length === 0} onClick={exportCsv} icon={<FileUp size={15} />}>{translate('dashboard.actionExportPassword')}</Button>}<Button tone="primary" onClick={openNew} icon={<Plus size={16} />}>{translate('vault.newItem')}</Button></div></header>
     <div className="react-vault__toolbar">
       <div className="react-vault__search" role="search"><Search size={16} /><input ref={searchRef} value={keyword} onChange={(event) => setKeyword(event.target.value)} placeholder={translate('vault.searchPlaceholder')} aria-label={translate('vault.searchPlaceholder')} />{keyword && <button type="button" className="react-vault__search-clear" aria-label={translate('vault.clearSearch')} title={translate('vault.clearSearch')} onClick={() => setKeyword('')}><X size={15} /></button>}<kbd>{searchShortcut}</kbd></div>

@@ -1,6 +1,6 @@
-export type AppearanceMode = 'system'
-export type ThemeDesign = 'liquid'
-export type AccentColor = 'blue'
+export type AppearanceMode = 'system' | 'light' | 'dark'
+export type ThemeDesign = 'classic' | 'liquid' | 'soft' | 'contrast'
+export type AccentColor = 'blue' | 'teal' | 'green' | 'purple' | 'coral' | 'amber'
 
 export interface ThemePreferences {
   appearanceMode: AppearanceMode

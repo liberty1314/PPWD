@@ -8,22 +8,19 @@ import pngToIco from 'png-to-ico'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 const resourcesDir = join(root, 'resources')
-const logoPngPath = join(root, '..', 'docs', 'img', 'logo.png')
+const brandMarkPath = join(root, 'src', 'assets', 'brand-mark.png')
 const traySvgPath = join(resourcesDir, 'tray-icon.svg')
 const publicDir = join(root, 'public')
-const desktopLogoPath = join(root, 'src', 'assets', 'logo.png')
 const extensionIconsDir = join(root, '..', 'ppwd-extension', 'public', 'icons')
 
-const sourcePngBuffer = await sharp(logoPngPath).resize(1024, 1024).png().toBuffer()
-const roundedMask = Buffer.from(
-  '<svg width="1024" height="1024"><rect x="0" y="0" width="1024" height="1024" rx="220" fill="white"/></svg>'
-)
-const pngBuffer = await sharp(sourcePngBuffer)
-  .composite([{ input: roundedMask, blend: 'dest-in' }])
+const markBuffer = await sharp(brandMarkPath).resize(680, 680, { fit: 'contain' }).png().toBuffer()
+const pngBuffer = await sharp({
+  create: { width: 1024, height: 1024, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
+})
+  .composite([{ input: markBuffer, gravity: 'centre' }])
   .png()
   .toBuffer()
 
-await sharp(pngBuffer).resize(512, 512).png().toFile(desktopLogoPath)
 await sharp(pngBuffer).resize(512, 512).png().toFile(join(extensionIconsDir, 'logo.png'))
 await sharp(pngBuffer).resize(512, 512).png().toFile(join(resourcesDir, 'icon.png'))
 await sharp(pngBuffer).resize(256, 256).png().toFile(join(publicDir, 'favicon.png'))

@@ -1398,3 +1398,37 @@
     - projects/bear_password_intro_ppt169_20260712/sources/root_README.md
     - projects/bear_password_intro_ppt169_20260712/sources/server_README.md
     - scripts/build-all.mjs
+
+[2026-11-10 15:01] feat(ui): 完善外观主题设置与品牌视觉
+  - Body: 新增明暗模式、主题设计和强调色设置，并完善主题偏好迁移与桌面端视觉样式。统一品牌图标资源，调整恢复密钥显隐/复制操作，并在离开安全设置时清理敏感输入状态。
+  - Files:
+    - ppwd-desktop/index.html
+    - ppwd-desktop/public/favicon.png
+    - ppwd-desktop/resources/icon.icns
+    - ppwd-desktop/resources/icon.ico
+    - ppwd-desktop/resources/icon.png
+    - ppwd-desktop/scripts/generate-icons.mjs
+    - ppwd-desktop/src/ReactApp.tsx
+    - ppwd-desktop/src/ReactAuthPages.tsx
+    - ppwd-desktop/src/ReactDashboardPage.tsx
+    - ppwd-desktop/src/ReactSettingsPage.tsx
+    - ppwd-desktop/src/ReactVaultWorkspace.tsx
+    - ppwd-desktop/src/assets/brand-mark.png
+    - ppwd-desktop/src/components/ui/sidebar.tsx
+    - ppwd-desktop/src/locales/en.ts
+    - ppwd-desktop/src/locales/ja.ts
+    - ppwd-desktop/src/locales/zh-CN.ts
+    - ppwd-desktop/src/reactApp.css
+    - ppwd-desktop/src/reactVault.css
+    - ppwd-desktop/src/stores/reactTheme.ts
+    - ppwd-desktop/tailwind.config.cjs
+    - ppwd-desktop/tests/themePreferenceMigration.test.mjs
+    - ppwd-extension/public/icons/icon-128.png
+    - ppwd-extension/public/icons/icon-16.png
+    - ppwd-extension/public/icons/icon-32.png
+    - ppwd-extension/public/icons/icon-48.png
+    - ppwd-extension/public/icons/logo.png
+    - shared/ui/themeMigration.ts
+    - shared/ui/themeTypes.ts
+    - shared/ui/tokens.css
+    - docs/readme_2611.md

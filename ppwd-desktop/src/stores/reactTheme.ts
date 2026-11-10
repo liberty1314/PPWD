@@ -11,6 +11,7 @@ interface ReactThemeState extends ThemePreferences {
   systemDark: boolean
   initialized: boolean
   initialize: () => Promise<void>
+  updatePreferences: (patch: Partial<ThemePreferences>) => void
 }
 
 function applyTheme(preferences: ThemePreferences, systemDark: boolean): void {
@@ -33,6 +34,13 @@ export const useReactThemeStore = create<ReactThemeState>((set, get) => ({
   ...DEFAULT_THEME_PREFERENCES,
   systemDark: false,
   initialized: false,
+  updatePreferences: (patch) => {
+    const current = get()
+    const preferences = { ...current, ...patch }
+    persistTheme(preferences)
+    applyTheme(preferences, current.systemDark)
+    set(patch)
+  },
   initialize: () => {
     if (get().initialized) return Promise.resolve()
     if (initialization) return initialization
