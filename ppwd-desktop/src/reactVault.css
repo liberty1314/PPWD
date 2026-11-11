@@ -1,6 +1,6 @@
 .react-vault__header-actions { display: flex; align-items: center; gap: 8px; }
 .react-vault { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
-.react-vault__toolbar { display: grid; flex: 0 0 auto; grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(118px, .9fr)) 36px; align-items: end; gap: 7px; border: 1px solid var(--bp-border); border-bottom-color: var(--bp-chrome-border); padding: 10px 9px; background: var(--bp-surface); }
+.react-vault__toolbar { display: grid; flex: 0 0 auto; grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(118px, .9fr)) 36px; align-items: end; gap: 7px; border-bottom: 1px solid var(--bp-border); padding: 10px 0; background: transparent; }
 .react-vault__toolbar > .bp-field { width: auto; min-width: 0; }
 .react-vault__search { display: flex; min-width: 180px; height: 36px; align-items: center; gap: 8px; border: 1px solid var(--bp-control-border); border-radius: var(--bp-radius-md); padding: 0 8px 0 10px; color: var(--bp-text-muted); background: var(--bp-control-bg); }
 .react-vault__search:focus-within { border-color: var(--bp-accent); box-shadow: 0 0 0 2px var(--bp-accent-soft), var(--bp-control-shadow); }
@@ -12,22 +12,30 @@
 .react-vault__toolbar > .bp-button.is-active { border-color: var(--bp-accent); background: var(--bp-nav-active-bg); color: var(--bp-nav-active-text); }
 .react-vault__filter-status { display: flex; min-height: 38px; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; color: var(--bp-text-muted); font-size: 11px; }
 .react-vault__filter-status .bp-button { width: auto; min-height: 30px; margin: 0; padding-inline: 8px; }
-.react-vault__workspace { display: grid; min-height: 0; flex: 1 1 auto; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); border-bottom: 1px solid var(--bp-border); }
+.react-vault__workspace { display: grid; min-height: 0; flex: 1 1 auto; grid-template-columns: minmax(280px, 420px) minmax(0, 1fr); border-bottom: 1px solid var(--bp-border); }
+.react-vault__workspace.is-empty { grid-template-columns: minmax(0, 1fr); }
+.react-vault__first-run { display: grid; min-height: 280px; align-content: center; justify-items: center; gap: 12px; padding: 28px; color: var(--bp-text-muted); text-align: center; }
+.react-vault__first-run h2 { margin: 0; color: var(--bp-text); font-size: 17px; }
+.react-vault__first-run p { max-width: 48ch; margin: 0; color: var(--bp-text-secondary); font-size: 12px; line-height: 1.6; }
+.react-vault__first-run-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
 .react-vault__list { min-width: 0; min-height: 0; overflow: hidden; border-right: 1px solid var(--bp-border); }
 .react-vault__list-scroll { height: 100%; min-height: 0; overflow: auto; overscroll-behavior: contain; }
-.react-vault__item { display: flex; min-height: 62px; align-items: center; gap: 8px; border-bottom: 1px solid var(--bp-border); padding: 7px 8px; }
+.react-vault__item { display: flex; min-height: 68px; align-items: center; gap: 8px; border-bottom: 1px solid var(--bp-border); padding: 7px 8px; }
 .react-vault__item:hover:not(.is-active) { background: var(--bp-row-hover-bg); }
 .react-vault__item.is-active { background: var(--bp-row-active-bg); }
 .react-vault__item-main { display: flex; min-width: 0; flex: 1; align-items: center; gap: 10px; border: 0; padding: 0; text-align: left; background: transparent; color: var(--bp-text); cursor: pointer; }
 .react-vault__icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 7px; background: color-mix(in srgb, var(--entry-color) 18%, var(--bp-card-bg)); color: var(--entry-color); }
-.react-vault__item-copy { display: grid; min-width: 0; flex: 1; gap: 4px; }
+.react-vault__item-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
 .react-vault__item-copy strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .react-vault__item-copy small { overflow: hidden; color: var(--bp-text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.react-vault__item-more { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--bp-text-muted); cursor: pointer; }
+.react-vault__item-copy .react-vault__item-type { color: var(--bp-accent-text); font-size: 10px; }
+.react-vault__item-more { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--bp-text-muted); cursor: pointer; opacity: 0; }
+.react-vault__item:hover .react-vault__item-more, .react-vault__item:focus-within .react-vault__item-more { opacity: 1; }
+.react-vault__item-more:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 1px; opacity: 1; }
 .react-vault__item-more:hover { background: var(--bp-control-hover-bg); color: var(--bp-text); }
 .react-vault__item .is-favorite { flex: none; color: var(--bp-warning); }
 .react-vault__detail { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
-.react-vault__detail-content { max-width: 720px; margin: 0 auto; padding: 23px clamp(16px, 3vw, 32px); }
+.react-vault__detail-content { max-width: 960px; margin: 0 auto; padding: 23px clamp(16px, 3vw, 40px); }
 .react-vault__detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--bp-border); padding-bottom: 18px; }
 .react-vault__detail-head h2 { overflow-wrap: anywhere; margin: 5px 0 0; color: var(--bp-text); font-size: 20px; }
 .react-vault__detail-head > div { min-width: 0; flex: 1; }
@@ -81,11 +89,17 @@
 .react-import { display: grid; gap: 12px; padding-top: 12px; }
 .react-entry-actions { display: grid; gap: 8px; padding-top: 12px; }
 .react-security-center__summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 18px 0; }
-.react-security-center__summary > div { display: grid; gap: 8px; border: 1px solid var(--bp-card-border); border-radius: var(--bp-radius-md); padding: 13px; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
-.react-security-center__summary span { color: var(--bp-text-secondary); font-size: 11px; }
+.react-security-center__summary > button { display: grid; min-width: 0; gap: 8px; border: 1px solid var(--bp-card-border); border-radius: var(--bp-radius-md); padding: 13px; background: var(--bp-card-bg); color: var(--bp-text-secondary); text-align: left; cursor: pointer; box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
+.react-security-center__summary > button:hover, .react-security-center__summary > button[aria-pressed='true'] { border-color: var(--bp-accent); background: var(--bp-card-hover-bg); }
+.react-security-center__summary > button:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 2px; }
+.react-security-center__summary span { color: inherit; font-size: 11px; }
 .react-security-center__summary strong { color: var(--bp-text); font-size: 22px; }
+.react-security-center__summary small { color: var(--bp-text-muted); font-size: 10px; }
+.react-security-center__note { margin: -7px 0 18px; color: var(--bp-text-muted); font-size: 11px; line-height: 1.5; }
 .react-security-center__risks { border-top: 1px solid var(--bp-border); padding-top: 16px; }
-.react-security-center__risks h2 { color: var(--bp-text); font-size: 14px; }
+.react-security-center__risks header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.react-security-center__risks h2 { margin: 0; color: var(--bp-text); font-size: 14px; }
+.react-security-center__risks header > span { color: var(--bp-text-muted); font-size: 11px; }
 .react-security-center__risks > button { display: flex; width: 100%; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--bp-border); padding: 11px 5px; background: transparent; color: var(--bp-warning); text-align: left; cursor: pointer; }
 .react-security-center__risks > button span { display: grid; gap: 3px; }
 .react-security-center__risks > button strong { color: var(--bp-text); font-size: 12px; }
@@ -108,6 +122,22 @@
   .react-inline-form > * { grid-column: 1; }
 }
 
+@media (max-width: 1200px) {
+  .react-vault__toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)) 36px; }
+  .react-vault__search { grid-column: span 2; }
+  .react-vault__toolbar > .bp-button:last-child { grid-column: 4; grid-row: 2; }
+}
+
+@media (max-width: 760px) {
+  .react-vault__workspace { position: relative; grid-template-columns: minmax(0, 1fr); }
+  .react-vault__list.has-selection { display: none; }
+  .react-vault__detail { display: none; }
+  .react-vault__detail.is-open { display: block; }
+  .react-vault__back { display: inline-flex; }
+  .react-vault__detail-content { padding-inline: 16px; }
+  .react-vault__item-more { opacity: 1; }
+}
+
 @media (max-width: 640px) {
   .react-security-center__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .react-vault .react-page__header { gap: 12px; }
@@ -123,7 +153,7 @@
   .react-vault__otp > div { grid-column: 1; grid-row: 2; }
   .react-vault__otp > button { grid-column: 2; grid-row: 1 / span 2; }
   .react-security-center__summary { gap: 6px; }
-  .react-security-center__summary > div { padding: 9px; }
+  .react-security-center__summary > button { padding: 9px; }
   .react-security-center__summary span { font-size: 10px; }
   .react-extra-fields__row { grid-template-columns: minmax(0, 1fr); }
   .react-extra-fields__authenticator { grid-template-columns: 1fr; }

@@ -15,10 +15,10 @@ button { color: inherit; }
 .popup-login__top, .popup-topbar { display: flex; height: 48px; align-items: center; gap: 9px; border-bottom: 1px solid var(--bp-chrome-border); background: var(--bp-chrome-bg); box-shadow: var(--bp-chrome-shadow); -webkit-backdrop-filter: var(--bp-chrome-backdrop); backdrop-filter: var(--bp-chrome-backdrop); }
 .popup-login__brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
 .popup-login__top .popup-icon-button { margin-left: auto; }
-.popup-login__panel { display: flex; flex: 1; flex-direction: column; justify-content: center; padding: 18px 16px; }
+.popup-login__panel { display: flex; flex: 1; flex-direction: column; justify-content: flex-start; padding: 24px 16px 12px; }
 .popup-login__panel > .popup-logo { align-self: center; margin-bottom: 8px; }
-.popup-login__subtitle { margin: 0 0 20px; color: var(--bp-text-secondary); text-align: center; }
-.popup-status { display: grid; gap: 11px; margin-bottom: 15px; border: 1px solid var(--bp-card-border); border-radius: var(--bp-radius-md); padding: 12px; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
+.popup-login__subtitle { margin: 0 0 14px; color: var(--bp-text-secondary); text-align: center; }
+.popup-status { display: grid; gap: 8px; margin-bottom: 10px; border: 1px solid var(--bp-card-border); border-radius: var(--bp-radius-md); padding: 10px; background: var(--bp-card-bg); box-shadow: var(--bp-card-shadow); backdrop-filter: var(--bp-card-backdrop); }
 .popup-status > div, .popup-settings__status { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .popup-status > div > span, .popup-settings__status > span { color: var(--bp-text-muted); font-size: 11px; }
 .popup-status__badge { display: inline-flex; align-items: center; border-radius: 4px; padding: 3px 7px; background: var(--bp-surface-raised); color: var(--bp-text-secondary); font-size: 10px; font-weight: 650; }
@@ -36,8 +36,8 @@ button { color: inherit; }
 .popup-button--danger { border-color: var(--bp-danger); background: var(--bp-danger); color: var(--bp-danger-on); }
 .popup-login__open { min-height: 39px; font-size: 12px; }
 .popup-login__hint { margin: 10px 0 0; color: var(--bp-warning); font-size: 10px; line-height: 1.5; }
-.popup-login__refresh { align-self: center; margin-top: 9px; }
-.popup-external-link { display: flex; align-items: center; justify-content: center; gap: 5px; padding-top: 10px; color: var(--bp-text-muted); font-size: 10px; text-decoration: none; }
+.popup-login__refresh { align-self: flex-end; margin-top: 4px; }
+.popup-external-link { display: flex; align-items: center; justify-content: center; gap: 5px; padding-top: 6px; color: var(--bp-text-muted); font-size: 10px; text-decoration: none; }
 .popup-external-link:hover { color: var(--bp-accent-text); }
 
 .popup-vault, .popup-settings { display: flex; flex-direction: column; position: relative; }

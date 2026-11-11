@@ -2,7 +2,7 @@ import { useEffect, useReducer, useRef, useState, type KeyboardEvent, type React
 import type { StoreGeneric } from './stores/reactiveStore'
 import { useStoreSnapshot } from './stores/reactiveStore'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Copy, Eye, EyeOff, Fingerprint, FolderOpen, HardDrive, KeyRound, Keyboard, RotateCcw, Settings2, Shield, Trash2 } from 'lucide-react'
+import { Check, Copy, Eye, EyeOff, Fingerprint, FolderOpen, HardDrive, KeyRound, Keyboard, RotateCcw, Settings2, Shield, Trash2 } from 'lucide-react'
 import { useAppStore } from './stores/app'
 import { useAutoLockStore } from './stores/autoLock'
 import { useAuthStore } from './stores/auth'
@@ -65,7 +65,7 @@ function ShortcutRecorder({ action, value, disabled, onSave }: { action: Shortcu
     void onSave(normalizeAcceleratorString(accelerator))
   }
 
-  return <button className={`react-shortcut-recorder ${recording ? 'is-recording' : ''}`} type="button" disabled={disabled} onClick={() => setRecording(true)} onKeyDown={handleKey} onBlur={() => setRecording(false)} aria-label={translate(`shortcut.${action}`)}>{recording ? translate('settings.shortcuts.recording') : value ? formatAccelerator(value, platform) : '—'}</button>
+  return <span className="react-shortcut-control"><button className={`react-shortcut-recorder ${recording ? 'is-recording' : ''}`} type="button" disabled={disabled} onClick={() => setRecording(true)} onKeyDown={handleKey} onBlur={() => setRecording(false)} aria-label={translate(`shortcut.${action}`)}>{recording ? translate('settings.shortcuts.recording') : value ? formatAccelerator(value, platform) : '—'}</button>{recording && <small role="status">{translate('settings.shortcuts.recordingHint')}</small>}</span>
 }
 
 export function SettingsPage() {
@@ -358,20 +358,26 @@ export function SettingsPage() {
     <div className="react-settings-content">
 
     {section === 'general' && <section className="react-settings" aria-label={translate('settings.general')}>
+      <section className="react-setting-group" aria-label={translate('settings.groupStartup')}><h2>{translate('settings.groupStartup')}</h2>
       <ToggleRow title={translate('settings.launchAtLogin')} description={translate('settings.launchAtLoginDesc')} checked={launchAtLogin.enabled} disabled={!launchAtLogin.available || launchAtLogin.loading} onChange={async (enabled) => { const result = await launchAtLogin.setEnabled(enabled); if (result.ok) toast(translate(enabled ? 'msg.launchAtLoginOn' : 'msg.launchAtLoginOff')); else toast(result.error ?? translate('common.settingsFailed')) }} />
       <ToggleRow title={translate('settings.tray')} description={translate('settings.trayDesc')} checked={tray.enabled} disabled={!tray.available || tray.loading} onChange={updateTrayEnabled} />
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.trayClickAction')}</h2><p>{translate('settings.trayClickActionDesc')}</p></div><SelectField label={translate('settings.trayClickAction')} labelHidden id="tray-click-action" value={tray.clickAction} onValueChange={(value) => void tray.updateSettings({ clickAction: value as TrayClickAction })}><option value="vault">{translate('nav.vault')}</option><option value="favorites">{translate('nav.favorites')}</option><option value="recent">{translate('nav.recent')}</option><option value="settings">{translate('nav.settings')}</option></SelectField></div>
       <ToggleRow title={translate('settings.dockHidden')} description={translate('settings.dockHiddenDesc')} checked={dock.hidden} disabled={!dock.available || dock.loading} onChange={updateDockHidden} />
+      </section>
+      <section className="react-setting-group" aria-label={translate('settings.groupInterface')}><h2>{translate('settings.groupInterface')}</h2>
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.font')}</h2><p>{translate(app.fontPreference === 'system' ? 'font.systemDesc' : 'font.cangerDesc')}</p></div><SelectField label={translate('settings.font')} labelHidden id="font-preference" value={app.fontPreference} onValueChange={(value) => app.setFontPreference(value)}>{FONT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(`font.${option.value}`)}</option>)}</SelectField></div>
-      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.subtitle')}</p></div><SelectField label={translate('settings.language')} labelHidden id="locale-preference" value={app.localePreference} onValueChange={(value) => app.setLocalePreference(value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</SelectField></div>
+      <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.language')}</h2><p>{translate(app.localePreference === 'system' ? 'locale.systemDesc' : 'settings.languageDesc')}</p></div><SelectField label={translate('settings.language')} labelHidden id="locale-preference" value={app.localePreference} onValueChange={(value) => app.setLocalePreference(value)}>{LOCALE_PREFERENCE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{translate(option.labelKey)}</option>)}</SelectField></div>
+      </section>
+      <section className="react-setting-group" aria-label={translate('settings.groupStorage')}><h2>{translate('settings.groupStorage')}</h2>
       <div className="react-setting-row react-setting-row--directory"><div className="react-setting-row__copy"><h2>{translate('settings.offlineDataDir')}</h2><p>{offline.dataDir || offline.defaultDataDir || translate('settings.offlineDataDirUnset')}</p></div><Button icon={<FolderOpen size={15} />} onClick={requestDirectoryChange} disabled={offline.saving}>{translate('settings.offlineDataDirChoose')}</Button></div>
+      </section>
     </section>}
 
     {section === 'appearance' && <section className="react-settings react-settings--stack" aria-label={translate('settings.appearance')}>
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.themeMode')}</h2><p>{translate('theme.systemDesc')}</p></div><SelectField label={translate('settings.themeMode')} labelHidden id="appearance-mode" value={theme.appearanceMode} onValueChange={(value) => theme.updatePreferences({ appearanceMode: value as AppearanceMode })}><option value="system">{translate('theme.system')}</option><option value="light">{translate('theme.light')}</option><option value="dark">{translate('theme.dark')}</option></SelectField></div>
       <div className="react-setting-row"><div className="react-setting-row__copy"><h2>{translate('settings.themeDesign')}</h2><p>{translate('settings.themeDesignDesc')}</p></div><SelectField label={translate('settings.themeDesign')} labelHidden id="theme-design" value={theme.themeDesign} onValueChange={(value) => theme.updatePreferences({ themeDesign: value as ThemeDesign })}>{(['classic', 'liquid', 'soft', 'contrast'] as const).map((design) => <option key={design} value={design}>{translate(`settings.themeDesign.${design}`)}</option>)}</SelectField></div>
       <div className="react-setting-row react-setting-row--accent"><div className="react-setting-row__copy"><h2>{translate('settings.accentColor')}</h2><p>{translate('settings.accentColorDesc')}</p></div><div className="react-accent-grid" role="group" aria-label={translate('settings.accentColor')}>
-        {(['blue', 'teal', 'green', 'purple', 'coral', 'amber'] as const).map((accent) => <button key={accent} type="button" className={`react-accent ${theme.accentColor === accent ? 'is-active' : ''}`} aria-label={translate(`accent.${accent}`)} aria-pressed={theme.accentColor === accent} title={translate(`accent.${accent}`)} onClick={() => theme.updatePreferences({ accentColor: accent as AccentColor })}><span className={`react-accent__swatch react-accent__swatch--${accent}`} /></button>)}
+        {(['blue', 'teal', 'green', 'purple', 'coral', 'amber'] as const).map((accent) => <button key={accent} type="button" className={`react-accent ${theme.accentColor === accent ? 'is-active' : ''}`} aria-label={translate(`accent.${accent}`)} aria-pressed={theme.accentColor === accent} title={translate(`accent.${accent}`)} onClick={() => theme.updatePreferences({ accentColor: accent as AccentColor })}><span className={`react-accent__swatch react-accent__swatch--${accent}`}>{theme.accentColor === accent && <Check size={13} aria-hidden="true" />}</span></button>)}
       </div></div>
     </section>}
 
@@ -402,7 +408,7 @@ export function SettingsPage() {
 
     {section === 'backup' && <section className="react-settings react-settings--stack react-backup-settings" aria-label={translate('backup.title')}>
       <div className="react-setting-row react-setting-row--stack"><div className="react-setting-row__copy"><h2>{translate('backup.title')}</h2><p>{translate('backup.description')}</p></div><TextField label={translate('backup.password')} type="password" autoComplete="new-password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></div>
-      <div className="react-backup-actions-row"><div className="react-setting-row__copy"><p>{translate('backup.hint')}</p></div><div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button></div></div>
+      <div className="react-backup-actions-row"><div className="react-preview-actions react-backup-settings__actions"><Button icon={<DownloadIcon />} onClick={() => void exportBackup()} disabled={backupBusy}>{translate('backup.export')}</Button><span className="react-backup-import-action"><Button tone="primary" icon={<FolderOpen size={15} />} onClick={() => void importBackup()} disabled={backupBusy}>{translate('backup.import')}</Button><small>{translate('backup.hint')}</small></span></div></div>
       <section className="react-subsection react-backup-danger"><h2>{translate('backup.dangerZone')}</h2>
         <div className="react-backup-danger__row"><div className="react-setting-row__copy"><h3>{translate('backup.deleteTitle')}</h3><p>{translate('backup.dangerZoneDescription')}</p></div><Button tone="danger" icon={<Trash2 size={15} />} onClick={() => setDeleteDialogOpen(true)} disabled={backupBusy}>{translate('backup.deleteVault')}</Button></div>
         <div className="react-backup-danger__row"><div className="react-setting-row__copy"><h3>{translate('resetLocal.sectionTitle')}</h3><p>{translate('resetLocal.sectionDescription')}</p></div><LocalDataReset /></div>

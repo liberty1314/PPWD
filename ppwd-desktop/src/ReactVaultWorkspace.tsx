@@ -369,6 +369,8 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
   const hasMore = filtered.length > visibleLimit
   const shownEntries = filtered.slice(0, visibleLimit)
 
+  const showFirstRun = mode === 'vault' && !loading && !error && items.length === 0 && !hasActiveFilters
+
   return <main className="react-page react-page--wide react-vault" aria-busy={loading}>
     <header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.dashboard')}</p><h1>{title}</h1><p className="react-page__description">{translate(mode === 'favorites' ? 'vault.favoriteSubtitle' : mode === 'recent' ? 'vault.recentSubtitle' : 'vault.subtitle')}</p></div><div className="react-vault__header-actions">{mode === 'vault' && <Button disabled={loading || items.length === 0} onClick={exportCsv} icon={<FileUp size={15} />}>{translate('dashboard.actionExportPassword')}</Button>}<Button tone="primary" onClick={openNew} icon={<Plus size={16} />}>{translate('vault.newItem')}</Button></div></header>
     <div className="react-vault__toolbar">
@@ -381,11 +383,12 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
     <div className="react-vault__filter-status" aria-live="polite"><span>{translate('vault.resultCount', { count: filtered.length })}</span>{hasActiveFilters && <Button tone="quiet" icon={<X size={14} />} onClick={clearFilters}>{translate('vault.clearFilters')}</Button>}</div>
     {selectionMode && <div className="react-vault__batch"><label><input type="checkbox" disabled={!filtered.length} checked={filtered.length > 0 && filtered.every((entry) => selection.includes(entry.id))} onChange={(event) => setSelection(event.target.checked ? Array.from(new Set([...selection, ...filtered.map((entry) => entry.id)])) : selection.filter((id) => !filtered.some((entry) => entry.id === id)))} />{translate('vault.batch.selectAll')}</label><span>{translate('vault.batch.selected', { count: selection.length })}</span>{mode === 'favorites' ? <Button disabled={batchBusy || !selection.length} onClick={() => void runBatch('unfavorite')}>{translate('vault.batch.removeFavorite')}</Button> : <Button disabled={batchBusy || !selection.length} onClick={() => void runBatch('favorite')}>{translate('vault.batch.addFavorite')}</Button>}<Button tone="danger" disabled={batchBusy || !selection.length} onClick={() => setConfirmBatchDelete(true)}>{translate('vault.batch.delete')}</Button><Button tone="quiet" onClick={() => { setSelection([]); setSelectionMode(false) }}>{translate('vault.batch.cancel')}</Button></div>}
     {error && <div className="react-vault__error" role="alert"><ShieldAlert size={16} />{error}<Button onClick={() => void load()}>{translate('common.retry')}</Button></div>}
-    <section className="react-vault__workspace">
+    <section className={`react-vault__workspace${showFirstRun ? ' is-empty' : ''}`}>
+      {showFirstRun ? <div className="react-vault__first-run"><KeyRound size={28} /><h2>{translate('vault.empty.default')}</h2><p>{translate('vault.empty.firstRunHint')}</p><div className="react-vault__first-run-actions"><Button tone="primary" icon={<Plus size={15} />} onClick={openNew}>{translate('vault.newItem')}</Button><Button icon={<FileUp size={15} />} onClick={() => setImportOpen(true)}>{translate('dashboard.actionImportPassword')}</Button></div></div> : <>
       <aside className={`react-vault__list ${selected ? 'has-selection' : ''}`} aria-label={title}>
         {loading ? <div className="react-vault__skeleton" aria-label={translate('common.loading')}>{Array.from({ length: 7 }, (_, index) => <i key={index} />)}</div> : shownEntries.length ? <div className="react-vault__list-scroll">{shownEntries.map((entry) => <article key={entry.id} className={`react-vault__item ${entry.id === selectedId ? 'is-active' : ''}`}>
           {selectionMode && <input type="checkbox" aria-label={resolveEntryTitle(entry)} checked={selection.includes(entry.id)} onChange={(event) => setSelection((current) => event.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))} />}
-          <button type="button" className="react-vault__item-main" aria-pressed={selectionMode ? selection.includes(entry.id) : undefined} onClick={() => { if (selectionMode) setSelection((current) => current.includes(entry.id) ? current.filter((id) => id !== entry.id) : [...current, entry.id]); else { setSelectedId(entry.id); void recordRecentVisitApi(entry.id) } }}><span className="react-vault__icon" style={{ '--entry-color': getEntryTypeColor(entry) } as React.CSSProperties}>{entryTypeIcon(entry)}</span><span className="react-vault__item-copy"><strong title={resolveEntryTitle(entry)}>{resolveEntryTitle(entry)}</strong><small>{subtitle(entry, translate)}</small></span>{favoriteIds.includes(entry.id) && <Star size={14} className="is-favorite" aria-label={translate('vault.detail.favorite')} />}</button>
+          <button type="button" className="react-vault__item-main" aria-pressed={selectionMode ? selection.includes(entry.id) : undefined} onClick={() => { if (selectionMode) setSelection((current) => current.includes(entry.id) ? current.filter((id) => id !== entry.id) : [...current, entry.id]); else { setSelectedId(entry.id); void recordRecentVisitApi(entry.id) } }}><span className="react-vault__icon" style={{ '--entry-color': getEntryTypeColor(entry) } as React.CSSProperties}>{entryTypeIcon(entry)}</span><span className="react-vault__item-copy"><strong title={resolveEntryTitle(entry)}>{resolveEntryTitle(entry)}</strong><small>{subtitle(entry, translate)}</small><small className="react-vault__item-type">{entryTypeLabel(entry, translate)}</small></span>{favoriteIds.includes(entry.id) && <Star size={14} className="is-favorite" aria-label={translate('vault.detail.favorite')} />}</button>
           <button type="button" className="react-vault__item-more" aria-label={translate('vault.detail.moreActions')} title={translate('vault.detail.moreActions')} onClick={() => { setSelectedId(entry.id); setActionEntry(entry) }}><MoreHorizontal size={17} /></button>
         </article>)}</div> : <div className="react-vault__empty"><KeyRound size={26} /><strong>{translate(keyword || type ? 'vault.empty.search' : mode === 'favorites' ? 'vault.empty.favorites' : mode === 'recent' ? 'vault.empty.recent' : 'vault.empty.default')}</strong></div>}
         {hasMore && <div className="react-vault__more-hint"><span>{translate('vault.listLimit', { count: shownEntries.length })}</span><Button onClick={() => setVisibleLimit((count) => count + 100)}>{translate('vault.loadMore')}</Button></div>}
@@ -393,6 +396,7 @@ export function ReactVaultWorkspace({ mode }: { mode: WorkspaceMode }) {
       <div className={`react-vault__detail ${selected ? 'is-open' : ''}`}>
         {selected ? <EntryDetail entry={selected} favorite={favoriteIds.includes(selected.id)} onBack={() => setSelectedId('')} onFavorite={() => void toggleFavorite(selected)} onEdit={() => beginEdit(selected)} onMore={() => setActionEntry(selected)} onCopy={copyValue} translate={translate} /> : <div className="react-vault__empty"><KeyRound size={28} /><strong>{translate('vault.empty.selectItem')}</strong></div>}
       </div>
+      </>}
     </section>
     <EntryTypePicker open={pickerOpen} onClose={() => setPickerOpen(false)} onImport={() => { setPickerOpen(false); setImportOpen(true) }} onSelect={(type) => { setEditing({ id: '', passwordType: type, content: emptyContent(type) } as PasswordEntry); setEditorOpen(true); setPickerOpen(false) }} translate={translate} />
     {editorOpen && <EntryEditor key={editing?.id || editing?.passwordType || 'new'} open={editorOpen} entry={editing} busy={operationBusy} onClose={() => setEditorOpen(false)} onSave={(params) => void saveEntry(params)} translate={translate} />}
@@ -411,6 +415,18 @@ function subtitle(entry: PasswordEntry, translate: (key: string) => string): str
   if (type === '银行卡') return String(content.cardHolder || translate('vault.type.bankCard'))
   if (type === '身份信息') return String(content.name || translate('vault.type.identity'))
   return translate(`vault.type.${type === '安全备注' ? 'secureNote' : type === '自定义' ? 'custom' : type === '两步验证（2FA）' ? 'authenticator' : 'login'}`)
+}
+
+function entryTypeLabel(entry: PasswordEntry, translate: (key: string) => string): string {
+  const type = resolveEntryType(entry)
+  const key = type === '身份信息' ? 'identity'
+    : type === '两步验证（2FA）' ? 'authenticator'
+      : type === '安全备注' ? 'secureNote'
+        : type === '银行卡' ? 'bankCard'
+          : type === '服务器' ? 'server'
+            : type === '数据库' ? 'database'
+              : type === '自定义' ? 'custom' : 'login'
+  return translate(`vault.type.${key}`)
 }
 
 function entryTypeIcon(entry: PasswordEntry): React.ReactNode {
@@ -556,6 +572,7 @@ export function ReactSecurityCenterPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
+  const [riskFilter, setRiskFilter] = useState<'all' | 'weak' | 'reused'>('all')
   useEffect(() => {
     let active = true
     setLoading(true)
@@ -568,5 +585,11 @@ export function ReactSecurityCenterPage() {
   }, [attempt])
   const audit = auditVaultPasswords(entries)
   const risks = entries.filter((entry) => audit.weakIds.has(entry.id) || audit.reusedIds.has(entry.id))
-  return <main className="react-page react-security-center"><header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.vault')}</p><h1>{translate('securityCenter.title')}</h1><p className="react-page__description">{translate('securityCenter.description')}</p></div><Button onClick={() => navigate('/vault')} icon={<KeyRound size={15} />}>{translate('nav.vault')}</Button></header>{error && <div className="react-vault__error" role="alert"><ShieldAlert size={16} />{error}<Button onClick={() => setAttempt((value) => value + 1)}>{translate('common.retry')}</Button></div>}<section className="react-security-center__summary"><div><span>{translate('securityCenter.checked')}</span><strong>{loading ? '—' : audit.checked}</strong></div><div><span>{translate('securityCenter.weak')}</span><strong>{loading ? '—' : audit.weakIds.size}</strong></div><div><span>{translate('securityCenter.reused')}</span><strong>{loading ? '—' : audit.reusedIds.size}</strong></div></section><section className="react-security-center__risks"><h2>{translate('securityCenter.risks')}</h2>{loading ? <p>{translate('common.loading')}</p> : error ? <p>{translate('vault.msg.operationFailed')}</p> : risks.length ? risks.map((entry) => <button key={entry.id} type="button" onClick={() => navigate(`/vault?entry=${encodeURIComponent(entry.id)}`)}><ShieldAlert size={16} /><span><strong>{resolveEntryTitle(entry)}</strong><small>{translate(audit.weakIds.has(entry.id) ? 'securityCenter.weakRisk' : 'securityCenter.reusedRisk')}</small></span></button>) : <p>{translate('securityCenter.allClear')}</p>}</section></main>
+  const visibleRisks = risks.filter((entry) => riskFilter === 'all' || (riskFilter === 'weak' ? audit.weakIds.has(entry.id) : audit.reusedIds.has(entry.id)))
+  const riskCount = riskFilter === 'weak' ? audit.weakIds.size : riskFilter === 'reused' ? audit.reusedIds.size : risks.length
+  const reasonText = (entry: PasswordEntry): string => [
+    ...(audit.weakIds.has(entry.id) ? [translate('securityCenter.weakRisk')] : []),
+    ...(audit.reusedIds.has(entry.id) ? [translate('securityCenter.reusedRisk')] : [])
+  ].join(' · ')
+  return <main className="react-page react-security-center"><header className="react-page__header"><div><p className="react-eyebrow">{translate('nav.vault')}</p><h1>{translate('securityCenter.title')}</h1><p className="react-page__description">{translate('securityCenter.description')}</p></div><Button onClick={() => navigate('/vault')} icon={<KeyRound size={15} />}>{translate('nav.vault')}</Button></header>{error && <div className="react-vault__error" role="alert"><ShieldAlert size={16} />{error}<Button onClick={() => setAttempt((value) => value + 1)}>{translate('common.retry')}</Button></div>}<section className="react-security-center__summary" aria-label={translate('securityCenter.summary')}><button type="button" aria-pressed={riskFilter === 'all'} onClick={() => setRiskFilter('all')}><span>{translate('securityCenter.checked')}</span><strong>{loading ? '—' : audit.checked}</strong><small>{translate('securityCenter.filterAll')}</small></button><button type="button" aria-pressed={riskFilter === 'weak'} onClick={() => setRiskFilter('weak')}><span>{translate('securityCenter.weak')}</span><strong>{loading ? '—' : audit.weakIds.size}</strong><small>{translate('securityCenter.filterWeak')}</small></button><button type="button" aria-pressed={riskFilter === 'reused'} onClick={() => setRiskFilter('reused')}><span>{translate('securityCenter.reused')}</span><strong>{loading ? '—' : audit.reusedIds.size}</strong><small>{translate('securityCenter.filterReused')}</small></button></section><p className="react-security-center__note">{translate('securityCenter.overlapHint')}</p><section className="react-security-center__risks"><header><h2>{translate('securityCenter.risks')}</h2>{!loading && !error && <span>{translate('securityCenter.showing', { count: riskCount })}</span>}</header>{loading ? <p>{translate('common.loading')}</p> : error ? <p>{translate('vault.msg.operationFailed')}</p> : visibleRisks.length ? visibleRisks.map((entry) => <button key={entry.id} type="button" onClick={() => navigate(`/vault?entry=${encodeURIComponent(entry.id)}`)}><ShieldAlert size={16} /><span><strong>{resolveEntryTitle(entry)}</strong><small>{reasonText(entry)}</small></span></button>) : risks.length ? <p>{translate('securityCenter.noFilteredRisks')}</p> : <p>{translate('securityCenter.allClear')}</p>}</section></main>
 }

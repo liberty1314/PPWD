@@ -166,7 +166,7 @@ export function SetupPage() {
         {error && <p className="react-form__error" role="alert">{error}</p>}
       </>}
       {!safeStorageAvailable && <p className="react-form__warning" role="status">{translate('unlock.safeStorageUnavailable')}</p>}
-      <div className="react-gate__reset"><LocalDataReset /></div>
+      <div className="react-gate__reset"><LocalDataReset tone="quiet" /></div>
       {error.includes('空数据目录') && <Button tone="quiet" onClick={() => void chooseEmptyDirectory()} disabled={busy}>{translate('unlock.chooseEmptyDir')}</Button>}
     </GateFrame>
   )

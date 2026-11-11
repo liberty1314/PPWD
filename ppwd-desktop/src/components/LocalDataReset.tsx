@@ -3,7 +3,7 @@ import { FolderOpen, RotateCcw } from 'lucide-react'
 import { Button, Dialog, DialogClose, DialogContent, TextField } from '../ui/primitives'
 import { useDesktopLocale } from '../ui/useDesktopLocale'
 
-export function LocalDataReset() {
+export function LocalDataReset({ tone = 'danger' }: { tone?: 'primary' | 'neutral' | 'quiet' | 'danger' }) {
   const { translate } = useDesktopLocale()
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -55,7 +55,7 @@ export function LocalDataReset() {
   }
 
   return <>
-    <Button tone='danger' icon={<RotateCcw size={15} />} onClick={() => setOpen(true)}>{translate('resetLocal.open')}</Button>
+    <Button tone={tone} icon={<RotateCcw size={15} />} onClick={() => setOpen(true)}>{translate('resetLocal.open')}</Button>
     <Dialog open={open} onOpenChange={close}>
       <DialogContent title={translate('resetLocal.title')} description={translate('resetLocal.description')}>
         <div className='react-dialog-body react-local-reset'>

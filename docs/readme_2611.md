@@ -1432,3 +1432,35 @@
     - shared/ui/themeTypes.ts
     - shared/ui/tokens.css
     - docs/readme_2611.md
+
+[2026-11-11 10:10] feat(ui): 优化桌面端与扩展端界面体验
+  - Body: 优化桌面端密码库、设置、认证页与安全中心的布局、操作反馈和响应式表现，并收紧扩展弹窗的离线与设置状态。补充中英日文案、UI 审计报告及各页面的渲染截图，记录阶段 5 发布验收依据。
+  - Files:
+    - docs/ui-audit-2026-11-after/setup.png
+    - docs/ui-audit-2026-11/dashboard.png
+    - docs/ui-audit-2026-11/extension-popup-offline.png
+    - docs/ui-audit-2026-11/extension-settings.png
+    - docs/ui-audit-2026-11/security-center.png
+    - docs/ui-audit-2026-11/settings-appearance.png
+    - docs/ui-audit-2026-11/settings-backup.png
+    - docs/ui-audit-2026-11/settings-general.png
+    - docs/ui-audit-2026-11/settings-security.png
+    - docs/ui-audit-2026-11/settings-shortcuts.png
+    - docs/ui-audit-2026-11/setup.png
+    - docs/ui-audit-2026-11/vault-empty.png
+    - docs/ui-audit-2026-11/vault-narrow.png
+    - docs/ui-audit-2026-11/vault-populated.png
+    - docs/ui-design-audit-2026-11.md
+    - ppwd-desktop/src/ReactAuthPages.tsx
+    - ppwd-desktop/src/ReactSettingsPage.tsx
+    - ppwd-desktop/src/ReactVaultWorkspace.tsx
+    - ppwd-desktop/src/components/LocalDataReset.tsx
+    - ppwd-desktop/src/locales/en.ts
+    - ppwd-desktop/src/locales/ja.ts
+    - ppwd-desktop/src/locales/messages/vaultEntry.ts
+    - ppwd-desktop/src/locales/zh-CN.ts
+    - ppwd-desktop/src/reactApp.css
+    - ppwd-desktop/src/reactVault.css
+    - ppwd-extension/src/popup/ReactApp.tsx
+    - ppwd-extension/src/popup/reactPopup.css
+    - docs/readme_2611.md
