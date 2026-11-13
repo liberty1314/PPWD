@@ -2,26 +2,22 @@
 
 ## 项目结构与模块组织
 
-本仓库是 PPWD monorepo。`bear-password-server/` 是 Java 17 + Spring Boot 3 后端，源码在 `src/main/java`，测试在 `src/test/java`，数据库初始化脚本在 `sql/init.sql`。`bear-password-web/` 是 Vue 3/Vite 网页端，`ppwd-desktop/` 是 Electron + Vue 桌面端，二者共享相近的 `src/api`、`src/components`、`src/stores`、`src/utils` 结构。`ppwd-extension/` 是浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup`。`bear-password-index/` 是官网静态页面，截图资源在 `assets/screenshots/`。
+本仓库是 PPWD 本地版 monorepo。`ppwd-desktop/` 是 Electron + React 桌面端，主进程和 preload 位于 `electron/`，渲染端源码位于 `src/`；`ppwd-extension/` 是 React 浏览器扩展，入口分布在 `src/background`、`src/content`、`src/popup` 和 `src/wake`。根目录 `shared/` 存放桌面端与扩展端共用的 UI 资源。服务端、网页端和官网不在当前仓库中。
 
 ## 构建、测试与开发命令
 
-- `npm install --prefix bear-password-web`、`npm install --prefix ppwd-desktop`、`npm install --prefix ppwd-extension`：分别安装前端模块依赖，避免在根目录混装。
-- `npm run build:all`：从根目录聚合构建桌面端、扩展等产物，输出到 `release/`。
-- `npm run build:web`：打包网页端并生成发布 zip。
-- `cd bear-password-server && mvn spring-boot:run`：启动本地后端，默认 API 为 `http://localhost:8080/api`。
-- `cd bear-password-server && mvn package`：构建后端 jar。
-- `cd bear-password-server && mvn test`：运行后端 JUnit/Spring Boot 测试。
-- `cd bear-password-web && npm run dev`、`cd ppwd-desktop && npm run dev`、`cd ppwd-extension && npm run dev`：分别启动对应前端模块开发模式。
-- `npm run typecheck`：在各前端子目录执行 TypeScript/Vue 类型检查。
+- `cd ppwd-desktop && pnpm install`、`cd ppwd-extension && pnpm install`：分别安装桌面端和扩展端依赖。
+- `pnpm run build:all`：从根目录聚合构建桌面端和扩展，产物输出到 `release/`。
+- `cd ppwd-desktop && pnpm run dev`、`cd ppwd-extension && pnpm run dev`：启动对应模块的开发模式。
+- 在桌面端或扩展端目录执行 `pnpm run typecheck` 和 `pnpm run build`：分别进行类型检查和构建。
 
 ## 代码风格与命名约定
 
-Java 使用 4 空格缩进，包名保持 `com.bear.password.*`，按 `controller`、`service`、`mapper`、`entity`、`dto` 分层。Vue/TypeScript 使用 2 空格缩进、单引号、无分号风格；组件文件使用 PascalCase，例如 `PasswordEntryDialog.vue`，组合式函数使用 `useXxx.ts`，Pinia store 按业务命名放在 `src/stores`。
+TypeScript/TSX 使用 2 空格缩进、单引号、无分号；React 组件文件使用 PascalCase，组合式函数使用 `useXxx.ts`，Zustand store 按业务命名放在 `src/stores`。
 
 ## 测试指南
 
-后端测试基于 `spring-boot-starter-test`，测试类放在 `bear-password-server/src/test/java`，命名为 `*Tests.java`。前端当前以 `vue-tsc --noEmit` 做类型验证；修改共享工具、加密、同步、自动填充等关键逻辑时，至少运行受影响模块的 `npm run typecheck` 和 `npm run build`。如果改动跨 `web` 与 `desktop` 的同名文件，两个模块都要验证。
+桌面端和扩展端使用 TypeScript 类型检查与 Node 测试。修改加密、保险库、扩展桥接、自动填充等关键逻辑时，运行受影响模块的 `pnpm run typecheck` 和 `pnpm run build`，并执行相关测试脚本。
 
 ## 提交与 Pull Request 规范
 
@@ -33,7 +29,7 @@ Git 历史采用 Conventional Commits 风格，如 `feat(web): ...`、`fix: ...`
 
 ## Agent 特定说明
 
-保持改动聚焦在目标模块，不要顺手重排生成文件、截图或锁文件。新增功能时优先复用 `bear-password-web` 与 `ppwd-desktop` 中已有的共享结构和命名，避免两端行为漂移。调试扩展时在 `chrome://extensions` 加载 `ppwd-extension/dist`。除发布任务外，不要提交 `release/` 或 `dist/` 产物。
+保持改动聚焦在目标模块，不要顺手重排生成文件、截图或锁文件。桌面端与扩展端存在相似的独立实现时，优先保持各自模块边界并避免行为漂移。调试扩展时在 `chrome://extensions` 加载 `ppwd-extension/dist`。除发布任务外，不要提交 `release/`、`dist/` 或 `out/` 产物。
 
 <!-- ASTRYX:START -->
 Astryx v0.7.11 · 90+ components

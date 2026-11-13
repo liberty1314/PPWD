@@ -3,7 +3,7 @@ import { storage } from './storage'
 /**
  * 主题工具
  * 解析用户偏好并应用到 DOM
- * 新增主题：在 THEME_PRESET_OPTIONS 增加一项，并添加对应 styles/themes/_*.scss
+ * 预设主题列表供旧主题偏好兼容逻辑使用；当前 React 主题样式由 shared/ui tokens 管理。
  */
 
 /** 预设主题 ID */

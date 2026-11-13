@@ -1464,3 +1464,45 @@
     - ppwd-extension/src/popup/ReactApp.tsx
     - ppwd-extension/src/popup/reactPopup.css
     - docs/readme_2611.md
+
+[2026-11-13 14:39] feat(branding): 更新产品图标并清理旧版主题资源
+  - Body: 统一桌面端与扩展端品牌图标，并改进 macOS 构建前的图标生成流程。移除已弃用的桌面图表组件和 SCSS 主题资源，并更新项目说明。
+  - Files:
+    - AGENTS.md
+    - ppwd-desktop/package.json
+    - ppwd-desktop/public/favicon.png
+    - ppwd-desktop/resources/icon.icns
+    - ppwd-desktop/resources/icon.ico
+    - ppwd-desktop/resources/icon.png
+    - ppwd-desktop/resources/tray-icon.png
+    - ppwd-desktop/resources/tray-icon.svg
+    - ppwd-desktop/resources/tray-icon@2x.png
+    - ppwd-desktop/scripts/generate-icons.mjs
+    - ppwd-desktop/src/assets/brand-mark.png
+    - ppwd-desktop/src/components/ui/StatCard.tsx
+    - ppwd-desktop/src/components/ui/chart-primitives.tsx
+    - ppwd-desktop/src/components/ui/dashboard-chart-utils.ts
+    - ppwd-desktop/src/styles/fonts.scss
+    - ppwd-desktop/src/styles/index.scss
+    - ppwd-desktop/src/styles/mixins.scss
+    - ppwd-desktop/src/styles/themes/_bloom.scss
+    - ppwd-desktop/src/styles/themes/_dark.scss
+    - ppwd-desktop/src/styles/themes/_earth.scss
+    - ppwd-desktop/src/styles/themes/_forest.scss
+    - ppwd-desktop/src/styles/themes/_lagoon.scss
+    - ppwd-desktop/src/styles/themes/_light.scss
+    - ppwd-desktop/src/styles/themes/_midnight.scss
+    - ppwd-desktop/src/styles/themes/_mint.scss
+    - ppwd-desktop/src/styles/themes/_noir.scss
+    - ppwd-desktop/src/styles/themes/_ocean.scss
+    - ppwd-desktop/src/styles/themes/_rose.scss
+    - ppwd-desktop/src/styles/themes/_violet.scss
+    - ppwd-desktop/src/styles/themes/_warm.scss
+    - ppwd-desktop/src/styles/variables.scss
+    - ppwd-desktop/src/utils/theme.ts
+    - ppwd-extension/public/icons/icon-128.png
+    - ppwd-extension/public/icons/icon-16.png
+    - ppwd-extension/public/icons/icon-32.png
+    - ppwd-extension/public/icons/icon-48.png
+    - ppwd-extension/public/icons/logo.png
+    - docs/readme_2611.md
