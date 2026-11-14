@@ -10,6 +10,7 @@ import { generatePhoneTokenRecoveryKey, generatePhoneTokenSecret, createPhoneTok
 import { isSixDigitTotp, validateSetupPassword } from './utils/reactGateRules'
 import { Button, TextField } from './ui/primitives'
 import { Form } from './components/ui/Form'
+import { OtpInput } from './components/ui/OtpInput'
 import logoUrl from './assets/brand-mark.png'
 import { LocalDataReset } from './components/LocalDataReset'
 
@@ -256,7 +257,7 @@ export function UnlockPage() {
         {biometricAvailable && biometricEnabled && !fallback
           ? <Button className="react-gate__wide" tone="primary" icon={<Fingerprint size={16} />} onClick={() => void unlockBiometric()} disabled={biometricBusy}>{biometricKind === 'touchId' ? translate('unlock.touchId') : translate('unlock.windowsHello')}</Button>
           : <Form className="react-form" onSubmit={(event) => void submit(event)}>
-            <TextField label={translate('unlock.tokenCode')} inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={busy} />
+            <OtpInput label={translate('unlock.tokenCode')} value={code} onChange={setCode} disabled={busy} />
             {error && <p className="react-form__error" role="alert">{error}</p>}
             <Button type="submit" tone="primary" disabled={busy}>{translate('unlock.totpUnlock')}</Button>
           </Form>}
@@ -378,7 +379,7 @@ export function BindPage() {
     <label className="bp-field react-gate__key-field" htmlFor="manual-token-secret"><span className="bp-field__label">{translate('unlock.manualSecret')}</span><input id="manual-token-secret" className="bp-input react-secret" value={secret} readOnly /></label>
     <Form className="react-form react-gate__form" onSubmit={(event) => void submit(event)}>
       <TextField label={translate('unlock.masterPassword')} type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} disabled={!storageAvailable || busy} />
-      <TextField label={translate('unlock.tokenCode')} inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={!storageAvailable || busy} />
+      <OtpInput label={translate('unlock.tokenCode')} value={code} onChange={setCode} disabled={!storageAvailable || busy} />
       {error && <p className="react-form__error" role="alert">{error}</p>}
       <Button type="submit" tone="primary" disabled={!storageAvailable || busy}>{translate('unlock.verifyBind')}</Button>
     </Form>

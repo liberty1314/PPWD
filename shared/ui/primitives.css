@@ -45,6 +45,14 @@
 .bp-field { display: grid; gap: 6px; min-width: 0; }
 .bp-field__label { color: var(--bp-text-secondary); font-size: 12px; font-weight: 600; }
 .bp-field__description { color: var(--bp-text-muted); font-size: 11px; }
+.bp-otp-field { gap: .5rem; }
+.bp-otp { position: relative; width: min(100%, 19rem); }
+.bp-otp__slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .5rem; }
+.bp-otp__slot { display: grid; aspect-ratio: 1; min-width: 0; place-items: center; border: 1px solid var(--bp-control-border); border-radius: var(--bp-radius-md); background: var(--bp-control-bg); color: var(--bp-text); font-size: 1rem; font-variant-numeric: tabular-nums; font-weight: 650; transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease; }
+.bp-otp__slot[data-active='true'] { border-color: var(--bp-focus); box-shadow: 0 0 0 .125rem color-mix(in srgb, var(--bp-focus) 22%, transparent); }
+.bp-otp__input { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; padding: 0; opacity: 0; color: transparent; caret-color: transparent; cursor: text; }
+.bp-otp[aria-disabled='true'] { opacity: .5; }
+.bp-otp[aria-disabled='true'] .bp-otp__input { cursor: not-allowed; }
 .bp-input {
   width: 100%;
   min-width: 0;

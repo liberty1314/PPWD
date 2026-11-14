@@ -166,50 +166,6 @@
   --bp-menu-item-hover-bg: color-mix(in srgb, var(--bp-accent) 22%, transparent);
 }
 
-:root[data-theme-design='classic'] {
-  --bp-chrome-bg: var(--bp-surface);
-  --bp-chrome-border: var(--bp-border);
-  --bp-chrome-shadow: none;
-  --bp-chrome-backdrop: none;
-  --bp-glass-control-bg: var(--bp-control-bg);
-  --bp-glass-control-border: var(--bp-control-border);
-  --bp-glass-control-hover-bg: var(--bp-control-hover-bg);
-  --bp-glass-control-hover-border: var(--bp-control-hover-border);
-  --bp-glass-control-shadow: none;
-  --bp-glass-control-backdrop: none;
-  --bp-segment-bg: var(--bp-surface-secondary);
-  --bp-segment-active-bg: var(--bp-surface-raised);
-  --bp-segment-backdrop: none;
-  --bp-menu-bg: var(--bp-surface-raised);
-  --bp-menu-border: var(--bp-border);
-  --bp-menu-shadow: var(--bp-shadow);
-  --bp-menu-backdrop: none;
-}
-
-:root[data-theme-design='soft'] {
-  --bp-bg: color-mix(in srgb, var(--bp-accent) 4%, #f6f7f8);
-  --bp-surface-secondary: color-mix(in srgb, var(--bp-accent) 5%, var(--bp-surface));
-  --bp-radius-md: 12px;
-  --bp-card-border: color-mix(in srgb, var(--bp-accent) 10%, var(--bp-border));
-}
-
-:root[data-theme-design='soft'][data-appearance='dark'] {
-  --bp-bg: color-mix(in srgb, var(--bp-accent) 5%, #191d1f);
-  --bp-surface-secondary: color-mix(in srgb, var(--bp-accent) 7%, var(--bp-surface));
-}
-
-:root[data-theme-design='contrast'] {
-  --bp-border: color-mix(in srgb, var(--bp-text) 32%, var(--bp-bg));
-  --bp-border-strong: color-mix(in srgb, var(--bp-text) 54%, var(--bp-bg));
-  --bp-focus: var(--bp-accent);
-  --bp-control-border: var(--bp-border-strong);
-  --bp-card-shadow: none;
-  --bp-chrome-bg: var(--bp-surface);
-  --bp-chrome-border: var(--bp-border-strong);
-  --bp-chrome-shadow: none;
-  --bp-chrome-backdrop: none;
-}
-
 :root[data-accent='blue'] { --bp-accent: var(--bp-accent-blue); --bp-accent-text: #2b5ea8; }
 :root[data-accent='teal'] { --bp-accent: var(--bp-accent-teal); --bp-accent-text: #176d6b; }
 :root[data-accent='green'] { --bp-accent: var(--bp-accent-green); --bp-accent-text: #356943; }

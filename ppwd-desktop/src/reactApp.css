@@ -38,6 +38,9 @@
 .react-page__description, .react-setting-row__copy p, .react-preview-copy p { margin: 0; color: var(--bp-text-secondary); font-size: 13px; }
 .react-settings-tabs-root { position: sticky; z-index: 8; top: 0; display: block; margin: 0 0 18px; border-bottom: 1px solid var(--bp-border); padding: 12px 0 10px; background: var(--bp-bg); }
 .react-settings-tabs { display: flex; min-width: 0; align-items: stretch; gap: 4px; overflow-x: auto; scrollbar-width: thin; }
+.react-settings-tabs > button { min-height: 2.5rem; }
+.react-settings-tab__icon { display: inline-grid; width: 1rem; height: 1rem; flex: 0 0 1rem; place-items: center; line-height: 0; }
+.react-settings-tab__icon > svg { display: block; }
 .react-dashboard__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 18px 0; }
 .react-dashboard__stat-button { min-width: 0; border: 0; padding: 0; background: transparent; text-align: left; cursor: pointer; }
 .react-dashboard__stat-button:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 4px; border-radius: var(--bp-radius-md); }
@@ -79,19 +82,19 @@
 .react-setting-row--toggle { grid-template-columns: minmax(220px, 1fr) auto; }
 .react-setting-row:last-child { border-bottom: 0; }
 .react-setting-row__copy h2, .react-preview-copy h2 { margin: 0 0 4px; font-size: 14px; font-weight: 650; }
-.react-setting-row > .bp-field { max-width: 340px; }
+.react-setting-row > .bp-field { width: 100%; max-width: 21.25rem; justify-self: end; }
+.react-setting-row > .bp-select-field { width: 12rem; max-width: min(100%, 12rem); justify-self: end; }
+.react-settings .react-setting-row > .bp-select-field > button { height: 2.5rem; padding-inline: .75rem; font-size: .8125rem; }
+.react-settings .react-setting-row > .bp-field input.bp-input { height: 2.5rem; min-height: 2.5rem; padding-inline: .75rem; font-size: .8125rem; }
 .react-settings--stack .react-setting-row--stack { grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .react-settings--stack .react-setting-row--stack > .bp-field { width: 100%; max-width: 420px; }
 .react-backup-settings .react-setting-row--stack { grid-template-columns: minmax(0, 1fr) minmax(240px, .8fr); align-items: center; gap: 16px; padding: 20px 0 24px; }
 .react-backup-settings .react-setting-row__copy { display: grid; gap: 6px; }
 .react-backup-settings .react-setting-row__copy p { max-width: 68ch; line-height: 1.6; }
 .react-backup-settings .react-setting-row--stack > .bp-field { gap: 7px; }
-.react-backup-actions-row { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(240px, .8fr); align-items: center; gap: 24px; border-bottom: 1px solid var(--bp-border); padding: 18px 0 20px; }
-.react-backup-actions-row:has(.react-backup-import-action) { grid-template-columns: minmax(0, 1fr); }
-.react-backup-import-action { display: grid; justify-items: start; gap: 5px; }
-.react-backup-import-action small { max-width: 38ch; color: var(--bp-text-muted); font-size: 10px; line-height: 1.45; }
+.react-backup-actions-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; border-bottom: 1px solid var(--bp-border); padding: 18px 0 20px; }
 .react-backup-actions-row .react-setting-row__copy p { max-width: 68ch; margin: 0; color: var(--bp-text-secondary); font-size: 12px; line-height: 1.6; }
-.react-backup-settings__actions { gap: 10px; justify-content: flex-start; }
+.react-backup-settings .react-backup-settings__actions { align-items: flex-start; gap: 10px; justify-content: flex-start; }
 .react-backup-settings > .react-form__error { margin: 0 0 16px; }
 .react-subsection { display: grid; gap: 10px; margin-top: 18px; border-top: 1px solid var(--bp-border); padding: 18px 0 4px; }
 .react-subsection > h2 { margin: 0; color: var(--bp-text); font-size: 14px; font-weight: 650; }
@@ -112,6 +115,9 @@
 .react-security-form { display: grid; gap: 12px; border-top: 1px solid var(--bp-border); padding: 16px 0 18px; }
 .react-security-form__heading { display: grid; gap: 5px; }
 .react-security-form__heading h3 { margin: 0; color: var(--bp-text); font-size: 13px; font-weight: 650; }
+.react-security-form .react-inline-form { grid-template-columns: minmax(0, 1fr); max-width: 22rem; align-items: stretch; }
+.react-security-form .react-inline-form > .bp-field, .react-security-form .react-inline-form .bp-otp { width: 100%; }
+.react-security-form .react-inline-form > .bp-button { grid-column: 1; justify-self: start; }
 .react-backup-danger { margin-top: 0; gap: 0; }
 .react-backup-danger { border: 1px solid color-mix(in srgb, var(--bp-danger) 28%, var(--bp-border)); border-radius: var(--bp-radius-md); padding: 14px; background: color-mix(in srgb, var(--bp-danger-subtle) 28%, transparent); }
 .react-backup-danger > h2 { margin-bottom: 4px; }
@@ -224,6 +230,8 @@
   .react-gate-main { padding: 32px 20px; }
   .react-workspace { padding: 30px 16px 22px; }
   .react-setting-row, .react-preview-row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .react-setting-row > .bp-field { justify-self: start; max-width: min(100%, 26.25rem); }
+  .react-setting-row > .bp-select-field { justify-self: start; max-width: min(100%, 12rem); }
   .react-backup-actions-row, .react-backup-danger__row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .react-backup-settings .react-setting-row--stack { grid-template-columns: minmax(0, 1fr); }
   .react-inline-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }

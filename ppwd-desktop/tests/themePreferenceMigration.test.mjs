@@ -4,7 +4,6 @@ import { migrateThemePreferences } from '../src/utils/themePreferenceMigration.t
 
 const defaults = {
   appearanceMode: 'system',
-  themeDesign: 'liquid',
   accentColor: 'blue'
 }
 
@@ -14,22 +13,23 @@ test('legacy appearance choices migrate without discarding valid current fields'
   assert.deepEqual(migrateThemePreferences({ theme: 'light' }), { ...defaults, appearanceMode: 'light' })
 })
 
-test('valid theme preference fields survive migration', () => {
-  assert.deepEqual(migrateThemePreferences({
-    appearanceMode: 'dark',
-    themeDesign: 'contrast',
-    accentColor: 'purple'
-  }), {
-    appearanceMode: 'dark',
-    themeDesign: 'contrast',
-    accentColor: 'purple'
-  })
+test('legacy theme design is ignored while appearance and accent preferences survive', () => {
+  for (const themeDesign of ['classic', 'liquid', 'soft', 'contrast']) {
+    assert.deepEqual(migrateThemePreferences({
+      appearanceMode: 'dark',
+      themeDesign,
+      accentColor: 'purple'
+    }), {
+      appearanceMode: 'dark',
+      accentColor: 'purple'
+    })
+  }
 })
 
 test('invalid preference fields use defaults independently', () => {
   assert.deepEqual(migrateThemePreferences({
     appearanceMode: 'sepia',
-    themeDesign: 'unknown',
+    themeDesign: 'soft',
     accentColor: 'pink'
   }), defaults)
 })

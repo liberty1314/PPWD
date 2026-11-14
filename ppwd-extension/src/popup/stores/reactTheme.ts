@@ -11,7 +11,6 @@ interface PopupThemeState extends ThemePreferences {
 
 const STORAGE_KEYS = {
   appearanceMode: 'bear_extension_appearance_mode',
-  themeDesign: 'bear_extension_theme_design',
   accentColor: 'bear_extension_accent_color'
 } as const
 let initialization: Promise<void> | null = null
@@ -21,7 +20,7 @@ function applyTheme(preferences: ThemePreferences, systemDark: boolean): void {
   root.dataset.appearance = preferences.appearanceMode === 'system'
     ? systemDark ? 'dark' : 'light'
     : preferences.appearanceMode
-  root.dataset.themeDesign = preferences.themeDesign
+  root.dataset.themeDesign = 'liquid'
   root.dataset.accent = preferences.accentColor
 }
 
@@ -33,21 +32,20 @@ export const usePopupThemeStore = create<PopupThemeState>((set, get) => ({
     if (get().initialized) return Promise.resolve()
     if (initialization) return initialization
     initialization = (async () => {
-    const keys = [...Object.values(STORAGE_KEYS), 'bear_extension_theme']
+    const keys = [...Object.values(STORAGE_KEYS), 'bear_extension_theme', 'bear_extension_theme_design']
     const stored = await chrome.storage.local.get(keys)
     const preferences = migrateThemePreferences({
       theme: stored['bear_extension_theme'],
       appearanceMode: stored[STORAGE_KEYS.appearanceMode],
-      themeDesign: stored[STORAGE_KEYS.themeDesign],
+      themeDesign: stored['bear_extension_theme_design'],
       accentColor: stored[STORAGE_KEYS.accentColor]
     })
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     await chrome.storage.local.set({
       [STORAGE_KEYS.appearanceMode]: preferences.appearanceMode,
-      [STORAGE_KEYS.themeDesign]: preferences.themeDesign,
       [STORAGE_KEYS.accentColor]: preferences.accentColor
     })
-    await chrome.storage.local.remove('bear_extension_theme')
+    await chrome.storage.local.remove(['bear_extension_theme', 'bear_extension_theme_design'])
     applyTheme(preferences, systemDark)
     set({ ...preferences, systemDark, initialized: true })
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
@@ -62,7 +60,6 @@ export const usePopupThemeStore = create<PopupThemeState>((set, get) => ({
     const preferences = migrateThemePreferences({
       theme,
       appearanceMode: desktopPreferences?.appearanceMode,
-      themeDesign: desktopPreferences?.themeDesign,
       accentColor: desktopPreferences?.accentColor
     })
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -70,9 +67,8 @@ export const usePopupThemeStore = create<PopupThemeState>((set, get) => ({
     set({ ...preferences, systemDark, initialized: true })
     void chrome.storage.local.set({
       [STORAGE_KEYS.appearanceMode]: preferences.appearanceMode,
-      [STORAGE_KEYS.themeDesign]: preferences.themeDesign,
       [STORAGE_KEYS.accentColor]: preferences.accentColor
     })
-    void chrome.storage.local.remove('bear_extension_theme')
+    void chrome.storage.local.remove(['bear_extension_theme', 'bear_extension_theme_design'])
   },
 }))

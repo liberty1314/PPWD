@@ -43,7 +43,6 @@ export function extensionBridgeHealth(): ExtensionBridgeHealth {
   const themePreferences = migrateThemePreferences({
     theme: storage.get<unknown>('theme'),
     appearanceMode: storage.get<unknown>('appearanceMode'),
-    themeDesign: storage.get<unknown>('themeDesign'),
     accentColor: storage.get<unknown>('accentColor')
   })
 

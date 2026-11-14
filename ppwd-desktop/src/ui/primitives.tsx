@@ -26,7 +26,7 @@ export function SelectField({ label, labelHidden = false, children, id, value, d
     if (!isValidElement<SelectOptionProps>(child) || child.type !== 'option') return []
     return [child]
   })
-  return <SpringSelect id={id} label={label} labelHidden={labelHidden} value={value} disabled={disabled} onChange={onValueChange} options={options.map((option) => ({ value: String(option.props.value ?? option.props.children ?? ''), label: String(option.props.children ?? ''), disabled: option.props.disabled }))} />
+  return <SpringSelect className="bp-select-field" id={id} label={label} labelHidden={labelHidden} value={value} disabled={disabled} onChange={onValueChange} options={options.map((option) => ({ value: String(option.props.value ?? option.props.children ?? ''), label: String(option.props.children ?? ''), disabled: option.props.disabled }))} />
 }
 
 export const Dialog = DialogPrimitive.Root

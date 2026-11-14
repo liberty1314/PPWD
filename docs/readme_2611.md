@@ -1506,3 +1506,27 @@
     - ppwd-extension/public/icons/icon-48.png
     - ppwd-extension/public/icons/logo.png
     - docs/readme_2611.md
+
+[2026-11-14 18:45] feat(ui): 新增动态验证码输入并统一主题设置
+  - Body: 新增可复用的六位动态验证码输入控件，并用于解锁、绑定、重绑和敏感操作验证；优化设置控件布局及下拉菜单的可视区域适配。移除主题风格选择并迁移旧偏好，同时保留外观模式与强调色设置。
+  - Files:
+    - ppwd-desktop/index.html
+    - ppwd-desktop/src/ReactAuthPages.tsx
+    - ppwd-desktop/src/ReactSettingsPage.tsx
+    - ppwd-desktop/src/components/ui/AnimatedTabs.tsx
+    - ppwd-desktop/src/components/ui/OtpInput.tsx
+    - ppwd-desktop/src/components/ui/SpringSelect.tsx
+    - ppwd-desktop/src/extensionBridge/handlers.ts
+    - ppwd-desktop/src/locales/en.ts
+    - ppwd-desktop/src/locales/ja.ts
+    - ppwd-desktop/src/locales/zh-CN.ts
+    - ppwd-desktop/src/reactApp.css
+    - ppwd-desktop/src/stores/reactTheme.ts
+    - ppwd-desktop/src/ui/primitives.tsx
+    - ppwd-desktop/tests/themePreferenceMigration.test.mjs
+    - ppwd-extension/src/popup/stores/reactTheme.ts
+    - shared/ui/primitives.css
+    - shared/ui/themeMigration.ts
+    - shared/ui/themeTypes.ts
+    - shared/ui/tokens.css
+    - docs/readme_2611.md

@@ -4,7 +4,7 @@ import { migrateThemePreferences } from '@/utils/themePreferenceMigration'
 import { DEFAULT_THEME_PREFERENCES, type ThemePreferences } from '../../../shared/ui/themeTypes'
 import { desktopThemeAdapter } from '@/platform/desktopThemeAdapter'
 
-const MIGRATION_VERSION = 2
+const MIGRATION_VERSION = 3
 let initialization: Promise<void> | null = null
 
 interface ReactThemeState extends ThemePreferences {
@@ -19,13 +19,12 @@ function applyTheme(preferences: ThemePreferences, systemDark: boolean): void {
   root.dataset.appearance = preferences.appearanceMode === 'system'
     ? systemDark ? 'dark' : 'light'
     : preferences.appearanceMode
-  root.dataset.themeDesign = preferences.themeDesign
+  root.dataset.themeDesign = 'liquid'
   root.dataset.accent = preferences.accentColor
 }
 
 function persistTheme(preferences: ThemePreferences): void {
   storage.set('appearanceMode', preferences.appearanceMode)
-  storage.set('themeDesign', preferences.themeDesign)
   storage.set('accentColor', preferences.accentColor)
   storage.set('theme_migration_version', MIGRATION_VERSION)
 }
@@ -53,6 +52,7 @@ export const useReactThemeStore = create<ReactThemeState>((set, get) => ({
     })
     const systemDark = await desktopThemeAdapter.isSystemDark().catch(() => false)
     storage.remove('theme')
+    storage.remove('themeDesign')
     persistTheme(preferences)
     applyTheme(preferences, systemDark)
     set({ ...preferences, systemDark, initialized: true })

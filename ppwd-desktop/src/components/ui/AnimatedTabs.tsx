@@ -97,7 +97,7 @@ export const AnimatedTabs: React.FC<AnimatedTabsProps> = ({
                 />
               )}
               <span className="relative z-10 flex items-center gap-1.5">
-                {tab.icon && <span>{tab.icon}</span>}
+                {tab.icon && <span className="react-settings-tab__icon" aria-hidden="true">{tab.icon}</span>}
                 {tab.label}
                 {tab.badge && (
                   <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-hover border border-border text-text-secondary dark:bg-[#141414] dark:border-[#1F1F1F] dark:text-[#A1A1A1]">

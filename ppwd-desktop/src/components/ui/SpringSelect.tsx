@@ -58,6 +58,8 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
   const generatedId = useId();
   const rootId = id ?? `spring-select-${generatedId}`;
   const [open, setOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
+  const [menuMaxHeight, setMenuMaxHeight] = useState(240);
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -66,6 +68,36 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
   const isControlled = value !== undefined;
   const current = isControlled ? value : internalValue;
   const currentOption = options.find((o) => o.value === current);
+
+  const openMenu = () => {
+    const root = rootRef.current;
+    if (root) {
+      const rootRect = root.getBoundingClientRect();
+      let clipTop = 0;
+      let clipBottom = window.innerHeight;
+      let ancestor = root.parentElement;
+
+      while (ancestor && ancestor !== document.body) {
+        const overflowY = window.getComputedStyle(ancestor).overflowY;
+        if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden' || overflowY === 'clip') {
+          const rect = ancestor.getBoundingClientRect();
+          clipTop = Math.max(clipTop, rect.top);
+          clipBottom = Math.min(clipBottom, rect.bottom);
+        }
+        ancestor = ancestor.parentElement;
+      }
+
+      const spaceAbove = Math.max(0, rootRect.top - clipTop - 8);
+      const spaceBelow = Math.max(0, clipBottom - rootRect.bottom - 8);
+      const desiredHeight = Math.min(240, options.length * 36 + 8);
+      const placeAbove = spaceBelow < desiredHeight && spaceAbove > spaceBelow;
+      const availableSpace = placeAbove ? spaceAbove : spaceBelow;
+      setOpenUpward(placeAbove);
+      setMenuMaxHeight(Math.max(64, Math.min(240, availableSpace)));
+    }
+
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -80,11 +112,20 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
         triggerRef.current?.focus();
       }
     };
+    const closeForScroll = (event: Event) => {
+      if (rootRef.current?.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+    const closeForResize = () => setOpen(false);
     document.addEventListener('mousedown', onDocClick);
     document.addEventListener('keydown', onKey);
+    document.addEventListener('scroll', closeForScroll, true);
+    window.addEventListener('resize', closeForResize);
     return () => {
       document.removeEventListener('mousedown', onDocClick);
       document.removeEventListener('keydown', onKey);
+      document.removeEventListener('scroll', closeForScroll, true);
+      window.removeEventListener('resize', closeForResize);
     };
   }, [open]);
 
@@ -101,7 +142,7 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
     if (disabled) return;
     if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      setOpen(true);
+      openMenu();
       setActiveIndex((i) => (i < 0 ? options.findIndex((o) => o.value === current) : i));
     }
   };
@@ -137,7 +178,11 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => !disabled && setOpen((o) => !o)}
+        onClick={() => {
+          if (disabled) return;
+          if (open) setOpen(false);
+          else openMenu();
+        }}
         onKeyDown={handleTriggerKey}
         className={cn(
           'relative w-full h-10 px-3.5 pr-9 text-xs rounded-lg border outline-none text-left flex items-center justify-between transition-colors duration-150 focus-ring',
@@ -170,14 +215,18 @@ export const SpringSelect: React.FC<SpringSelectProps> = ({
             role="listbox"
             tabIndex={-1}
             onKeyDown={handleListKey}
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            initial={{ opacity: 0, y: openUpward ? 6 : -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            exit={{ opacity: 0, y: openUpward ? 6 : -4, scale: 0.98 }}
             transition={motionTransitions.springSnappy}
             // The container itself rides the spring: a tiny upward slide that
             // "settles" with the snappy spring, plus a slight overshoot via the
             // scale: 0.98 -> 1 motion.
-            className="absolute z-50 left-0 right-0 mt-1.5 max-h-60 overflow-auto py-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-elevated)] focus:outline-none"
+            className={cn(
+              'absolute z-50 left-0 right-0 overflow-auto py-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-elevated)] focus:outline-none',
+              openUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+            )}
+            style={{ maxHeight: menuMaxHeight }}
           >
             {options.map((opt, idx) => {
               const selected = opt.value === current;
