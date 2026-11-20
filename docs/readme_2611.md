@@ -1530,3 +1530,26 @@
     - shared/ui/themeTypes.ts
     - shared/ui/tokens.css
     - docs/readme_2611.md
+
+[2026-11-20 09:12] feat(vault): 提取详情组件并统一网站匹配逻辑
+  - Body: 将保险库条目详情抽取为独立组件，优化列表标签与扩展操作菜单。把桌面端和扩展端重复的网站匹配逻辑迁移到共享模块，并添加匹配测试和发布说明。
+  - Files:
+    - AGENTS.md
+    - README.md
+    - package.json
+    - ppwd-desktop/src/ReactApp.tsx
+    - ppwd-desktop/src/ReactDashboardPage.tsx
+    - ppwd-desktop/src/ReactVaultWorkspace.tsx
+    - ppwd-desktop/src/components/vault/EntryDetail.tsx
+    - ppwd-desktop/src/extensionBridge/websiteMatch.ts
+    - ppwd-desktop/src/reactApp.css
+    - ppwd-desktop/src/reactVault.css
+    - ppwd-extension/src/locales/en.ts
+    - ppwd-extension/src/locales/ja.ts
+    - ppwd-extension/src/locales/zh-CN.ts
+    - ppwd-extension/src/popup/ReactApp.tsx
+    - ppwd-extension/src/popup/reactPopup.css
+    - ppwd-extension/src/shared/utils/websiteMatch.ts
+    - shared/ui/websiteMatch.test.mjs
+    - shared/ui/websiteMatch.ts
+    - docs/readme_2611.md

@@ -15,9 +15,18 @@
 - 浏览器扩展：连接已解锁的桌面端，辅助填写网页登录信息。
 - 本地版面向全新创建，不支持旧版数据迁移。
 
+## 下载
+
+从 [GitHub Releases](https://github.com/liberty1314/PPWD/releases/latest) 下载最新版本 **PPWD 26.9.9**：
+
+- **macOS Apple Silicon**：下载 `PPWD.dmg`
+- **Windows x64**：下载 `PPWD-Setup.exe`
+
+安装包尚未进行代码签名，首次打开时 macOS 或 Windows 可能显示安全提示。其他平台暂未提供安装包。
+
 ## 开发环境
 
-- Node.js 18 或更新版本
+- Node.js 20 或更新版本
 - pnpm
 
 安装桌面端依赖并启动开发模式：
@@ -62,7 +71,3 @@ pnpm run build
 - 主密码和保险库数据保存在本机；本地版不连接云端服务。
 - 扩展只从已解锁的桌面端读取条目，不单独保存主密码或条目明文。
 - 生物识别仅用于本机快捷解锁，不能替代手机令牌验证。
-
-## 许可证
-
-MIT · 作者：薛伟同学

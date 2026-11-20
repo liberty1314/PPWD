@@ -100,6 +100,7 @@ const messages: MessageDict = {
   'credential.share': '分享',
   'credential.favorite': '收藏',
   'credential.unfavorite': '取消收藏',
+  'credential.moreActions': '更多操作',
   'credential.delete': '删除',
   'credential.noUsername': '（无用户名）',
   'credential.totpView': '查看验证码',

@@ -32,7 +32,7 @@ Git 历史采用 Conventional Commits 风格，如 `feat(web): ...`、`fix: ...`
 保持改动聚焦在目标模块，不要顺手重排生成文件、截图或锁文件。桌面端与扩展端存在相似的独立实现时，优先保持各自模块边界并避免行为漂移。调试扩展时在 `chrome://extensions` 加载 `ppwd-extension/dist`。除发布任务外，不要提交 `release/`、`dist/` 或 `out/` 产物。
 
 <!-- ASTRYX:START -->
-Astryx v0.7.11 · 90+ components
+Astryx v0.7.11 · 174 components
 CLI: run every command as `astryx <cmd>` (shown below as `astryx ...`).
 
 SETUP (once, in app entry e.g. main.tsx) — without these, components render unstyled:

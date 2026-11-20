@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { ArrowLeft, ArrowUpRight, CircleAlert, ExternalLink, Eye, EyeOff, Globe2, KeyRound, LoaderCircle, Pencil, Plus, RefreshCw, Search, Settings2, Share2, ShieldCheck, Star, Trash2 } from 'lucide-react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { ArrowLeft, ArrowUpRight, CircleAlert, ExternalLink, Eye, EyeOff, Globe2, KeyRound, LoaderCircle, MoreHorizontal, Pencil, Plus, RefreshCw, Search, Settings2, Share2, ShieldCheck, Star, Trash2 } from 'lucide-react'
 import type { FillCredential } from '@/shared/types'
 import { t as translate } from '@/locales'
 import { PASSWORD_TITLE_MAX_LENGTH } from '@/shared/constants/vaultFieldLimits'
@@ -124,13 +125,19 @@ function CredentialRow({ credential }: { credential: FillCredential }) {
   }
 
   return <article className="popup-credential">
-    <PopupButton className="popup-credential__main" type="button" title={t('credential.autofill')} onClick={() => void state.autofill(credential.id)}><strong>{credential.title}</strong><span>{credential.username || t('credential.noUsername')}</span></PopupButton>
+    <PopupButton className="popup-credential__main" type="button" title={t('credential.autofill')} aria-label={`${t('credential.autofill')}: ${credential.title}`} onClick={() => void state.autofill(credential.id)}><strong>{credential.title}</strong><span>{credential.username || t('credential.noUsername')}</span></PopupButton>
     <div className="popup-credential__actions">
       {credential.authenticator && <div className="popup-totp"><PopupButton type="button" className="popup-icon-button popup-totp__trigger" title={t('credential.totpView')} aria-label={t('credential.totpView')} onClick={() => void copyTotp()}><ShieldCheck size={15} /></PopupButton><div className="popup-totp__popover" role="tooltip"><PopupButton type="button" onClick={() => void copyTotp()} title={t('credential.totpCopy')}><code>{totp?.code.match(/.{1,3}/g)?.join(' ') ?? '------'}</code><span>{totp?.remainingSeconds ?? '--'}s</span></PopupButton></div></div>}
-      <PopupButton type="button" className="popup-icon-button" title={t('credential.edit')} aria-label={t('credential.edit')} onClick={() => state.openEdit(credential)}><Pencil size={14} /></PopupButton>
-      <PopupButton type="button" className="popup-icon-button" title={t('credential.share')} aria-label={t('credential.share')} onClick={() => void state.shareCredential(credential)}><Share2 size={15} /></PopupButton>
       <PopupButton type="button" className={`popup-icon-button ${credential.favorite ? 'is-favorite' : ''}`} title={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} aria-label={t(credential.favorite ? 'credential.unfavorite' : 'credential.favorite')} onClick={() => void state.toggleFavorite(credential)}><Star size={15} fill={credential.favorite ? 'currentColor' : 'none'} /></PopupButton>
-      <PopupButton type="button" className="popup-icon-button popup-icon-button--danger" title={t('credential.delete')} aria-label={t('credential.delete')} onClick={() => state.requestDelete(credential)}><Trash2 size={15} /></PopupButton>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild><PopupButton type="button" className="popup-icon-button" title={t('credential.moreActions')} aria-label={t('credential.moreActions')}><MoreHorizontal size={16} /></PopupButton></DropdownMenu.Trigger>
+        <DropdownMenu.Portal><DropdownMenu.Content className="bp-menu popup-actions-menu" align="end" sideOffset={4}>
+          <DropdownMenu.Item className="popup-actions-menu__item" onSelect={() => state.openEdit(credential)}><Pencil size={14} />{t('credential.edit')}</DropdownMenu.Item>
+          <DropdownMenu.Item className="popup-actions-menu__item" onSelect={() => void state.shareCredential(credential)}><Share2 size={14} />{t('credential.share')}</DropdownMenu.Item>
+          <DropdownMenu.Separator className="popup-actions-menu__separator" />
+          <DropdownMenu.Item className="popup-actions-menu__item popup-actions-menu__item--danger" onSelect={() => state.requestDelete(credential)}><Trash2 size={14} />{t('credential.delete')}</DropdownMenu.Item>
+        </DropdownMenu.Content></DropdownMenu.Portal>
+      </DropdownMenu.Root>
     </div>
   </article>
 }

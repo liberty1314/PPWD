@@ -27,8 +27,12 @@
 .react-vault__icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 7px; background: color-mix(in srgb, var(--entry-color) 18%, var(--bp-card-bg)); color: var(--entry-color); }
 .react-vault__item-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
 .react-vault__item-copy strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
-.react-vault__item-copy small { overflow: hidden; color: var(--bp-text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.react-vault__item-copy .react-vault__item-type { color: var(--bp-accent-text); font-size: 10px; }
+.react-vault__item-copy > small { overflow: hidden; color: var(--bp-text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.react-vault__item-copy .react-vault__item-meta { display: flex; min-width: 0; align-items: center; gap: 5px; overflow: hidden; white-space: nowrap; }
+.react-vault__item-copy .react-vault__item-type { flex: 0 1 auto; color: var(--bp-text-muted); font-size: 10px; }
+.react-vault__item-copy .react-vault__item-label, .react-vault__item-copy .react-vault__item-label-count { min-width: 0; overflow: hidden; border: 1px solid var(--bp-border); border-radius: 4px; padding: 1px 5px; color: var(--bp-text-secondary); font-size: 10px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.react-vault__item-copy .react-vault__item-label { max-width: 88px; flex: 0 1 auto; }
+.react-vault__item-copy .react-vault__item-label-count { flex: 0 0 auto; color: var(--bp-text-muted); }
 .react-vault__item-more { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--bp-text-muted); cursor: pointer; opacity: 0; }
 .react-vault__item:hover .react-vault__item-more, .react-vault__item:focus-within .react-vault__item-more { opacity: 1; }
 .react-vault__item-more:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 1px; opacity: 1; }

@@ -3,6 +3,7 @@ html, body, #app { width: 380px; min-width: 320px; height: 560px; min-height: 48
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
 button, input { font: inherit; }
 button { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 2px; }
 
 .popup-logo { width: 25px; height: 25px; object-fit: contain; flex: 0 0 auto; }
 .popup-logo--lg { width: 54px; height: 54px; }
@@ -72,6 +73,12 @@ button { color: inherit; }
 .popup-credential__main span { color: var(--bp-text-muted); font-size: 11px; }
 .popup-credential__actions { display: flex; flex: 0 0 auto; align-items: center; gap: 1px; }
 .popup-credential__actions .popup-icon-button { width: 32px; height: 32px; flex-basis: 32px; }
+.popup-actions-menu { z-index: 90; min-width: 146px; }
+.popup-actions-menu__item { gap: 8px; color: var(--bp-text-secondary); font-size: 11px; }
+.popup-actions-menu__item svg { flex: none; color: var(--bp-text-muted); }
+.popup-actions-menu__item--danger { color: var(--bp-danger); }
+.popup-actions-menu__item--danger svg { color: inherit; }
+.popup-actions-menu__separator { height: 1px; margin: 4px 5px; background: var(--bp-border); }
 .popup-totp { position: relative; }
 .popup-totp__trigger { color: var(--bp-success); }
 .popup-totp__popover { position: absolute; z-index: 10; top: 34px; right: -15px; visibility: hidden; border: 1px solid var(--bp-menu-border); border-radius: var(--bp-radius-md); padding: 7px; background: var(--bp-menu-bg); box-shadow: var(--bp-menu-shadow); -webkit-backdrop-filter: var(--bp-menu-backdrop); backdrop-filter: var(--bp-menu-backdrop); opacity: 0; transform: translateY(-3px); transition: opacity .12s ease, transform .12s ease, visibility .12s ease; }

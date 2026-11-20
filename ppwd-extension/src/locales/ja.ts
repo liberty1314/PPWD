@@ -101,6 +101,7 @@ const messages: MessageDict = {
   'credential.share': '共有',
   'credential.favorite': 'お気に入り',
   'credential.unfavorite': 'お気に入り解除',
+  'credential.moreActions': 'その他の操作',
   'credential.delete': '削除',
   'credential.noUsername': '（ユーザー名なし）',
   'credential.totpView': '認証コードを表示',

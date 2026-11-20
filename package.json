@@ -4,6 +4,7 @@
   "description": "PPWD monorepo",
   "scripts": {
     "build:all": "node scripts/build-all.mjs",
+    "test:website-match": "node --experimental-strip-types --test shared/ui/websiteMatch.test.mjs",
     "build:mac": "node scripts/build-all.mjs --mac",
     "build:win": "node scripts/build-all.mjs --win",
     "build:extension": "node scripts/build-all.mjs --extension"

@@ -14,7 +14,7 @@
 .react-brand img { grid-row: span 2; width: 30px; height: 30px; }
 .react-brand small { color: var(--bp-text-muted); font-size: 11px; font-weight: 500; }
 .react-sidebar__status { display: flex; align-items: center; gap: 8px; margin-top: auto; border-top: 1px solid var(--bp-border); padding: 13px 7px 0; color: var(--bp-text-muted); font-size: 11px; }
-.react-library-sidebar { grid-row: 2; height: 100% !important; margin-top: 0; border-color: var(--bp-chrome-border) !important; background: var(--bp-chrome-bg) !important; box-shadow: var(--bp-chrome-shadow); -webkit-backdrop-filter: var(--bp-chrome-backdrop); backdrop-filter: var(--bp-chrome-backdrop); }
+.react-library-sidebar { grid-row: 2; height: auto !important; min-height: 0; margin-top: 0; border-color: var(--bp-chrome-border) !important; background: var(--bp-chrome-bg) !important; box-shadow: var(--bp-chrome-shadow); -webkit-backdrop-filter: var(--bp-chrome-backdrop); backdrop-filter: var(--bp-chrome-backdrop); }
 .bp-sidebar-panel { border-color: var(--bp-chrome-border); background: var(--bp-chrome-bg); color: var(--bp-text); }
 .bp-sidebar-panel button:focus-visible { outline: 2px solid var(--bp-focus); outline-offset: 2px; }
 .bp-sidebar-overlay { background: color-mix(in srgb, var(--bp-text) 42%, transparent); }
@@ -67,7 +67,6 @@
 .react-dashboard__entry-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .react-dashboard__empty { margin: 14px 0 0; color: var(--bp-text-muted); font-size: 12px; }
 .react-dashboard__security-status { display: flex; align-items: center; gap: 8px; margin: 20px 0 12px; color: var(--bp-text); font-size: 12px; }
-.react-dashboard__security > .bp-button { margin-top: 14px; }
 .react-settings-content { min-width: 0; }
 .react-settings { border-bottom: 1px solid var(--bp-border); }
 .react-setting-group { border-bottom: 1px solid var(--bp-border); }

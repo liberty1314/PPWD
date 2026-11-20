@@ -134,7 +134,7 @@ function ReactShellRoutes() {
       toggleLabel={translate('sidebar.collapse')}
       expandLabel={translate('sidebar.expand')}
       header={<div className="react-brand"><img src={logoUrl} alt="" /><span>PPWD</span><small>{translate('unlock.localVault')}</small></div>}
-      footer={<div className="react-sidebar__status"><span className="react-status-dot" />{translate('dashboard.vaultProtected')}</div>}
+      footer={<div className="react-sidebar__status" aria-label={translate('dashboard.vaultProtected')}><span className="react-status-dot" aria-hidden="true" /></div>}
     />
     <div ref={workspaceRef} className={`react-workspace ${['/vault', '/favorites', '/recent'].includes(location.pathname) ? 'react-workspace--vault' : ''}`}><Routes><Route path="/" element={<ReactDashboardPage />} /><Route path="/vault" element={<ReactVaultWorkspace mode="vault" />} /><Route path="/favorites" element={<ReactVaultWorkspace mode="favorites" />} /><Route path="/recent" element={<ReactVaultWorkspace mode="recent" />} /><Route path="/security" element={<ReactSecurityCenterPage />} /><Route path="/settings/:section" element={<SettingsPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<ReactDashboardPage />} /></Routes></div>
   </div>

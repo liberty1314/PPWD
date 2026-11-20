@@ -101,6 +101,7 @@ const messages: MessageDict = {
   'credential.share': 'Share',
   'credential.favorite': 'Favorite',
   'credential.unfavorite': 'Unfavorite',
+  'credential.moreActions': 'More actions',
   'credential.delete': 'Delete',
   'credential.noUsername': '(no username)',
   'credential.totpView': 'View verification code',
